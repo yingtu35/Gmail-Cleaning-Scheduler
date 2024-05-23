@@ -6,21 +6,30 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx app/drizzle/migrate.ts"
   },
   "dependencies": {
-    "react": "^18",
-    "react-dom": "^18",
-    "next": "14.2.3"
+    "@neondatabase/serverless": "^0.9.3",
+    "clsx": "^2.1.1",
+    "dotenv-flow": "^4.1.0",
+    "drizzle-orm": "^0.30.10",
+    "next": "14.2.3",
+    "next-auth": "^5.0.0-beta.18",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsx": "^4.11.0"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.3"
+    "@types/node": "^20.12.12",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
+    "drizzle-kit": "^0.21.2",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.3",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.4.5"
   }
 }
