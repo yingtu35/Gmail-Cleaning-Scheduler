@@ -1,3 +1,6 @@
+import TaskForm from "./components/tasks/create-form";
+import TaskTable from "./components/tasks/table";
+
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -6,6 +9,9 @@ export default function Home() {
         <p className="text-center">
           The best app for cleaning up your Gmail inbox.
         </p>
+        <TaskForm />
+        <br/>
+        <TaskTable />
       </div>
     </main>
   );

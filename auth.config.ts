@@ -1,6 +1,8 @@
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
-import github from "next-auth/providers/github";
+import { UserInDB } from "@/app/lib/definitions";
+import { epochToDate } from "@/app/utils/date";
+import { createUserOnSignIn } from "@/app/lib/actions";
 
 export const autoConfig = {
   providers: [
@@ -8,30 +10,57 @@ export const autoConfig = {
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
-    }),
+      authorization: {
+        params: { 
+          access_type: "offline", 
+          prompt: "consent", 
+          scope: "openid email profile https://mail.google.com/"
+      }
+    }}),
   ],
   // pages: {
   //   signIn: "/", // ? Redirect to home page
   // },
   callbacks: {
-    // async signIn({ user, account, profile }) {
-    //   // console.log('signIn', user, account, profile);
-    //   return true;
-    // },
+    /* Use the signIn() callback to control if a user is allowed to sign in. */
+    async signIn({ user, account, profile }) {
+      // console.log('signIn', account);
+      // reject sign in if email is not verified
+      if (account?.email_verified === false) {
+        return false;
+      }
+      if (!user.email || !user.name) {
+        return false;
+      }
+      const newUser: UserInDB = {
+        name: user.name,
+        email: user.email,
+        image: user.image as string,
+        accessToken: account?.access_token as string,
+        expiresAt: epochToDate(account?.expires_at),
+        refreshToken: account?.refresh_token,
+      };
+      createUserOnSignIn(newUser);
+      return true;
+    },
+
+    /* This callback is called whenever a JSON Web Token is created. returned value will be encrypted, and it is stored in a cookie called "authjs.session-token" */
     // async jwt({ token, account }) {
-    //   console.log('jwt', token, account);
+    //   console.log('jwt', account);
     //   if (account) {
     //     token = Object.assign({}, token, { access_token: account.access_token });
     //   }
     //   return token;
     // },
-    async session({ session, token }) {
-      console.log('session', session, token)
-      if (session) {
-        session = Object.assign({}, session, { access_token: token.access_token })
-      }
-      return session;
-    },
+
+    // async session({ session, token }) {
+    //   console.log('session', token) 
+    //   if (token?.access_token) {
+    //     session = Object.assign({}, session, { access_token: token.access_token })
+    //     // console.log('session after', session)
+    //   }
+    //   return session;
+    // },
     // * authorized is called when a user visits a page that requires authentication
     // authorized({ auth, request: { nextUrl } }) {
     //   console.log('authorized', auth, nextUrl);
