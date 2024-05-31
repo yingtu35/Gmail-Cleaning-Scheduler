@@ -9,7 +9,9 @@ import { UserInDB, Task } from "./definitions";
 import { revalidatePath } from "next/cache";
 import { redirect } from 'next/navigation';
 
-import { mockTaskData } from "../data/mock-data";
+import { createSchedule } from "@/app/aws/scheduler";
+
+import { mockTaskData, mockLambdaPayload } from "../data/mock-data";
 
 export async function authenticate() {
   await signIn('google');
@@ -30,6 +32,9 @@ async function getUserId() {
   const email = session.user.email as string;
   const user = await getUserIdByEmail(email);
   // save the id in the session
+  if (!user) {
+    return null;
+  }
   session.user.id = user.id;
   return user.id;
 }
@@ -85,6 +90,7 @@ export async function createUserOnSignIn(user: UserInDB) {
     email: UserTable.email,
     image: UserTable.image,
   })
+  // ! Cannot call setUserId on newly created user
   setUserId(returnedUser[0].id);
   console.log("returnedUser", returnedUser);
   return returnedUser;
@@ -107,7 +113,7 @@ export async function getTasks(): Promise<Task[]> {
     }
   }) as Task[];
   // return the tasks
-  console.log("tasks", tasks);
+  // console.log("tasks", tasks);
   return tasks;
 }
 
@@ -116,30 +122,36 @@ export async function createTask(data: FormData) {
   // console.log("data", data);
   // parse the data using zod
   // form the task object
-  const userId = await getUserId();
-  if (!userId) {
-    return;
-  }
+  // const userId = await getUserId();
+  // if (!userId) {
+  //   return;
+  // }
 
-  const newTask: Task = {
-    title: mockTaskData["title"] as string,
-    description: mockTaskData["description"] as string,
-    tasks: mockTaskData["tasks"] as string,
-    isRepeatable: mockTaskData["isRepeatable"] === "true",
-    repeatInterval: mockTaskData["repeatInterval"] as string,
-    userId: userId as string,
-  }
-  // insert the data into the database
-  const returnedTask = await db.insert(UserTasksTable).values(newTask).returning({
-    id: UserTasksTable.id,
-    title: UserTasksTable.title,
-    description: UserTasksTable.description,
-    tasks: UserTasksTable.tasks,
-    isRepeatable: UserTasksTable.isRepeatable,
-    repeatInterval: UserTasksTable.repeatInterval,
-    userId: UserTasksTable.userId,
-  })
-  console.log("returnedTask", returnedTask);
+  // const newTask: Task = {
+  //   title: mockTaskData["title"] as string,
+  //   description: mockTaskData["description"] as string,
+  //   tasks: mockTaskData["tasks"] as string,
+  //   isRepeatable: mockTaskData["isRepeatable"] === "true",
+  //   repeatInterval: mockTaskData["repeatInterval"] as string,
+  //   userId: userId as string,
+  // }
+  // // insert the data into the database
+  // const returnedTask = await db.insert(UserTasksTable).values(newTask).returning({
+  //   id: UserTasksTable.id,
+  //   title: UserTasksTable.title,
+  //   description: UserTasksTable.description,
+  //   tasks: UserTasksTable.tasks,
+  //   isRepeatable: UserTasksTable.isRepeatable,
+  //   repeatInterval: UserTasksTable.repeatInterval,
+  //   userId: UserTasksTable.userId,
+  // })
+  // console.log("returnedTask", returnedTask);
+  // create a schedule for the task
+  const name = data.get("title") as string;
+  const description = data.get("description") as string;
+  const expression = "at(2024-05-31T18:00:00)";
+  const response = await createSchedule(name, description, expression, JSON.stringify(mockLambdaPayload));
+  console.log("response", response);
   // revalidate path
   revalidatePath("/");
   // redirect to the task page

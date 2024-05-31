@@ -40,7 +40,7 @@ export const autoConfig = {
         expiresAt: epochToDate(account?.expires_at),
         refreshToken: account?.refresh_token,
       };
-      createUserOnSignIn(newUser);
+      await createUserOnSignIn(newUser);
       return true;
     },
 

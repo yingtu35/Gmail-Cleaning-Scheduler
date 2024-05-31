@@ -1,5 +1,6 @@
 import TaskForm from "./components/tasks/create-form";
 import TaskTable from "./components/tasks/table";
+import { Suspense } from "react";
 
 export default function Home() {
   return (
@@ -11,7 +12,9 @@ export default function Home() {
         </p>
         <TaskForm />
         <br/>
-        <TaskTable />
+        <Suspense fallback={<div>Loading...</div>}>
+          <TaskTable />
+        </Suspense>  
       </div>
     </main>
   );
