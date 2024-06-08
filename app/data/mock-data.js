@@ -1,8 +1,8 @@
 export const mockEmail = "yingtu35@gmail.com"
 
 export const mockTaskData = {
-  title: "Schedule test 1",
-  description: "This is a schedule test 1",
+  title: "Schedule test 2",
+  description: "This is a schedule test 2",
   tasks: "from:leetcode in:inbox",
   isRepeatable: "true",
   repeatInterval: "7 days",

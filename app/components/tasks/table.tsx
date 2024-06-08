@@ -1,5 +1,7 @@
 import { getTasks } from "@/app/lib/actions";
 import { Task } from "@/app/lib/definitions";
+import Link from "next/link";
+import TaskCard from "./card";
 
 export default async function TaskTable() {
   const tasks: Task[] = await getTasks();
@@ -8,18 +10,11 @@ export default async function TaskTable() {
   }
 
   return (
-    <div>
+    <div className="grid grid-cols-autofit-300 gap-2">
       {tasks.map((task: Task) => (
-          <div key={task.id}>
-            <h2>{task.title}</h2>
-            <p>{task.description}</p>
-            <p>{task.tasks}</p>
-            <p>{task.isRepeatable ? "Repeatable" : "Not Repeatable"}</p>
-            {task.isRepeatable && (
-              <p>{task.repeatInterval}</p>
-            )}
-            <br/>
-          </div>
+        <Link key={task.id} href={`/tasks/${task.id}`}>
+          <TaskCard key={task.id} task={task} />
+        </Link>
       ))}
     </div>
   );

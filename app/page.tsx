@@ -1,21 +1,17 @@
-import TaskForm from "./components/tasks/create-form";
-import TaskTable from "./components/tasks/table";
-import { Suspense } from "react";
+import Landing from "./components/landing/landing";
+import Tasks from "./components/tasks/tasks";
+import { auth } from "@/auth";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  const user = session?.user;
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div>
-        <h1 className="text-4xl font-bold text-center">Gmail Cleaner</h1>
-        <p className="text-center">
-          The best app for cleaning up your Gmail inbox.
-        </p>
-        <TaskForm />
-        <br/>
-        <Suspense fallback={<div>Loading...</div>}>
-          <TaskTable />
-        </Suspense>  
-      </div>
+    <main className="min-h-screen items-center justify-between">
+      { user ? (
+        <Tasks />
+      ) : (
+        <Landing />
+      )}
     </main>
   );
 }

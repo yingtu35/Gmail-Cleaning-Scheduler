@@ -9,7 +9,7 @@ import { UserInDB, Task } from "./definitions";
 import { revalidatePath } from "next/cache";
 import { redirect } from 'next/navigation';
 
-import { createSchedule } from "@/app/aws/scheduler";
+import { createSchedule, updateSchedule, deleteSchedule } from "@/app/aws/scheduler";
 
 import { mockTaskData, mockLambdaPayload } from "../data/mock-data";
 
@@ -90,10 +90,26 @@ export async function createUserOnSignIn(user: UserInDB) {
     email: UserTable.email,
     image: UserTable.image,
   })
-  // ! Cannot call setUserId on newly created user
-  setUserId(returnedUser[0].id);
+  await setUserId(returnedUser[0].id);
   console.log("returnedUser", returnedUser);
   return returnedUser;
+}
+
+export async function getTaskById(taskId: string): Promise<Task | null> {
+  const userId = await getUserId();
+  if (!userId) {
+    return null;
+  }
+  const task = await db.query.UserTasksTable.findFirst({
+    where: and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, userId as string)),
+    columns: {
+      repeatInterval: false
+    },
+    extras: {
+      repeatInterval: sql<string>`${UserTasksTable.repeatInterval}::text`.as("repeatInterval")
+    }
+  }) as Task;
+  return task;
 }
 
 export async function getTasks(): Promise<Task[]> {
@@ -151,7 +167,7 @@ export async function createTask(data: FormData) {
   const description = data.get("description") as string;
   const expression = "at(2024-05-31T18:00:00)";
   const response = await createSchedule(name, description, expression, JSON.stringify(mockLambdaPayload));
-  console.log("response", response);
+  // console.log("response", response);
   // revalidate path
   revalidatePath("/");
   // redirect to the task page
@@ -161,49 +177,60 @@ export async function createTask(data: FormData) {
 export async function updateTask(data: FormData) {
   // parse the data using zod
   // update the data in the database
-  const userId = await getUserId();
-  if (!userId) {
-    return;
-  }
-  const updatedTask: Task = {
-    id: data.get("id") as string,
-    title: data.get("title") as string,
-    description: data.get("description") as string,
-    tasks: data.get("tasks") as string,
-    isRepeatable: data.get("isRepeatable") === "true",
-    repeatInterval: data.get("repeatInterval") as string,
-    userId: userId as string,
-  }
-  const returnedTask = await db.update(UserTasksTable).set(updatedTask)
-  .where(eq(UserTasksTable.id, updatedTask.id as string))
-  .returning({
-    id: UserTasksTable.id,
-    title: UserTasksTable.title,
-    description: UserTasksTable.description,
-    tasks: UserTasksTable.tasks,
-    isRepeatable: UserTasksTable.isRepeatable,
-    repeatInterval: UserTasksTable.repeatInterval,
-    userId: UserTasksTable.userId,
-  })
-  console.log("returnedTask", returnedTask);
+  // const userId = await getUserId();
+  // if (!userId) {
+  //   return;
+  // }
+  // const updatedTask: Task = {
+  //   id: data.get("id") as string,
+  //   title: data.get("title") as string,
+  //   description: data.get("description") as string,
+  //   tasks: data.get("tasks") as string,
+  //   isRepeatable: data.get("isRepeatable") === "true",
+  //   repeatInterval: data.get("repeatInterval") as string,
+  //   userId: userId as string,
+  // }
+  // const returnedTask = await db.update(UserTasksTable).set(updatedTask)
+  // .where(eq(UserTasksTable.id, updatedTask.id as string))
+  // .returning({
+  //   id: UserTasksTable.id,
+  //   title: UserTasksTable.title,
+  //   description: UserTasksTable.description,
+  //   tasks: UserTasksTable.tasks,
+  //   isRepeatable: UserTasksTable.isRepeatable,
+  //   repeatInterval: UserTasksTable.repeatInterval,
+  //   userId: UserTasksTable.userId,
+  // })
+  // console.log("returnedTask", returnedTask);
+  // update the schedule for the task
+  const name = "123";
+  const description = "updated description";
+  const expression = "at(2024-05-31T19:00:00)";
+  const response = await updateSchedule(name, description, expression, JSON.stringify(mockLambdaPayload));
+  console.log("updated response", response);
   // reinvalidate the cache
+  
   revalidatePath("/");
   // redirect to the task page
   redirect("/");
 }
 
 export async function deleteTask(taskId: string) {
-  const userId = await getUserId();
-  if (!userId) {
-    return;
-  }
-  // delete the task from the database
-  const deletedTaskId = await db.delete(UserTasksTable)
-    .where(and( eq(UserTasksTable.id, taskId), 
-                eq(UserTasksTable.userId, userId as string))
-          )
-    .returning({ deletedId: UserTasksTable.id})
-  console.log("deletedTaskId", deletedTaskId);
+  // const userId = await getUserId();
+  // if (!userId) {
+  //   return;
+  // }
+  // // delete the task from the database
+  // const deletedTaskId = await db.delete(UserTasksTable)
+  //   .where(and( eq(UserTasksTable.id, taskId), 
+  //               eq(UserTasksTable.userId, userId as string))
+  //         )
+  //   .returning({ deletedId: UserTasksTable.id})
+  // console.log("deletedTaskId", deletedTaskId);
+  // delete the schedule for the task
+  const name = "123";
+  const response = await deleteSchedule(name);
+  console.log("deleted response", response);
   // reinvalidate the cache
   revalidatePath("/");
 }

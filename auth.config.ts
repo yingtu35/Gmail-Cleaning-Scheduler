@@ -13,7 +13,7 @@ export const autoConfig = {
       authorization: {
         params: { 
           access_type: "offline", 
-          prompt: "consent", 
+          // prompt: "consent", 
           scope: "openid email profile https://mail.google.com/"
       }
     }}),
@@ -24,7 +24,7 @@ export const autoConfig = {
   callbacks: {
     /* Use the signIn() callback to control if a user is allowed to sign in. */
     async signIn({ user, account, profile }) {
-      // console.log('signIn', account);
+      console.log('signIn', account);
       // reject sign in if email is not verified
       if (account?.email_verified === false) {
         return false;
