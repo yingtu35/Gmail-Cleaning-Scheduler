@@ -5,13 +5,16 @@ import { auth, signIn, signOut } from "@/auth";
 import { db } from "@/app/drizzle/db";
 import { UserTable, UserTasksTable } from "@/app/drizzle/schema";
 import { eq, and, sql } from "drizzle-orm";
-import { UserInDB, Task } from "./definitions";
+import { UserInDB, Task, FormValues } from "./definitions";
 import { revalidatePath } from "next/cache";
 import { redirect } from 'next/navigation';
+import { convertToUTCDate, createCommandInput } from "@/app/utils/schedule";
 
 import { createSchedule, updateSchedule, deleteSchedule } from "@/app/aws/scheduler";
 
 import { mockTaskData, mockLambdaPayload } from "../data/mock-data";
+import { AdapterSession, AdapterUser } from "next-auth/adapters";
+import { Session } from "next-auth";
 
 export async function authenticate() {
   await signIn('google');
@@ -23,28 +26,29 @@ export async function logOut() {
 
 async function getUserId() {
   const session = await auth();
+  // console.log("session get", session);
   if (!session) {
     return null;
   }
   if (session.user.id !== undefined) {
     return session.user.id;
   }
-  const email = session.user.email as string;
-  const user = await getUserIdByEmail(email);
-  // save the id in the session
-  if (!user) {
-    return null;
-  }
-  session.user.id = user.id;
-  return user.id;
+  return null;
 }
 
-async function setUserId(id: string) {
-  const session = await auth();
-  if (!session) {
+export async function setUserId(session: {
+  user: AdapterUser;
+} & AdapterSession & Session) {
+  // console.log('session', session) 
+  if (!session || session.user.id !== undefined) {
     return;
   }
-  session.user.id = id;
+  const user = await getUserByEmail(session.user.email as string);
+  if (!user || !user.id) {
+    return;
+  }
+  session.user = Object.assign({}, session.user, { id: user.id });
+  // console.log('session after', session)
   return;
 }
 
@@ -60,6 +64,13 @@ async function getUserIdByEmail(email: string) {
 export async function getUserByEmail(email: string): Promise<UserInDB>{
   const user = await db.query.UserTable.findFirst({
     where: eq(UserTable.email, email)
+  }) as UserInDB;
+  return user;
+}
+
+async function getUserById(id: string): Promise<UserInDB> {
+  const user = await db.query.UserTable.findFirst({
+    where: eq(UserTable.id, id)
   }) as UserInDB;
   return user;
 }
@@ -90,7 +101,6 @@ export async function createUserOnSignIn(user: UserInDB) {
     email: UserTable.email,
     image: UserTable.image,
   })
-  await setUserId(returnedUser[0].id);
   console.log("returnedUser", returnedUser);
   return returnedUser;
 }
@@ -102,13 +112,8 @@ export async function getTaskById(taskId: string): Promise<Task | null> {
   }
   const task = await db.query.UserTasksTable.findFirst({
     where: and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, userId as string)),
-    columns: {
-      repeatInterval: false
-    },
-    extras: {
-      repeatInterval: sql<string>`${UserTasksTable.repeatInterval}::text`.as("repeatInterval")
-    }
   }) as Task;
+  // console.log("task", task);
   return task;
 }
 
@@ -121,12 +126,6 @@ export async function getTasks(): Promise<Task[]> {
   const tasks = await db.query.UserTasksTable.findMany({
     where: eq(UserTasksTable.userId, userId as string),
     orderBy: (task, { desc }) => desc(task.updatedAt),
-    columns: {
-      repeatInterval: false
-    },
-    extras: {
-      repeatInterval: sql<string>`${UserTasksTable.repeatInterval}::text`.as("repeatInterval")
-    }
   }) as Task[];
   // return the tasks
   // console.log("tasks", tasks);
@@ -134,105 +133,140 @@ export async function getTasks(): Promise<Task[]> {
 }
 
 // create a new task for the user in the database
-export async function createTask(data: FormData) {
+export async function createTask(data: FormValues) {
   // console.log("data", data);
   // parse the data using zod
   // form the task object
-  // const userId = await getUserId();
-  // if (!userId) {
-  //   return;
-  // }
-
-  // const newTask: Task = {
-  //   title: mockTaskData["title"] as string,
-  //   description: mockTaskData["description"] as string,
-  //   tasks: mockTaskData["tasks"] as string,
-  //   isRepeatable: mockTaskData["isRepeatable"] === "true",
-  //   repeatInterval: mockTaskData["repeatInterval"] as string,
-  //   userId: userId as string,
-  // }
-  // // insert the data into the database
-  // const returnedTask = await db.insert(UserTasksTable).values(newTask).returning({
-  //   id: UserTasksTable.id,
-  //   title: UserTasksTable.title,
-  //   description: UserTasksTable.description,
-  //   tasks: UserTasksTable.tasks,
-  //   isRepeatable: UserTasksTable.isRepeatable,
-  //   repeatInterval: UserTasksTable.repeatInterval,
-  //   userId: UserTasksTable.userId,
-  // })
-  // console.log("returnedTask", returnedTask);
+  const userId = await getUserId();
+  if (!userId) {
+    return;
+  }
+  const user = await getUserById(userId);
   // create a schedule for the task
-  const name = data.get("title") as string;
-  const description = data.get("description") as string;
-  const expression = "at(2024-05-31T18:00:00)";
-  const response = await createSchedule(name, description, expression, JSON.stringify(mockLambdaPayload));
-  // console.log("response", response);
-  // revalidate path
+  // console.log("data", data)
+  const commandInput = createCommandInput(data, user);
+  // console.log("commandInput", commandInput);
+  const response = await createSchedule(commandInput);
+  if (response.$metadata.httpStatusCode !== 200) {
+    console.error("error creating schedule", response);
+    return;
+  }
+  // create a new task in the database
+  const newTask: Task = {
+    expiresAt: 'endDate' in data.occurrence.Schedule ? convertToUTCDate(data.occurrence.Schedule.endDate, data.occurrence.TimeZone) : null,
+    repeatCount: 0,
+    formValues: data,
+    userId: userId
+  }
+  const result = await db.insert(UserTasksTable).values(newTask).returning({
+    id: UserTasksTable.id,
+    createdAt: UserTasksTable.createdAt,
+    updatedAt: UserTasksTable.updatedAt,
+    expiresAt: UserTasksTable.expiresAt,
+    repeatCount: UserTasksTable.repeatCount,
+    formValues: UserTasksTable.formValues,
+    userId: UserTasksTable.userId,
+  })
+  if (!result) {
+    console.error("error creating task");
+    return;
+  }
+  const returnedTask = result[0] as Task;
+  console.log("returnedTask", returnedTask);
   revalidatePath("/");
-  // redirect to the task page
-  redirect("/");
+  redirect(`/tasks/${returnedTask.id}`);
 }
 
-export async function updateTask(data: FormData) {
+export async function updateTask(data: FormValues, taskId: string) {
   // parse the data using zod
   // update the data in the database
-  // const userId = await getUserId();
-  // if (!userId) {
-  //   return;
-  // }
-  // const updatedTask: Task = {
-  //   id: data.get("id") as string,
-  //   title: data.get("title") as string,
-  //   description: data.get("description") as string,
-  //   tasks: data.get("tasks") as string,
-  //   isRepeatable: data.get("isRepeatable") === "true",
-  //   repeatInterval: data.get("repeatInterval") as string,
-  //   userId: userId as string,
-  // }
-  // const returnedTask = await db.update(UserTasksTable).set(updatedTask)
-  // .where(eq(UserTasksTable.id, updatedTask.id as string))
-  // .returning({
-  //   id: UserTasksTable.id,
-  //   title: UserTasksTable.title,
-  //   description: UserTasksTable.description,
-  //   tasks: UserTasksTable.tasks,
-  //   isRepeatable: UserTasksTable.isRepeatable,
-  //   repeatInterval: UserTasksTable.repeatInterval,
-  //   userId: UserTasksTable.userId,
-  // })
-  // console.log("returnedTask", returnedTask);
-  // update the schedule for the task
-  const name = "123";
-  const description = "updated description";
-  const expression = "at(2024-05-31T19:00:00)";
-  const response = await updateSchedule(name, description, expression, JSON.stringify(mockLambdaPayload));
-  console.log("updated response", response);
+  const userId = await getUserId();
+  if (!userId) {
+    return;
+  }
+  const user = await getUserById(userId);
+  const commandInput = createCommandInput(data, user);
+  const response = await updateSchedule(commandInput);
+  // console.log("updated response", response);
+  if (response.$metadata.httpStatusCode !== 200) {
+    console.error("error creating schedule", response);
+    return;
+  }
+  // update the task in the database
+  const result = await db.update(UserTasksTable)
+  .set({
+    updatedAt: new Date(),
+    expiresAt: 'endDate' in data.occurrence.Schedule ? convertToUTCDate(data.occurrence.Schedule.endDate, data.occurrence.TimeZone) : null,
+    repeatCount: 0,
+    formValues: data,
+  })
+  .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, userId as string)))
+  .returning({
+    id: UserTasksTable.id,
+    createdAt: UserTasksTable.createdAt,
+    updatedAt: UserTasksTable.updatedAt,
+    expiresAt: UserTasksTable.expiresAt,
+    repeatCount: UserTasksTable.repeatCount,
+    formValues: UserTasksTable.formValues,
+    userId: UserTasksTable.userId,
+  });
+  if (!result) {
+    console.error("error updating task");
+    return;
+  }
+  const updatedTask = result[0] as Task;
+  console.log("updatedTask", updatedTask);
   // reinvalidate the cache
-  
-  revalidatePath("/");
+  revalidatePath(`/tasks/${taskId}`);
   // redirect to the task page
-  redirect("/");
+  redirect(`/tasks/${taskId}`);
 }
 
 export async function deleteTask(taskId: string) {
-  // const userId = await getUserId();
-  // if (!userId) {
-  //   return;
-  // }
-  // // delete the task from the database
-  // const deletedTaskId = await db.delete(UserTasksTable)
-  //   .where(and( eq(UserTasksTable.id, taskId), 
-  //               eq(UserTasksTable.userId, userId as string))
-  //         )
-  //   .returning({ deletedId: UserTasksTable.id})
-  // console.log("deletedTaskId", deletedTaskId);
+  const userId = await getUserId();
+  if (!userId) {
+    return;
+  }
+  // check if the task exists
+  const task = await getTaskById(taskId);
+  if (!task) {
+    return;
+  }
+  // check if the user is the owner of the task
+  if (task.userId !== userId) {
+    return;
+  }
+  const result = await db.delete(UserTasksTable)
+    .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, userId as string)))
+    .returning({
+      id: UserTasksTable.id,
+      createdAt: UserTasksTable.createdAt,
+      updatedAt: UserTasksTable.updatedAt,
+      expiresAt: UserTasksTable.expiresAt,
+      repeatCount: UserTasksTable.repeatCount,
+      formValues: UserTasksTable.formValues,
+      userId: UserTasksTable.userId,
+    })
+  if (!result) {
+    console.error("error deleting task");
+    return;
+  }
+  const deletedTask = result[0] as Task;
+  console.log("deletedTask", deletedTask); 
+  const taskName = deletedTask.formValues.name; 
+
   // delete the schedule for the task
-  const name = "123";
-  const response = await deleteSchedule(name);
+  const response = await deleteSchedule(taskName);
+  if (response.$metadata.httpStatusCode !== 200) {
+    console.error("error deleting schedule", response);
+    // insert the task back into the database
+    await db.insert(UserTasksTable).values(deletedTask);
+    return;
+  }
   console.log("deleted response", response);
   // reinvalidate the cache
   revalidatePath("/");
+  redirect("/");
 }
 
 

@@ -1,0 +1,1 @@
+ALTER TABLE "task" ADD COLUMN "form_values" json NOT NULL;

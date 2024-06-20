@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { FormWrapper } from "./formWrapper"
 import { OccurrenceType, TimeZone, rateUnit, OneTimeSchedule, RecurringSchedule } from "@/app/lib/definitions";
+import { isEndDateLarger } from "@/app/utils/date";
+import timezones from "timezones-list";
 
 type ScheduleData = {
   name: string;
@@ -10,16 +12,18 @@ type ScheduleData = {
 
 type ScheduleFormProps = ScheduleData & {
   updateFields: (fields: Partial<ScheduleData>) => void;
+  isEditing?: boolean;
 }
 export function ScheduleForm({
   name,
   description,
   occurrence,
   updateFields,
+  isEditing
 }: ScheduleFormProps) {
   const [error, setError] = useState<string | null>(null);
   const validateDates = (startDate: string, endDate: string) => {
-    if (new Date(startDate) > new Date(endDate)) {
+    if (!isEndDateLarger(startDate, endDate)) {
       setError('End date must be later than start date');
     } else {
       setError(null);
@@ -62,6 +66,7 @@ export function ScheduleForm({
           id="name"
           name="name"
           required
+          disabled={isEditing}
           placeholder="Enter your schedule name"
           value={name}
           onChange={(e) => updateFields({ name: e.target.value })}
@@ -112,10 +117,9 @@ export function ScheduleForm({
             value={occurrence.TimeZone}
             onChange={(e) => updateFields({ occurrence: { ...occurrence, TimeZone: e.target.value as TimeZone } })}
             className="flex-1 border border-gray-300 rounded-md p-2">
-            <option value="PST">PST</option>
-            <option value="MST">MST</option>
-            <option value="CST">CST</option>
-            <option value="EST">EST</option>
+            {timezones.map((tz) => (
+              <option key={tz.tzCode} value={tz.tzCode}>(UTC{tz.utc}) {tz.tzCode}</option>
+            ))}
           </select>
         </div>
         <div className="flex items-center space-x-4">
@@ -184,10 +188,9 @@ export function ScheduleForm({
             onChange={(e) => updateFields({ occurrence: { ...occurrence, TimeZone: e.target.value as TimeZone } })}
             className="flex-1 border border-gray-300 rounded-md p-2"
           >
-            <option value="PST">PST</option>
-            <option value="MST">MST</option>
-            <option value="CST">CST</option>
-            <option value="EST">EST</option>
+            {timezones.map((tz) => (
+              <option key={tz.tzCode} value={tz.tzCode}>(UTC{tz.utc}) {tz.tzCode}</option>
+            ))}
           </select>
         </div>
       </div>

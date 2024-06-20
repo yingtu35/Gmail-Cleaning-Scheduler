@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 import { UserTable, UserTasksTable } from "./schema";
 import { UserInDB, Task } from "@/app/lib/definitions";
-import { mockUser, mockTasks } from "./mock-data";
+import { mockUser } from "./mock-data";
 import "dotenv-flow/config";
 import { eq } from "drizzle-orm";
 
@@ -32,42 +32,42 @@ async function updateUser(user: UserInDB) {
   .where(eq(UserTable.id, user.id as string));
 }
 
-async function createTasks(tasks: Task[]) {
-  const returnedTasks = await db.insert(UserTasksTable)
-  .values(tasks)
-  .returning({
-    id: UserTasksTable.id,
-    title: UserTasksTable.title,
-    description: UserTasksTable.description,
-    tasks: UserTasksTable.tasks,
-    isRepeatable: UserTasksTable.isRepeatable,
-    repeatInterval: UserTasksTable.repeatInterval,
-    repeatCount: UserTasksTable.repeatCount,
-    userId: UserTasksTable.userId,
-  })
-  return returnedTasks;
-}
+// async function createTasks(tasks: Task[]) {
+//   const returnedTasks = await db.insert(UserTasksTable)
+//   .values(tasks)
+//   .returning({
+//     id: UserTasksTable.id,
+//     title: UserTasksTable.title,
+//     description: UserTasksTable.description,
+//     tasks: UserTasksTable.tasks,
+//     isRepeatable: UserTasksTable.isRepeatable,
+//     repeatInterval: UserTasksTable.repeatInterval,
+//     repeatCount: UserTasksTable.repeatCount,
+//     userId: UserTasksTable.userId,
+//   })
+//   return returnedTasks;
+// }
 
 async function test() {
   // create user
   const users = await createUser(mockUser);
 
   // create tasks
-  const tasks = await createTasks(mockTasks);
+  // const tasks = await createTasks(mockTasks);
 
   // update user
   await updateUser(mockUser);
 
-  // update task
-  await db.update(UserTasksTable)
-  .set({
-    title: "Updated Task",
-  })
-  .where(eq(UserTasksTable.id, tasks[0].id as string));
+  // // update task
+  // await db.update(UserTasksTable)
+  // .set({
+  //   title: "Updated Task",
+  // })
+  // .where(eq(UserTasksTable.id, tasks[0].id as string));
 
-  // delete task
-  await db.delete(UserTasksTable)
-  .where(eq(UserTasksTable.title, tasks[1].title));
+  // // delete task
+  // await db.delete(UserTasksTable)
+  // .where(eq(UserTasksTable.title, tasks[1].title));
 }
 
 async function clear() {

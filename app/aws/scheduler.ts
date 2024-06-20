@@ -9,21 +9,22 @@ import { CreateScheduleCommand,
    DeleteScheduleCommandOutput
 } from "@aws-sdk/client-scheduler";
 import { client } from "./client";
+import { CommandInput } from "../lib/definitions";
 
-export const createSchedule = async (name: string, description: string, expression: string, payload: string) => {
+export const createSchedule = async (commandInput: CommandInput) => {
   const input: CreateScheduleCommandInput = { // CreateScheduleInput
-    Name: name, // required
+    Name: commandInput.name, // required
     // GroupName: "STRING_VALUE",
-    ScheduleExpression: expression, // required
-    // StartDate: new Date("TIMESTAMP"),
-    // EndDate: new Date("TIMESTAMP"),
-    Description: description,
-    ScheduleExpressionTimezone: "Asia/Taipei",
-    // State: "STRING_VALUE",
+    ScheduleExpression: commandInput.scheduleExpression, // required
+    StartDate: commandInput.startDate,
+    EndDate: commandInput.endDate,
+    Description: commandInput.description,
+    ScheduleExpressionTimezone: commandInput.scheduleExpressionTimezone,
+    State: commandInput.state === "ENABLED" ? "ENABLED" : "DISABLED",
     // KmsKeyArn: "STRING_VALUE",
     Target: { // Target
-      Arn: "arn:aws:lambda:us-west-2:051514083281:function:TestGmailDeletion", // required
-      RoleArn: "arn:aws:iam::051514083281:role/service-role/Amazon_EventBridge_Scheduler_LAMBDA_28318b7a96", // required
+      Arn: process.env.LAMBDA_TARGET_ARN, // required
+      RoleArn: process.env.SCHEDULER_ROLE_ARN, // required
       // DeadLetterConfig: { // DeadLetterConfig
       //   Arn: "STRING_VALUE",
       // },
@@ -31,14 +32,14 @@ export const createSchedule = async (name: string, description: string, expressi
         MaximumEventAgeInSeconds: 60,
         MaximumRetryAttempts: 2,
       },
-      Input: payload, //* Must be a JSON string
+      Input: commandInput.input, //* Must be a JSON string
     },
     FlexibleTimeWindow: { // FlexibleTimeWindow
       Mode: "OFF", // required
       // MaximumWindowInMinutes: Number("int"),
     },
     // ClientToken: "STRING_VALUE",
-    // ActionAfterCompletion: "STRING_VALUE",
+    ActionAfterCompletion: "DELETE",
   };
   const command = new CreateScheduleCommand(input);
   const response: CreateScheduleCommandOutput = await client.send(command);
@@ -57,23 +58,23 @@ export const deleteSchedule = async (name: string) => {
   };
   const command = new DeleteScheduleCommand(input);
   const response: DeleteScheduleCommandOutput = await client.send(command);
-  // {};
+  return response;
 }
 
-export const updateSchedule = async (name: string, description: string, expression: string, payload: string) => {
+export const updateSchedule = async (commandInput: CommandInput) => {
   const input: UpdateScheduleCommandInput = { // UpdateScheduleInput
-    Name: name, // required
+    Name: commandInput.name, // required
     // GroupName: "STRING_VALUE",
-    ScheduleExpression: expression, // required
-    // StartDate: new Date("TIMESTAMP"),
-    // EndDate: new Date("TIMESTAMP"),
-    Description: description,
-    ScheduleExpressionTimezone: "Asia/Taipei",
-    // State: "STRING_VALUE",
+    ScheduleExpression: commandInput.scheduleExpression, // required
+    StartDate: commandInput.startDate,
+    EndDate: commandInput.endDate,
+    Description: commandInput.description,
+    ScheduleExpressionTimezone: commandInput.scheduleExpressionTimezone,
+    State: commandInput.state === "ENABLED" ? "ENABLED" : "DISABLED",
     // KmsKeyArn: "STRING_VALUE",
     Target: { // Target
-      Arn: "arn:aws:lambda:us-west-2:051514083281:function:TestGmailDeletion", // required
-      RoleArn: "arn:aws:iam::051514083281:role/service-role/Amazon_EventBridge_Scheduler_LAMBDA_28318b7a96", // required
+      Arn: process.env.LAMBDA_TARGET_ARN, // required
+      RoleArn: process.env.SCHEDULER_ROLE_ARN, // required
       // DeadLetterConfig: { // DeadLetterConfig
       //   Arn: "STRING_VALUE",
       // },
@@ -81,19 +82,20 @@ export const updateSchedule = async (name: string, description: string, expressi
         MaximumEventAgeInSeconds: 60,
         MaximumRetryAttempts: 2,
       },
-      Input: payload, //* Must be a JSON string
+      Input: commandInput.input, //* Must be a JSON string
     },
     FlexibleTimeWindow: { // FlexibleTimeWindow
       Mode: "OFF", // required
       // MaximumWindowInMinutes: Number("int"),
     },
     // ClientToken: "STRING_VALUE",
-    // ActionAfterCompletion: "STRING_VALUE",
+    ActionAfterCompletion: "DELETE"
   };
   const command = new UpdateScheduleCommand(input);
   const response: UpdateScheduleCommandOutput = await client.send(command);
-  // console.log(response); // { // UpdateScheduleOutput
+  console.log(response); // { // UpdateScheduleOutput
   // { // UpdateScheduleOutput
   //   ScheduleArn: "STRING_VALUE", // required
   // };
+  return response;
 }

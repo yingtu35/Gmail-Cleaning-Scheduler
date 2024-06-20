@@ -1,8 +1,6 @@
-import { Task } from "@/app/lib/definitions";
+import { Task as TaskType } from "@/app/lib/definitions";
 import { getTaskById } from "@/app/lib/actions";
-
-import TaskCard from "@/app/components/tasks/card";
-
+import Task from "@/app/components/tasks/task";
 export default async function Page({
   params
 }: {
@@ -10,13 +8,11 @@ export default async function Page({
     taskId: string;
   }
 }) {
-  const task: Task | null = await getTaskById(params.taskId);
+  const task: TaskType | null = await getTaskById(params.taskId);
   if (!task) {
     return <div>Task not found</div>
   }
   return (
-    <div>
-      <TaskCard key={task.id} task={task} />
-    </div>
+    <Task task={task} />
   )
 }

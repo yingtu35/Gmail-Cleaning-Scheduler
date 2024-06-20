@@ -1,4 +1,4 @@
-import { pgTable, uuid, integer, varchar, text, timestamp, boolean, interval, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, integer, varchar, timestamp, boolean, interval, uniqueIndex, json } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 export const UserTable = pgTable('user', {
@@ -18,14 +18,11 @@ export const UserTable = pgTable('user', {
 
 export const UserTasksTable = pgTable('task', {
   id: uuid('id').primaryKey().defaultRandom(),
-  title: text('title').notNull(),
-  description: text('description'),
-  tasks: varchar('tasks').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
-  isRepeatable: boolean('is_repeatable').default(false),
-  repeatInterval: interval('repeat_interval'),
+  expiresAt: timestamp('expires_at'),
   repeatCount: integer('repeat_count').default(0),
+  formValues: json('form_values').notNull(),
   userId: uuid('user_id')
     .references(() => UserTable.id)
     .notNull(),

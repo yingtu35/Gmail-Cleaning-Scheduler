@@ -1,8 +1,6 @@
 // This file contains type definitions for the data.
 // It describes the shape of the data, and what data type each property should accept.
 
-import { One } from "drizzle-orm";
-
 export type UserIconType = {
   name: string;
   avatarUrl: string;
@@ -22,14 +20,11 @@ export type UserInDB = {
 
 export type Task = {
   id?: string;
-  title: string;
-  description?: string;
-  tasks: string;
   createdAt?: Date;
   updatedAt?: Date;
-  isRepeatable: boolean;
-  repeatInterval?: string;
+  expiresAt: Date | null;
   repeatCount?: number;
+  formValues: FormValues;
   userId: string;
 }
 
@@ -155,4 +150,23 @@ export type FormValues = {
   age: AgeType;
   time: TimeType;
   emailIn: EmailInType;
+}
+
+export type LambdaInput = {
+  email: string;
+  access_token: string;
+  refresh_token: string;
+  expires_at: string;
+  q: string;
+}
+
+export type CommandInput = {
+  name: string;
+  scheduleExpression: string;
+  description: string;
+  startDate?: Date;
+  endDate?: Date;
+  scheduleExpressionTimezone: string;
+  state: string;
+  input: string;
 }

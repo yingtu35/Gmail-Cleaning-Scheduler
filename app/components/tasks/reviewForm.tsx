@@ -1,4 +1,4 @@
-import { AgeValue, FormValues, OccurrenceType, SizeValue, TimeValue } from "@/app/lib/definitions"
+import { AgeType, AgeValue, CategoryType, DoesntHaveType, EmailInType, EmailIsType, FormValues, FromType, HasType, LabelsType, OccurrenceType, SizeType, SizeValue, TimeType, TimeValue, TitleType, ToType } from "@/app/lib/definitions"
 import { FormWrapper } from "./formWrapper"
 
 function RenderComplexKeyValue({ keyField, value }: { keyField: string, value: any }) {
@@ -40,45 +40,58 @@ function RenderObject({ value }: { value: any }) {
     }
   })
 }
+
+export function ScheduleDetail({ scheduleEntries }: { scheduleEntries: [string, string | OccurrenceType | FromType | ToType | TitleType | EmailIsType | DoesntHaveType | HasType | LabelsType | CategoryType | SizeType | AgeType | TimeType | EmailInType][] }) {
+  return (
+    <div className="space-y-4 p-4 border">
+      <h3 className="text-2xl">Schedule Detail</h3>
+      <div className="grid grid-cols-3 gap-2">
+        {scheduleEntries.map(([key, value]) => {
+          if (typeof value === "object") {
+            if ('enabled' in value && !value.enabled) return null;
+            return (
+              <RenderObject key={key} value={value} />
+            )
+          } else {
+            return (
+              <RenderKeyValue key={key} keyField={key} value={value} />
+            )
+          }
+        })}
+      </div>
+    </div>
+  )
+}
+
+export function TaskDetail({ taskEntries }: { taskEntries: [string, string | OccurrenceType | FromType | ToType | TitleType | EmailIsType | DoesntHaveType | HasType | LabelsType | CategoryType | SizeType | AgeType | TimeType | EmailInType][] }) {
+  return (
+    <div className="space-y-4 p-4 border">
+      <h3 className="text-2xl">Task Detail</h3>
+      <div className="grid grid-cols-3 gap-2">
+        {taskEntries.map(([key, value]) => {
+          if (typeof value === "object" && 'enabled' in value && value.enabled) {
+            return (
+              <RenderObject key={key} value={value} />
+            )
+          }
+        })}
+      </div>
+    </div>
+  )
+}
+
 export function ReviewForm({ formValues }: { formValues: FormValues }) {
   // convert formValues to an array of key-value pairs
   const aggregatedEntries = Object.entries(formValues)
-  // extract the first 5 entries
+  // extract the first 3 entries
   const scheduleEntries = aggregatedEntries.slice(0, 3)
-  console.log('scheduleEntries', scheduleEntries)
+  // console.log('scheduleEntries', scheduleEntries)
   const taskEntries = aggregatedEntries.slice(3)
-  console.log('taskEntries', taskEntries)
+  // console.log('taskEntries', taskEntries)
   return (
     <FormWrapper title="Schedule Review">
-      <div className="space-y-4 p-4 border">
-        <h3 className="text-2xl">Schedule Detail</h3>
-        <div className="grid grid-cols-3 gap-2">
-          {scheduleEntries.map(([key, value]) => {
-            if (typeof value === "object") {
-              if ('enabled' in value && !value.enabled) return null;
-              return (
-                <RenderObject key={key} value={value} />
-              )
-            } else {
-              return (
-                <RenderKeyValue key={key} keyField={key} value={value} />
-              )
-            }
-          })}
-        </div>
-      </div>
-      <div className="space-y-4 p-4 border">
-        <h3 className="text-2xl">Task Detail</h3>
-        <div className="grid grid-cols-3 gap-2">
-          {taskEntries.map(([key, value]) => {
-            if (typeof value === "object" && 'enabled' in value && value.enabled) {
-              return (
-                <RenderObject key={key} value={value} />
-              )
-            }
-          })}
-        </div>
-      </div>
+      <ScheduleDetail scheduleEntries={scheduleEntries} />
+      <TaskDetail taskEntries={taskEntries} />
       {/* <div className="space-y-4 p-4 border">
         <h3 className="text-2xl">Task Detail</h3>
         <div className="grid grid-cols-3">

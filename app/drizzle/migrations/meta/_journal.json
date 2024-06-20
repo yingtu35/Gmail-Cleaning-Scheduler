@@ -8,6 +8,34 @@
       "when": 1716466178635,
       "tag": "0000_soft_earthquake",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1718848324514,
+      "tag": "0001_perpetual_katie_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1718849672358,
+      "tag": "0002_fast_marten_broadcloak",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1718849804420,
+      "tag": "0003_thick_phalanx",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1718849988234,
+      "tag": "0004_steady_obadiah_stane",
+      "breakpoints": true
     }
   ]
 }

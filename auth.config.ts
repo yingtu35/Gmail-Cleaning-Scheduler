@@ -2,7 +2,7 @@ import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import { UserInDB } from "@/app/lib/definitions";
 import { epochToDate } from "@/app/utils/date";
-import { createUserOnSignIn } from "@/app/lib/actions";
+import { createUserOnSignIn, setUserId } from "@/app/lib/actions";
 
 export const autoConfig = {
   providers: [
@@ -53,14 +53,14 @@ export const autoConfig = {
     //   return token;
     // },
 
-    // async session({ session, token }) {
-    //   console.log('session', token) 
-    //   if (token?.access_token) {
-    //     session = Object.assign({}, session, { access_token: token.access_token })
-    //     // console.log('session after', session)
-    //   }
-    //   return session;
-    // },
+    async session({ session }) {
+      // if (token?.access_token) {
+      // session = Object.assign({}, session, { access_token: token.access_token })
+      //   // console.log('session after', session)
+      // }
+      await setUserId(session)
+      return session;
+    },
     // * authorized is called when a user visits a page that requires authentication
     // authorized({ auth, request: { nextUrl } }) {
     //   console.log('authorized', auth, nextUrl);
