@@ -1,3 +1,5 @@
+import { SignIn } from "@/app/components/auth-components";
+
 export default function Landing() {
   return (
     <div>
@@ -5,6 +7,7 @@ export default function Landing() {
       <p className="text-center">
         The best app for cleaning up your Gmail inbox.
       </p>
+      <SignIn />
     </div>
   )
 }

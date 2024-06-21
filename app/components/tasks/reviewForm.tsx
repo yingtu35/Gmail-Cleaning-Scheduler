@@ -41,7 +41,11 @@ function RenderObject({ value }: { value: any }) {
   })
 }
 
-export function ScheduleDetail({ scheduleEntries }: { scheduleEntries: [string, string | OccurrenceType | FromType | ToType | TitleType | EmailIsType | DoesntHaveType | HasType | LabelsType | CategoryType | SizeType | AgeType | TimeType | EmailInType][] }) {
+export function ScheduleDetail({ 
+  scheduleEntries, 
+}: 
+{ scheduleEntries: [string, string | OccurrenceType | FromType | ToType | TitleType | EmailIsType | DoesntHaveType | HasType | LabelsType | CategoryType | SizeType | AgeType | TimeType | EmailInType][]
+}) {
   return (
     <div className="space-y-4 p-4 border">
       <h3 className="text-2xl">Schedule Detail</h3>
@@ -80,7 +84,11 @@ export function TaskDetail({ taskEntries }: { taskEntries: [string, string | Occ
   )
 }
 
-export function ReviewForm({ formValues }: { formValues: FormValues }) {
+export function ReviewForm({ 
+  formValues, 
+}: { 
+  formValues: FormValues
+}) {
   // convert formValues to an array of key-value pairs
   const aggregatedEntries = Object.entries(formValues)
   // extract the first 3 entries

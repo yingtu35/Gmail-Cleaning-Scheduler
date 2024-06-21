@@ -49,7 +49,7 @@ const EditForm = ({ task, taskId } : { task: FormValues, taskId: string}) => {
         {step}
         <div className="flex items-center justify-end mt-4 gap-4">
           <Link href="https://support.google.com/mail/answer/7190?hl=en" target='_blank' className="text-blue-600">Help</Link>
-          <Link href="/">
+          <Link href={`/tasks/${taskId}`}>
             <button type="button" className="px-4 py-2 hover:bg-gray-200 transition text-gray-700 rounded-md">Cancel</button>
           </Link>
           {!isLastStep && <button type="button" onClick={() => goToStep(steps.length-1)} className="px-4 py-2 bg-blue-600 text-white rounded-md">Skip to Review</button>}

@@ -8,8 +8,8 @@ import { CreateScheduleCommand,
    UpdateScheduleCommandOutput,
    DeleteScheduleCommandOutput
 } from "@aws-sdk/client-scheduler";
-import { client } from "./client";
-import { CommandInput } from "../lib/definitions";
+import { schedulerClient as client } from "./client";
+import { CommandInput } from "@/app/lib/definitions";
 
 export const createSchedule = async (commandInput: CommandInput) => {
   const input: CreateScheduleCommandInput = { // CreateScheduleInput

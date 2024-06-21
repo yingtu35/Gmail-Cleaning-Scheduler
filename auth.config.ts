@@ -2,7 +2,7 @@ import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import { UserInDB } from "@/app/lib/definitions";
 import { epochToDate } from "@/app/utils/date";
-import { createUserOnSignIn, setUserId } from "@/app/lib/actions";
+import { createUserOnSignIn, getUserIdByEmail, updateUserOnSignIn, subscribeEmailNotification } from "@/app/lib/actions";
 
 export const autoConfig = {
   providers: [
@@ -40,7 +40,13 @@ export const autoConfig = {
         expiresAt: epochToDate(account?.expires_at),
         refreshToken: account?.refresh_token,
       };
-      await createUserOnSignIn(newUser);
+      const existingUserId = await getUserIdByEmail(user.email);
+      if (existingUserId) {
+        await updateUserOnSignIn(newUser);
+      } else {
+        await createUserOnSignIn(newUser);
+        await subscribeEmailNotification(user.email);
+      }
       return true;
     },
 
@@ -53,14 +59,14 @@ export const autoConfig = {
     //   return token;
     // },
 
-    async session({ session }) {
-      // if (token?.access_token) {
-      // session = Object.assign({}, session, { access_token: token.access_token })
-      //   // console.log('session after', session)
-      // }
-      await setUserId(session)
-      return session;
-    },
+    // async session({ session }) {
+    //   // if (token?.access_token) {
+    //   // session = Object.assign({}, session, { access_token: token.access_token })
+    //   //   // console.log('session after', session)
+    //   // }
+    //   await setUserId(session)
+    //   return session;
+    // },
     // * authorized is called when a user visits a page that requires authentication
     // authorized({ auth, request: { nextUrl } }) {
     //   console.log('authorized', auth, nextUrl);
@@ -71,7 +77,7 @@ export const autoConfig = {
     //     return false; // Redirect unauthenticated users to login page
     //   } 
     //   else if (isLoggedIn) {
-    //     return Response.redirect(new URL('/', nextUrl));
+        // return Response.redirect(new URL('/', nextUrl));
     //   }
     //   return true;
     // },
