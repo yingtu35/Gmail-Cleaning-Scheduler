@@ -50,7 +50,7 @@ function formatTimeField(fieldValue: TimeValue): string {
 
 type Field<T> = { enabled: boolean; } & { [key: string]: T | boolean; };
 
-function formatFields(jsonObj: FormValues): string {
+export function formatFields(jsonObj: FormValues): string {
   const resultArray: string[] = [];
 
   function processField<T>(key: string, field: Field<T>, formatter: (fieldValue: T) => string) {

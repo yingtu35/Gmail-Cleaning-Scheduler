@@ -10,7 +10,8 @@ export const INITIAL_STATE: FormValues = {
     Occurrence: 'One-time',
     TimeZone: 'PST',
     Schedule: {
-      date: '',
+      // default date is today plus 1 day
+      date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       time: '00:00',
     },
   },

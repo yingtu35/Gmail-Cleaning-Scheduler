@@ -1,8 +1,7 @@
-import CreateForm from "@/app/components/tasks/create-form";
+import CreateTask from "@/app/components/tasks/createTask"
 
-export default function CreateTask() {
+export default function Page() {
   return (
-    // <TaskForm />
-    <CreateForm />
+    <CreateTask />
   )
 }

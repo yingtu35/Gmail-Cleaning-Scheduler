@@ -16,6 +16,9 @@ import { subscribe, confirmSubscription } from "@/app/aws/sns";
 
 import { UserInDB, Task, FormValues } from "@/app/lib/definitions";
 import { convertToUTCDate, createCommandInput } from "@/app/utils/schedule";
+import { isValidUser } from "@/app/utils/database";
+
+import { getEmailSearchesExplanation } from "@/app/openai/chat";
 
 export async function authenticate() {
   await signIn('google');
@@ -24,35 +27,6 @@ export async function authenticate() {
 export async function logOut() {
   await signOut();
 }
-
-// async function getUserId() {
-//   const session = await auth();
-//   // console.log("session get", session);
-//   if (!session) {
-//     return null;
-//   }
-//   if (session.user.id !== undefined) {
-//     return session.user.id;
-//   }
-//   return null;
-// }
-
-// export async function setUserId(session: {
-//   user: AdapterUser;
-// } & AdapterSession & Session) {
-//   // console.log('session', session) 
-//   console.log("calling setUserId")
-//   if (!session || session.user.id !== undefined) {
-//     return;
-//   }
-//   const user = await getUserByEmail(session.user.email as string);
-//   if (!user || !user.id) {
-//     return;
-//   }
-//   session.user = Object.assign({}, session.user, { id: user.id });
-//   // console.log('session after', session)
-//   return;
-// }
 
 export const getAuthenticatedUser = async () => {
   const session = await auth();
@@ -104,13 +78,6 @@ export async function getUserByEmail(email: string) {
   return user as UserInDB;
 }
 
-async function getUserById(id: string): Promise<UserInDB> {
-  const user = await db.query.UserTable.findFirst({
-    where: eq(UserTable.id, id)
-  }) as UserInDB;
-  return user;
-}
-
 export async function updateUserOnSignIn(user: UserInDB) {
   console.log("calling updateUserOnSignIn")
   await db.update(UserTable).set({
@@ -155,13 +122,14 @@ export async function createUserOnSignIn(user: UserInDB) {
   return;
 }
 
+
 export async function getTaskById(taskId: string): Promise<Task | null> {
   const user = await getUser();
-  if (!user || !user.id) {
+  if (!isValidUser(user)) {
     return null;
   }
   const task = await db.query.UserTasksTable.findFirst({
-    where: and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id)),
+    where: and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)),
   }) as Task;
   // console.log("task", task);
   return task;
@@ -169,13 +137,13 @@ export async function getTaskById(taskId: string): Promise<Task | null> {
 
 export async function getTasks(): Promise<Task[]> {
   const user = await getUser();
-  if (!user || !user.id) {
+  if (!isValidUser(user)) {
     return [];
   }
   // get the tasks for the user
   console.log("calling getTasks")
   const tasks = await db.query.UserTasksTable.findMany({
-    where: eq(UserTasksTable.userId, user.id),
+    where: eq(UserTasksTable.userId, user.id as string),
     orderBy: (task, { desc }) => desc(task.updatedAt),
   }) as Task[];
   // return the tasks
@@ -187,7 +155,7 @@ export async function getTasks(): Promise<Task[]> {
 export async function createTask(data: FormValues) {
   // TODO: parse the data using zod
   const user = await getUser();
-  if (!user || !user.id) {
+  if (!isValidUser(user)) {
     return;
   }
   // create a schedule for the task
@@ -204,16 +172,16 @@ export async function createTask(data: FormValues) {
     expiresAt: 'endDate' in data.occurrence.Schedule ? convertToUTCDate(data.occurrence.Schedule.endDate, data.occurrence.TimeZone) : null,
     repeatCount: 0,
     formValues: data,
-    userId: user.id
+    userId: user.id as string,
   }
   const result = await db.insert(UserTasksTable).values(newTask).returning({
     id: UserTasksTable.id,
-    createdAt: UserTasksTable.createdAt,
-    updatedAt: UserTasksTable.updatedAt,
-    expiresAt: UserTasksTable.expiresAt,
-    repeatCount: UserTasksTable.repeatCount,
-    formValues: UserTasksTable.formValues,
-    userId: UserTasksTable.userId,
+    // createdAt: UserTasksTable.createdAt,
+    // updatedAt: UserTasksTable.updatedAt,
+    // expiresAt: UserTasksTable.expiresAt,
+    // repeatCount: UserTasksTable.repeatCount,
+    // formValues: UserTasksTable.formValues,
+    // userId: UserTasksTable.userId,
   })
   if (!result) {
     console.error("error creating task");
@@ -226,10 +194,10 @@ export async function createTask(data: FormValues) {
 }
 
 export async function updateTask(data: FormValues, taskId: string) {
-  // parse the data using zod
+  // TODO: parse the data using zod
   // update the data in the database
   const user = await getUser();
-  if (!user || !user.id) {
+  if (!isValidUser(user)) {
     return;
   }
   const commandInput = createCommandInput(data, user);
@@ -240,38 +208,35 @@ export async function updateTask(data: FormValues, taskId: string) {
     return;
   }
   // update the task in the database
-  const result = await db.update(UserTasksTable)
-  .set({
-    updatedAt: new Date(),
-    expiresAt: 'endDate' in data.occurrence.Schedule ? convertToUTCDate(data.occurrence.Schedule.endDate, data.occurrence.TimeZone) : null,
-    repeatCount: 0,
-    formValues: data,
-  })
-  .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id)))
-  .returning({
-    id: UserTasksTable.id,
-    createdAt: UserTasksTable.createdAt,
-    updatedAt: UserTasksTable.updatedAt,
-    expiresAt: UserTasksTable.expiresAt,
-    repeatCount: UserTasksTable.repeatCount,
-    formValues: UserTasksTable.formValues,
-    userId: UserTasksTable.userId,
-  });
-  if (!result) {
-    console.error("error updating task");
+  try {
+    await db.update(UserTasksTable)
+    .set({
+      updatedAt: new Date(),
+      expiresAt: 'endDate' in data.occurrence.Schedule ? convertToUTCDate(data.occurrence.Schedule.endDate, data.occurrence.TimeZone) : null,
+      repeatCount: 0,
+      formValues: data,
+    })
+    .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
+    // .returning({
+    //   id: UserTasksTable.id,
+    //   createdAt: UserTasksTable.createdAt,
+    //   updatedAt: UserTasksTable.updatedAt,
+    //   expiresAt: UserTasksTable.expiresAt,
+    //   repeatCount: UserTasksTable.repeatCount,
+    //   formValues: UserTasksTable.formValues,
+    //   userId: UserTasksTable.userId,
+    // });
+    revalidatePath(`/tasks/${taskId}`);
+    redirect(`/tasks/${taskId}`);
+  } catch (error) {
+    console.error("error updating task", error);
     return;
   }
-  const updatedTask = result[0] as Task;
-  console.log("updatedTask", updatedTask);
-  // reinvalidate the cache
-  revalidatePath(`/tasks/${taskId}`);
-  // redirect to the task page
-  redirect(`/tasks/${taskId}`);
 }
 
 export async function deleteTask(taskId: string) {
   const user = await getUser();
-  if (!user || !user.id) {
+  if (!isValidUser(user)) {
     return;
   }
   // check if the task exists
@@ -311,7 +276,6 @@ export async function deleteTask(taskId: string) {
     return;
   }
   console.log("deleted response", response);
-  // reinvalidate the cache
   revalidatePath("/");
   redirect("/");
 }
@@ -325,23 +289,26 @@ export async function subscribeEmailNotification(email: string) {
   }
   console.log("subscribing email send");
   return;
-  // return the response
 }
 
 
-// export async function confirmSubscriptionByToken(prevState: any, token: string) {
-//   const cookieStore = cookies();
-//   // confirm the subscription
-//   // const response = await confirmSubscription(token);
-//   // console.log("response", response);
-//   // if (response.$metadata.httpStatusCode !== 200) {
-//   //   console.error("error confirming subscription", response);
-//   //   return "Error confirming subscription";
-//   // }
-//   console.log("confirming subscription");
-//   // set the cookie
-//   cookieStore.set("isSubscribed", "true");
-//   return "success";
-//   // return the response
-// }
+export async function confirmSubscriptionByToken(prevState: any, token: string) {
+  const cookieStore = cookies();
+  // confirm the subscription
+  const response = await confirmSubscription(token);
+  console.log("response", response);
+  if (response.$metadata.httpStatusCode !== 200) {
+    console.error("error confirming subscription", response);
+    return "error";
+  }
+  console.log("confirming subscription");
+  // set the cookie
+  cookieStore.set("isSubscribed", "true");
+  return "success";
+  // return the response
+}
 
+export async function getSearchQueryExplanation(prevState: any, query: string) {
+  const result = await getEmailSearchesExplanation(query);
+  return result;
+}
