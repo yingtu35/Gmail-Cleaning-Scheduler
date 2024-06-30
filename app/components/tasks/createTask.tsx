@@ -3,12 +3,27 @@
 import { useState } from 'react';
 import CreateForm from './create-form';
 import CreateFormAI from './create-form-ai';
+import {
+  FormValues,
+  AIPromptValues,
+} from '@/app/lib/definitions';
+import { INITIAL_STATE } from '@/app/data/form';
+
 
 export default function CreateTask() {
+  const [formValues, setFormValues] = useState<FormValues>(INITIAL_STATE);
   const [isAIGenerated, setIsAIGenerated] = useState<Boolean | null>(null);
+  const [aiPromptValues, setAIPromptValues] = useState<AIPromptValues>({
+    taskPrompt: '',
+    schedulePrompt: {
+      isOneTime: true,
+      oneTimePrompt: '',
+      recurringPrompt: '',
+    }
+  });
 
-  function resetIsAIGenerated() {
-    setIsAIGenerated(null);
+  function onSwitchForm() {
+    setIsAIGenerated(!isAIGenerated);
   }
 
   if (isAIGenerated === null) {
@@ -34,8 +49,18 @@ export default function CreateTask() {
     )
   }
   return isAIGenerated ? (
-    <CreateFormAI onReselect={resetIsAIGenerated}  />
+    <CreateFormAI 
+      onSwitchForm={onSwitchForm}
+      formValues={formValues}
+      setFormValues={setFormValues}
+      aiPromptValues={aiPromptValues}
+      setAIPromptValues={setAIPromptValues}
+    />
   ) : (
-    <CreateForm onReselect={resetIsAIGenerated} />
+    <CreateForm 
+      onSwitchForm={onSwitchForm}
+      formValues={formValues}
+      setFormValues={setFormValues}
+    />
   );
 }

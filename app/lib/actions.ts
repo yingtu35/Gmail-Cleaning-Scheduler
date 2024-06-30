@@ -14,11 +14,11 @@ import { eq, and } from "drizzle-orm";
 import { createSchedule, updateSchedule, deleteSchedule } from "@/app/aws/scheduler";
 import { subscribe, confirmSubscription } from "@/app/aws/sns";
 
-import { UserInDB, Task, FormValues } from "@/app/lib/definitions";
+import { UserInDB, Task, FormValues, AIPromptValues } from "@/app/lib/definitions";
 import { convertToUTCDate, createCommandInput } from "@/app/utils/schedule";
 import { isValidUser } from "@/app/utils/database";
 
-import { getEmailSearchesExplanation } from "@/app/openai/chat";
+import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/app/openai/chat";
 
 export async function authenticate() {
   await signIn('google');
@@ -311,4 +311,14 @@ export async function confirmSubscriptionByToken(prevState: any, token: string) 
 export async function getSearchQueryExplanation(prevState: any, query: string) {
   const result = await getEmailSearchesExplanation(query);
   return result;
+}
+
+export async function generateScheduleByPrompt(prompt: AIPromptValues): Promise<FormValues | string>{
+  const result = await getScheduleByPrompt(prompt);
+  if (!result) {
+    return "Sorry, There was an error processing your request. Please try again later.";
+  }
+  const formValues = JSON.parse(result) as FormValues;
+  console.log("generated form values: ", formValues)
+  return formValues;
 }

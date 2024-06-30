@@ -1,4 +1,8 @@
 import { openai } from "./client";
+import { INITIAL_STATE, PROMPT_TYPES } from "@/app/data/form";
+import {
+  AIPromptValues
+} from '@/app/lib/definitions';
 
 export async function getEmailSearchesExplanation(query: string) {
   try {
@@ -23,18 +27,26 @@ export async function getEmailSearchesExplanation(query: string) {
   }
 }
 
-export async function getScheduleByPrompt(prompt: string) {
+export async function getScheduleByPrompt(prompt: AIPromptValues) {
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
-          content: "You are an assistant specializing in scheduling. Create a json object like  based on the following prompt.",
+          content: "You are an assistant specializing in forming JSON object. You will be given a TypeScript type called FormValues representing the format you should return, then a example json object, then another json object containing the prompt. You must change the name and description field to summarize the json object you created. Other fields should be unchanged as the example json object if it's not mentioned in the prompt.",
         },
         {
           role: "user",
-          content: prompt,
+          content: PROMPT_TYPES,
+        },
+        {
+          role: "user",
+          content: JSON.stringify(INITIAL_STATE)
+        },
+        {
+          role: "user",
+          content: JSON.stringify(prompt),
         },
       ],
       response_format: {
@@ -45,7 +57,7 @@ export async function getScheduleByPrompt(prompt: string) {
     return response.choices[0].message.content;
   } catch (error) {
     console.error("error", error);
-    return "Sorry, There was an error processing your request. Please try again later."
+    return null
   }
 }
 

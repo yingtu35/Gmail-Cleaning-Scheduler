@@ -50,8 +50,6 @@ export type TimeValue = {
   value: string;
 }
 
-export type TimeZone = 'PST' | 'MST' | 'CST' | 'EST';
-
 export type OneTimeSchedule = {
   date: string;
   time: string;
@@ -69,7 +67,7 @@ export type RecurringSchedule = {
 export type OccurenceValue = 'One-time' | 'Recurring';
 export type OccurrenceType = {
   Occurrence: OccurenceValue;
-  TimeZone: TimeZone;
+  TimeZone: string;
   Schedule: OneTimeSchedule | RecurringSchedule;
   temp?: OneTimeSchedule | RecurringSchedule;
 }
@@ -169,4 +167,15 @@ export type CommandInput = {
   scheduleExpressionTimezone: string;
   state: string;
   input: string;
+}
+
+export type SchedulePromptType = {
+  isOneTime: boolean;
+  oneTimePrompt: string;
+  recurringPrompt: string;
+}
+
+export type AIPromptValues = {
+  taskPrompt: string;
+  schedulePrompt: SchedulePromptType;
 }

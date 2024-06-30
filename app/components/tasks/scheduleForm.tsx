@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FormWrapper } from "./formWrapper"
-import { OccurrenceType, TimeZone, rateUnit, OneTimeSchedule, RecurringSchedule } from "@/app/lib/definitions";
+import { OccurrenceType, rateUnit, OneTimeSchedule, RecurringSchedule } from "@/app/lib/definitions";
 import { isEndDateLarger } from "@/app/utils/date";
 import timezones from "timezones-list";
 
@@ -115,7 +115,7 @@ export function ScheduleForm({
             disabled={!(occurrence.Occurrence === 'One-time')}
             required={(occurrence.Occurrence === 'One-time')}
             value={occurrence.TimeZone}
-            onChange={(e) => updateFields({ occurrence: { ...occurrence, TimeZone: e.target.value as TimeZone } })}
+            onChange={(e) => updateFields({ occurrence: { ...occurrence, TimeZone: e.target.value } })}
             className="flex-1 border border-gray-300 rounded-md p-2">
             {timezones.map((tz) => (
               <option key={tz.tzCode} value={tz.tzCode}>(UTC{tz.utc}) {tz.tzCode}</option>
@@ -185,7 +185,7 @@ export function ScheduleForm({
             required={occurrence.Occurrence === 'Recurring'}
             disabled={!(occurrence.Occurrence === 'Recurring')}
             value={occurrence.TimeZone}
-            onChange={(e) => updateFields({ occurrence: { ...occurrence, TimeZone: e.target.value as TimeZone } })}
+            onChange={(e) => updateFields({ occurrence: { ...occurrence, TimeZone: e.target.value } })}
             className="flex-1 border border-gray-300 rounded-md p-2"
           >
             {timezones.map((tz) => (

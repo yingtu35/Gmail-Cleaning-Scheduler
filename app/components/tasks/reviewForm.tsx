@@ -93,13 +93,15 @@ export function TaskDetail({
       </div>
       <div>
         <p className="font-light">Full explanation (powered by openAI)</p>
-        <button 
-          type="button"
-          onClick={() => action(fullSearchQueries)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md"
-        >
-          Generate
-        </button>
+        {!result && (
+          <button 
+            type="button"
+            onClick={() => action(fullSearchQueries)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md"
+          >
+            Generate
+          </button>
+        )}
         {result && <p>{result}</p>}
       </div>
     </div>
