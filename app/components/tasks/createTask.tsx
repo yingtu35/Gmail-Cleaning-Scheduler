@@ -7,60 +7,63 @@ import {
   FormValues,
   AIPromptValues,
 } from '@/app/lib/definitions';
-import { INITIAL_STATE } from '@/app/data/form';
-
+import { QUERY_TEMPLATE } from '@/app/constants/formValues';
+import { INITIAL_AI_STATE } from '@/app/constants/aiPromptValues';
+import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
+import { TEMPLATES } from '@/app/types/createTask';
+import TemplateCard from './templateCard';
 
 export default function CreateTask() {
-  const [formValues, setFormValues] = useState<FormValues>(INITIAL_STATE);
-  const [isAIGenerated, setIsAIGenerated] = useState<Boolean | null>(null);
-  const [aiPromptValues, setAIPromptValues] = useState<AIPromptValues>({
-    taskPrompt: '',
-    schedulePrompt: {
-      isOneTime: true,
-      oneTimePrompt: '',
-      recurringPrompt: '',
-    }
-  });
+  const [formValues, setFormValues] = useState<FormValues>(QUERY_TEMPLATE.QUERY_EMPTY_FORM);
+  const [aiPromptValues, setAIPromptValues] = useState<AIPromptValues>(INITIAL_AI_STATE);
+  const [selectedTemplate, setSelectedTemplate] = useState<TEMPLATE_TYPE | null>(null);
 
-  function onSwitchForm() {
-    setIsAIGenerated(!isAIGenerated);
+  function onSelectTemplate(templateFormType: TEMPLATE_FORM_TYPE, templateType: TEMPLATE_TYPE) {
+    setSelectedTemplate(templateType);
+    setFormValues(QUERY_TEMPLATE[templateFormType]);
   }
 
-  if (isAIGenerated === null) {
+  function onEditAIGeneratedForm() {
+    setSelectedTemplate(TEMPLATE_TYPE.EMPTY);
+  }
+
+  if (selectedTemplate === null) {
     return (
       <div className='min-h-screen flex items-center justify-center bg-gray-100'>
-        <div className='flex justify-center gap-16'>
-          <div 
-            onClick={() => setIsAIGenerated(false)}
-            className="w-full max-w-lg p-8 bg-blue-500 text-white text-lg font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition duration-200 cursor-pointer flex flex-col items-center justify-center space-y-8"
-          >
-            <div className="h-96 w-96 bg-blue-300 rounded-full"></div>
-            <p className='text-4xl'>Build Your Own Task</p>
-          </div>
-          <div 
-            onClick={() => setIsAIGenerated(true)}
-            className="w-full max-w-md p-8 bg-green-500 text-white text-lg font-semibold rounded-lg shadow-lg hover:bg-green-600 transition duration-200 cursor-pointer flex flex-col items-center justify-center space-y-8"
-          >
-            <div className="h-96 w-96 bg-green-300 rounded-full"></div>
-            <p className='text-4xl'>AI Assisted</p>
-          </div>
+        {/* TODO: Use grid to display cards */}
+        <div className='flex flex-wrap justify-center gap-4'>
+          {TEMPLATES.map((template) => (
+            <TemplateCard
+              key={template.name}
+              name={template.name}
+              formType={template.formType}
+              templateType={template.templateType}
+              backgroundColor={template.backgroundColor}
+              onSelectTemplate={onSelectTemplate}
+            />
+          ))}
         </div>
       </div>
     )
   }
-  return isAIGenerated ? (
-    <CreateFormAI 
-      onSwitchForm={onSwitchForm}
-      formValues={formValues}
-      setFormValues={setFormValues}
-      aiPromptValues={aiPromptValues}
-      setAIPromptValues={setAIPromptValues}
-    />
-  ) : (
-    <CreateForm 
-      onSwitchForm={onSwitchForm}
-      formValues={formValues}
-      setFormValues={setFormValues}
-    />
-  );
+
+  switch (selectedTemplate) {
+    case TEMPLATE_TYPE.AI:
+      return (
+        <CreateFormAI
+          formValues={formValues}
+          onEditAIGeneratedForm={onEditAIGeneratedForm}
+          setFormValues={setFormValues}
+          aiPromptValues={aiPromptValues}
+          setAIPromptValues={setAIPromptValues}
+        />
+      );
+    default:
+      return (
+        <CreateForm
+          formValues={formValues}
+          setFormValues={setFormValues}
+        />
+      );
+  }
 }

@@ -87,9 +87,10 @@ export type TitleType = {
   title: string;
 }
 
+export type EmailIsValue = "unread" | "read" | "starred" | "important";
 export type EmailIsType = {
   enabled: boolean;
-  emailIs: string[];
+  emailIs: EmailIsValue[];
 }
 
 export type DoesntHaveType = {
@@ -97,9 +98,10 @@ export type DoesntHaveType = {
   doesntHave: string;
 }
 
+export type HasValue = "attachment" | "drive" | "document" | "spreadsheet" | "presentation" | "image" | "video";
 export type HasType = {
   enabled: boolean;
-  has: string[];
+  has: HasValue[];
 }
 
 export type LabelsType = {
@@ -107,9 +109,10 @@ export type LabelsType = {
   labels: string;
 }
 
+export type CategoryValue = "primary" | "social" | "promotions" | "updates" | "forums" | "reservations" | "purchases";
 export type CategoryType = {
   enabled: boolean;
-  category: string[];
+  category: CategoryValue[];
 }
 
 export type SizeType = {
@@ -127,9 +130,10 @@ export type TimeType = {
   time: TimeValue;
 }
 
+export type EmailInValue = "inbox" | "draft" | "sent" | "chats" | "scheduled";
 export type EmailInType = {
   enabled: boolean;
-  emailIn: string[];
+  emailIn: EmailInValue[];
 }
 
 export type FormValues = {

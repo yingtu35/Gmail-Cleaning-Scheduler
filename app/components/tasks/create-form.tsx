@@ -14,11 +14,9 @@ import {
 
 
 const CreateForm = ({ 
-  onSwitchForm,
   formValues,
   setFormValues,
 } : { 
-  onSwitchForm: () => void;
   formValues: FormValues;
   setFormValues: React.Dispatch<React.SetStateAction<FormValues>>;
 }) => {
@@ -56,7 +54,6 @@ const CreateForm = ({
         </div>
         {step}
         <div className="flex items-center justify-end mt-4 gap-4">
-          <button type="button" onClick={onSwitchForm} className="px-4 py-2 bg-green-400 hover:bg-green-200 transition text-gray-700 rounded-md">Switch to AI Form</button>
           <Link href="https://support.google.com/mail/answer/7190?hl=en" target='_blank' className="text-blue-600">Help</Link>
           <Link href="/">
             <button type="button" className="px-4 py-2 hover:bg-gray-200 transition text-gray-700 rounded-md">Cancel</button>

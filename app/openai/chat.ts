@@ -1,5 +1,6 @@
 import { openai } from "./client";
-import { INITIAL_STATE, PROMPT_TYPES } from "@/app/data/form";
+import { PROMPT_TYPES } from "@/app/data/prompt-types";
+import { QUERY_TEMPLATE } from "../constants/formValues";
 import {
   AIPromptValues
 } from '@/app/lib/definitions';
@@ -42,7 +43,7 @@ export async function getScheduleByPrompt(prompt: AIPromptValues) {
         },
         {
           role: "user",
-          content: JSON.stringify(INITIAL_STATE)
+          content: JSON.stringify(QUERY_TEMPLATE.QUERY_EMPTY_FORM)
         },
         {
           role: "user",

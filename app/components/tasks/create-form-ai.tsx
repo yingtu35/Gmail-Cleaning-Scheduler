@@ -12,13 +12,13 @@ import {
 import { useState } from 'react';
 
 export default function CreateFormAI({ 
-  onSwitchForm,
+  onEditAIGeneratedForm,
   formValues,
   setFormValues,
   aiPromptValues,
   setAIPromptValues,
 }: { 
-  onSwitchForm: () => void,
+  onEditAIGeneratedForm: () => void,
   formValues: FormValues,
   setFormValues: React.Dispatch<React.SetStateAction<FormValues>>;
   aiPromptValues: AIPromptValues,
@@ -51,14 +51,13 @@ export default function CreateFormAI({
         <div className="relative space-y-4 p-4">
           {step}
           <div className="flex items-center justify-end mt-4 gap-4">
-            {!isResultGenerated && <button type="button" onClick={onSwitchForm} className="px-4 py-2 bg-green-400 hover:bg-green-200 transition text-gray-700 rounded-md">Switch to Own Form</button>}
             <Link href="https://support.google.com/mail/answer/7190?hl=en" target='_blank' className="text-blue-600">Help</Link>
             <Link href="/">
               <button type="button" className="px-4 py-2 hover:bg-gray-200 transition text-gray-700 rounded-md">Cancel</button>
             </Link>
             {!isFirstStep && (
               isResultGenerated ? (
-                <button type="button" onClick={onSwitchForm} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md">Edit</button>
+                <button type="button" onClick={onEditAIGeneratedForm} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md">Edit</button>
               ) : (
                 <button type="button" onClick={prevStep} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md">Back</button>)
               )
