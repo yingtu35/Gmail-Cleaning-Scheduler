@@ -1,5 +1,5 @@
 import { openai } from "./client";
-import { PROMPT_TYPES } from "@/app/data/prompt-types";
+import { PROMPT_TYPES } from "@/app/constants/prompt-types";
 import { QUERY_TEMPLATE } from "../constants/formValues";
 import {
   AIPromptValues

@@ -1,3 +1,13 @@
+export enum TEMPLATE_TITLE {
+  EMPTY = 'Start empty',
+  OLD_UNREAD = 'Old unread emails',
+  LARGE_READ = 'Large read emails',
+  LAST_YEAR = 'Last year',
+  DRAFTS = 'Drafts',
+  NOT_PRIMARY = 'Not primary',
+  AI = 'AI Assisted',
+}
+
 export enum TEMPLATE_FORM_TYPE {
   EMPTY = 'QUERY_EMPTY_FORM',
   OLD_UNREAD = 'QUERY_OLD_UNREAD_FORM',
@@ -26,4 +36,14 @@ export enum TEMPLATE_BACKGROUND_COLOR {
   DRAFTS = 'bg-pink-500',
   NOT_PRIMARY = 'bg-red-500',
   AI = 'bg-purple-500',
+}
+
+export enum TEMPLATE_DESCRIPTION {
+  EMPTY = 'Start with an empty form. Customize your own filters.',
+  OLD_UNREAD = 'Delete all unread emails older than 3 months.',
+  LARGE_READ = 'Delete all read emails larger than 500KB.',
+  LAST_YEAR = 'Depending on the current date, delete all emails from last year.',
+  DRAFTS = 'Delete all drafts. How simple is that?',
+  NOT_PRIMARY = 'This will delete all emails that are not in the primary tab.',
+  AI = 'Use our AI to generate a form for you.'
 }
