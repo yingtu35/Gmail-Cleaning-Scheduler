@@ -10,6 +10,7 @@ import { CreateScheduleCommand,
 } from "@aws-sdk/client-scheduler";
 import { schedulerClient as client } from "./client";
 import { CommandInput } from "@/app/lib/definitions";
+import log from "@/app/utils/log";
 
 export const createSchedule = async (commandInput: CommandInput) => {
   const input: CreateScheduleCommandInput = { // CreateScheduleInput
@@ -43,7 +44,7 @@ export const createSchedule = async (commandInput: CommandInput) => {
   };
   const command = new CreateScheduleCommand(input);
   const response: CreateScheduleCommandOutput = await client.send(command);
-  console.log("response", response);
+  log.debug("response", response);
   // { // CreateScheduleOutput
   //   ScheduleArn: "STRING_VALUE", // required
   // };
@@ -93,7 +94,7 @@ export const updateSchedule = async (commandInput: CommandInput) => {
   };
   const command = new UpdateScheduleCommand(input);
   const response: UpdateScheduleCommandOutput = await client.send(command);
-  console.log(response); // { // UpdateScheduleOutput
+  log.debug(response); // { // UpdateScheduleOutput
   // { // UpdateScheduleOutput
   //   ScheduleArn: "STRING_VALUE", // required
   // };

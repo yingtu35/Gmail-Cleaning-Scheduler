@@ -7,6 +7,7 @@ import {
   ConfirmSubscriptionCommandInput,
   ConfirmSubscriptionCommandOutput
  } from '@aws-sdk/client-sns';
+ import log from '@/app/utils/log';
 
  export const subscribe = async (email: string) => {
   const filterPolicy = {
@@ -24,7 +25,7 @@ import {
   };
   const command = new SubscribeCommand(input);
   const response: SubscribeCommandOutput = await client.send(command);
-  console.log("Subscription response:", response);
+  log.debug("Subscription response:", response);
   return response;
  }
 

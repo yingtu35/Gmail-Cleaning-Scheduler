@@ -4,6 +4,7 @@ import { QUERY_TEMPLATE } from "../constants/formValues";
 import {
   AIPromptValues
 } from '@/app/lib/definitions';
+import log from "../utils/log";
 
 export async function getEmailSearchesExplanation(query: string) {
   try {
@@ -20,10 +21,10 @@ export async function getEmailSearchesExplanation(query: string) {
         },
       ],
     })
-    console.log("response", response);
+    log.debug("response", response);
     return response.choices[0].message.content;
   } catch (error) {
-    console.error("error", error);
+    log.error("error", error);
     return "Sorry, There was an error processing your request. Please try again later."
   }
 }
@@ -54,10 +55,10 @@ export async function getScheduleByPrompt(prompt: AIPromptValues) {
         "type": "json_object",
       }
     })
-    console.log("response", response);
+    log.debug("response", response);
     return response.choices[0].message.content;
   } catch (error) {
-    console.error("error", error);
+    log.error("error", error);
     return null
   }
 }
@@ -80,10 +81,10 @@ export async function getTaskByPrompt(prompt: string) {
         "type": "json_object",
       }
     })
-    console.log("response", response);
+    log.debug("response", response);
     return response.choices[0].message.content;
   } catch (error) {
-    console.error("error", error);
+    log.error("error", error);
     return "Sorry, There was an error processing your request. Please try again later."
   }
 }

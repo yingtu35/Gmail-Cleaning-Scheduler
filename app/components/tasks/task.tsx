@@ -6,7 +6,7 @@ import { ScheduleDetail, TaskDetail } from './reviewForm'
 import Link from "next/link"
 import { deleteTask } from "@/app/lib/actions"
 
-export default function Task({ task } : { task: TaskType}) {
+export default function Task({ task }: { task: TaskType }) {
   if (!task) {
     return <div>Task not found</div>
   }
@@ -17,7 +17,6 @@ export default function Task({ task } : { task: TaskType}) {
   const aggregatedEntries = Object.entries(formValues)
   // extract the first 3 entries
   const scheduleEntries = aggregatedEntries.slice(0, 3)
-  // console.log('scheduleEntries', scheduleEntries)
   const taskEntries = aggregatedEntries.slice(3)
 
   const onDeleteTask = async () => {

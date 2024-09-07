@@ -44,11 +44,12 @@ function RenderObject({ value }: { value: any }) {
   })
 }
 
-export function ScheduleDetail({ 
-  scheduleEntries, 
-}: 
-{ scheduleEntries: [string, string | OccurrenceType | FromType | ToType | TitleType | EmailIsType | DoesntHaveType | HasType | LabelsType | CategoryType | SizeType | AgeType | TimeType | EmailInType][]
-}) {
+export function ScheduleDetail({
+  scheduleEntries,
+}:
+  {
+    scheduleEntries: [string, string | OccurrenceType | FromType | ToType | TitleType | EmailIsType | DoesntHaveType | HasType | LabelsType | CategoryType | SizeType | AgeType | TimeType | EmailInType][]
+  }) {
   return (
     <div className="space-y-4 p-4 border">
       <h3 className="text-2xl">Schedule Detail</h3>
@@ -70,10 +71,10 @@ export function ScheduleDetail({
   )
 }
 
-export function TaskDetail({ 
+export function TaskDetail({
   taskEntries,
-  formValues 
-}: { 
+  formValues
+}: {
   taskEntries: [string, string | OccurrenceType | FromType | ToType | TitleType | EmailIsType | DoesntHaveType | HasType | LabelsType | CategoryType | SizeType | AgeType | TimeType | EmailInType][],
   formValues: FormValues
 }) {
@@ -94,7 +95,7 @@ export function TaskDetail({
       <div>
         <p className="font-light">Full explanation (powered by openAI)</p>
         {!result && (
-          <button 
+          <button
             type="button"
             onClick={() => action(fullSearchQueries)}
             className="bg-blue-600 text-white px-4 py-2 rounded-md"
@@ -108,18 +109,16 @@ export function TaskDetail({
   )
 }
 
-export function ReviewForm({ 
-  formValues, 
-}: { 
+export function ReviewForm({
+  formValues,
+}: {
   formValues: FormValues
 }) {
   // convert formValues to an array of key-value pairs
   const aggregatedEntries = Object.entries(formValues)
   // extract the first 3 entries
   const scheduleEntries = aggregatedEntries.slice(0, 3)
-  // console.log('scheduleEntries', scheduleEntries)
   const taskEntries = aggregatedEntries.slice(3)
-  // console.log('taskEntries', taskEntries)
   return (
     <FormWrapper title="Schedule Review">
       <ScheduleDetail scheduleEntries={scheduleEntries} />

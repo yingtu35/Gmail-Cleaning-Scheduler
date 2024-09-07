@@ -19,6 +19,7 @@ import { convertToUTCDate, createCommandInput } from "@/app/utils/schedule";
 import { isValidUser } from "@/app/utils/database";
 
 import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/app/openai/chat";
+import log from "../utils/log";
 
 export async function authenticate() {
   await signIn('google');
@@ -67,19 +68,16 @@ export async function getUserIdByEmail(email: string) {
 
 // get user by email from the database
 export async function getUserByEmail(email: string) {
-  console.log("calling getUserByEmail")
   const user = await db.query.UserTable.findFirst({
     where: eq(UserTable.email, email)
   });
   if (!user) {
     return null;
   }
-  // console.log("user", user)
   return user as UserInDB;
 }
 
 export async function updateUserOnSignIn(user: UserInDB) {
-  console.log("calling updateUserOnSignIn")
   await db.update(UserTable).set({
     name: user.name,
     image: user.image,
@@ -94,13 +92,11 @@ export async function updateUserOnSignIn(user: UserInDB) {
   //   email: UserTable.email,
   //   image: UserTable.image,
   // })
-  // console.log("returnedUser", returnedUser);
   return;
 }
 
 // create a new user in the database
 export async function createUserOnSignIn(user: UserInDB) {
-  console.log("calling createUserOnSignIn")
   await db.insert(UserTable).values(user)
   .onConflictDoUpdate({
     target: UserTable.email,
@@ -118,7 +114,6 @@ export async function createUserOnSignIn(user: UserInDB) {
   //   email: UserTable.email,
   //   image: UserTable.image,
   // })
-  // console.log("returnedUser", returnedUser);
   return;
 }
 
@@ -131,7 +126,6 @@ export async function getTaskById(taskId: string): Promise<Task | null> {
   const task = await db.query.UserTasksTable.findFirst({
     where: and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)),
   }) as Task;
-  // console.log("task", task);
   return task;
 }
 
@@ -141,13 +135,10 @@ export async function getTasks(): Promise<Task[]> {
     return [];
   }
   // get the tasks for the user
-  console.log("calling getTasks")
   const tasks = await db.query.UserTasksTable.findMany({
     where: eq(UserTasksTable.userId, user.id as string),
     orderBy: (task, { desc }) => desc(task.updatedAt),
   }) as Task[];
-  // return the tasks
-  // console.log("tasks", tasks);
   return tasks;
 }
 
@@ -159,9 +150,7 @@ export async function createTask(data: FormValues) {
     return;
   }
   // create a schedule for the task
-  // console.log("data", data)
   const commandInput = createCommandInput(data, user);
-  // console.log("commandInput", commandInput);
   const response = await createSchedule(commandInput);
   if (response.$metadata.httpStatusCode !== 200) {
     console.error("error creating schedule", response);
@@ -184,11 +173,11 @@ export async function createTask(data: FormValues) {
     // userId: UserTasksTable.userId,
   })
   if (!result) {
-    console.error("error creating task");
+    log.error("error creating task");
     return;
   }
   const returnedTask = result[0] as Task;
-  console.log("returnedTask", returnedTask);
+  log.debug("created task", returnedTask);
   revalidatePath("/");
   redirect(`/tasks/${returnedTask.id}`);
 }
@@ -202,9 +191,8 @@ export async function updateTask(data: FormValues, taskId: string) {
   }
   const commandInput = createCommandInput(data, user);
   const response = await updateSchedule(commandInput);
-  // console.log("updated response", response);
   if (response.$metadata.httpStatusCode !== 200) {
-    console.error("error creating schedule", response);
+    log.error("error updating schedule", response);
     return;
   }
   // update the task in the database
@@ -229,7 +217,7 @@ export async function updateTask(data: FormValues, taskId: string) {
     revalidatePath(`/tasks/${taskId}`);
     redirect(`/tasks/${taskId}`);
   } catch (error) {
-    console.error("error updating task", error);
+    log.error("error updating task", error);
     return;
   }
 }
@@ -264,18 +252,16 @@ export async function deleteTask(taskId: string) {
     return;
   }
   const deletedTask = result[0] as Task;
-  console.log("deletedTask", deletedTask); 
   const taskName = deletedTask.formValues.name; 
 
   // delete the schedule for the task
   const response = await deleteSchedule(taskName);
   if (response.$metadata.httpStatusCode !== 200) {
-    console.error("error deleting schedule", response);
+    log.error("error deleting schedule", response);
     // insert the task back into the database
     await db.insert(UserTasksTable).values(deletedTask);
     return;
   }
-  console.log("deleted response", response);
   revalidatePath("/");
   redirect("/");
 }
@@ -287,7 +273,6 @@ export async function subscribeEmailNotification(email: string) {
     console.error("error subscribing", response);
     throw new Error("Error subscribing");
   }
-  console.log("subscribing email send");
   return;
 }
 
@@ -296,16 +281,13 @@ export async function confirmSubscriptionByToken(prevState: any, token: string) 
   const cookieStore = cookies();
   // confirm the subscription
   const response = await confirmSubscription(token);
-  console.log("response", response);
+  log.debug("confirming subscription response", response);
   if (response.$metadata.httpStatusCode !== 200) {
     console.error("error confirming subscription", response);
     return "error";
   }
-  console.log("confirming subscription");
-  // set the cookie
   cookieStore.set("isSubscribed", "true");
   return "success";
-  // return the response
 }
 
 export async function getSearchQueryExplanation(prevState: any, query: string) {
@@ -319,6 +301,6 @@ export async function generateScheduleByPrompt(prompt: AIPromptValues): Promise<
     return "Sorry, There was an error processing your request. Please try again later.";
   }
   const formValues = JSON.parse(result) as FormValues;
-  console.log("generated form values: ", formValues)
+  log.debug("generated schedule", formValues);
   return formValues;
 }
