@@ -30,7 +30,6 @@ export default function ReviewFormAI({
   const aggregatedEntries = Object.entries(formValues)
   // extract the first 3 entries
   const scheduleEntries = aggregatedEntries.slice(0, 3)
-  // console.log('scheduleEntries', scheduleEntries)
   const taskEntries = aggregatedEntries.slice(3)
 
   async function onGenerate() {
@@ -68,24 +67,24 @@ function GenerateScheduleForm({
 }) {
   return (
     <>
-    <div>
+      <div>
         <p className="font-light">Generate Schedule from Prompt</p>
-        <button 
+        <button
           type="button"
           onClick={onGenerate}
           className={`bg-blue-600 text-white px-4 py-2 rounded-md`}
         >
           Generate
         </button>
-    </div>
-    {error && <p className="text-red-500">{error}</p>}
+      </div>
+      {error && <p className="text-red-500">{error}</p>}
     </>
   )
 }
 
-function PromptDetail({ 
+function PromptDetail({
   promptEntries
-} : {
+}: {
   promptEntries: [string, string | SchedulePromptType][]
 }) {
   return (

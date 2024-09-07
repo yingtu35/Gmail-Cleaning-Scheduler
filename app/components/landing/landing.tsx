@@ -1,13 +1,11 @@
-import { SignIn } from "@/app/components/auth-components";
+import LandingContent from "./LandingContent";
+import LandingSignIn from "./LandingSignIn";
 
 export default function Landing() {
   return (
-    <div>
-    <h1 className="text-4xl font-bold text-center">Gmail Cleaner</h1>
-      <p className="text-center">
-        The best app for cleaning up your Gmail inbox.
-      </p>
-      <SignIn />
+    <div className="flex flex-row h-screen">
+      <LandingContent />
+      <LandingSignIn />
     </div>
   )
 }

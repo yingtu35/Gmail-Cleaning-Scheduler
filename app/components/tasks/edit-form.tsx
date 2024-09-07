@@ -11,9 +11,8 @@ import {
 import { isEndDateLarger } from '@/app/utils/date';
 import { updateTask } from '@/app/lib/actions';
 
-const EditForm = ({ task, taskId } : { task: FormValues, taskId: string}) => {
+const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
   const [formValues, setFormValues] = useState<FormValues>(task);
-  console.log("taskId", taskId);
   function updateFields(fields: Partial<FormValues>) {
     setFormValues({ ...formValues, ...fields });
   }
@@ -52,7 +51,7 @@ const EditForm = ({ task, taskId } : { task: FormValues, taskId: string}) => {
           <Link href={`/tasks/${taskId}`}>
             <button type="button" className="px-4 py-2 hover:bg-gray-200 transition text-gray-700 rounded-md">Cancel</button>
           </Link>
-          {!isLastStep && <button type="button" onClick={() => goToStep(steps.length-1)} className="px-4 py-2 bg-blue-600 text-white rounded-md">Skip to Review</button>}
+          {!isLastStep && <button type="button" onClick={() => goToStep(steps.length - 1)} className="px-4 py-2 bg-blue-600 text-white rounded-md">Skip to Review</button>}
           {!isFirstStep && <button type="button" onClick={prevStep} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md">Back</button>}
           <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md">
             {isLastStep ? "Update" : "Next"}
