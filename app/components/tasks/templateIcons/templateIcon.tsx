@@ -1,8 +1,14 @@
 import React from 'react'
 
-function TemplateIcon() {
+interface TemplateIconProps {
+  isHovered: boolean
+}
+function TemplateIcon({
+  isHovered
+}: TemplateIconProps) {
   return (
-    <div className="h-48 w-48 bg-blue-300 rounded-full"></div>
+    <div className={`h-48 w-48 m-4 bg-blue-300 rounded-full transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'
+      }`}></div>
   )
 }
 

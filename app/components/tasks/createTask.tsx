@@ -10,8 +10,9 @@ import {
 import { QUERY_TEMPLATE } from '@/app/constants/formValues';
 import { INITIAL_AI_STATE } from '@/app/constants/aiPromptValues';
 import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
-import { TEMPLATES } from '@/app/types/createTask';
+import { TEMPLATES } from '@/app/constants/template';
 import TemplateCard from './templateCard';
+import { Template } from '@/app/types/createTask';
 
 export default function CreateTask() {
   const [formValues, setFormValues] = useState<FormValues>(QUERY_TEMPLATE.QUERY_EMPTY_FORM);
@@ -32,13 +33,10 @@ export default function CreateTask() {
       <div className='min-h-screen flex items-center justify-center bg-gray-100'>
         {/* TODO: Use grid to display cards */}
         <div className='flex flex-wrap justify-center gap-4'>
-          {TEMPLATES.map((template) => (
+          {TEMPLATES.map((template: Template) => (
             <TemplateCard
-              key={template.name}
-              name={template.name}
-              formType={template.formType}
-              templateType={template.templateType}
-              backgroundColor={template.backgroundColor}
+              key={template.title}
+              template={template}
               onSelectTemplate={onSelectTemplate}
             />
           ))}

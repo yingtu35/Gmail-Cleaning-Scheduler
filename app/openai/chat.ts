@@ -1,5 +1,5 @@
 import { openai } from "./client";
-import { PROMPT_TYPES } from "@/app/data/prompt-types";
+import { PROMPT_TYPES } from "@/app/constants/prompt-types";
 import { QUERY_TEMPLATE } from "../constants/formValues";
 import {
   AIPromptValues
@@ -8,7 +8,7 @@ import {
 export async function getEmailSearchesExplanation(query: string) {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
