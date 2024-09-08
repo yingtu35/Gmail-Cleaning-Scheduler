@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* <Header /> */}
+        <Header />
         <main className="flex-auto w-full px-1 py-4 mx-auto sm:px-6 md:py-6">
           {children}
         </main>
