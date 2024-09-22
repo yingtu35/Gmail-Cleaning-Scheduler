@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from '@/components/ui/button';
+import { logOut } from '@/app/lib/actions';
 
 interface ProfileProps {
   user: ({
@@ -24,13 +25,11 @@ export default function Profile({ user }: ProfileProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className='flex justify-center items-center'>
-        <Button variant="ghost" className='w-full p-4'>
-          <Avatar className='mr-3'>
-            <AvatarImage src={profileImage} alt={name} />
-            <AvatarFallback>{name}</AvatarFallback>
-          </Avatar>
-          <p className='text-xs'>{email}</p>
-        </Button>
+        <Avatar className='mr-3'>
+          <AvatarImage src={profileImage} alt={name} />
+          <AvatarFallback>{name}</AvatarFallback>
+        </Avatar>
+        <p className='text-xs'>{email}</p>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>{name}</DropdownMenuLabel>
@@ -38,7 +37,11 @@ export default function Profile({ user }: ProfileProps) {
         <DropdownMenuItem>Subscribe to Premium</DropdownMenuItem>
         <DropdownMenuItem>Settings</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Sign out</DropdownMenuItem>
+        <DropdownMenuItem>
+          <form action={logOut}>
+            <button type='submit'>Sign out</button>
+          </form>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -2,6 +2,7 @@ import React from 'react';
 import { auth } from '@/auth';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+
 import Profile from './Profile';
 import Logo from './Logo';
 
@@ -21,6 +22,13 @@ async function Sidebar() {
               <Link href="/">
                 <Button variant="ghost" className="w-full text-left">
                   Home
+                </Button>
+              </Link>
+            </li>
+            <li>
+              <Link href="/statistics">
+                <Button variant="ghost" className="w-full text-left">
+                  Statistics
                 </Button>
               </Link>
             </li>
