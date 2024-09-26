@@ -1,9 +1,4 @@
-
-import { getTasks } from "@/app/lib/actions";
 import { Task } from "@/app/lib/definitions";
-import Link from "next/link";
-import TaskCard from "./card";
-import TaskPagination from "./taskPagination";
 
 const MOCK_TASKS: Task[] = [
   {
@@ -82,31 +77,24 @@ const MOCK_TASKS: Task[] = [
   },
 ];
 
-const TASKS_PER_PAGE = 6;
+const MANY_TASKS: Task[] = [
+  ...MOCK_TASKS,
+  ...MOCK_TASKS,
+  ...MOCK_TASKS,
+  ...MOCK_TASKS,
+  ...MOCK_TASKS,
+  ...MOCK_TASKS,
+  ...MOCK_TASKS,
+  ...MOCK_TASKS,
+  ...MOCK_TASKS,
+  ...MOCK_TASKS,
+  ...MOCK_TASKS,
+  ...MOCK_TASKS,
+];
 
-export default async function TaskTable() {
-  const tasks: Task[] = await getTasks();
-  if (tasks.length === 0) {
-    tasks.push(...MOCK_TASKS);
-  }
+const TOO_MANY_TASKS: Task[] = [
+  ...MANY_TASKS,
+  ...MANY_TASKS,
+];
 
-  return (
-    <div>
-      <div className="grid grid-cols-autofit-300 gap-2">
-        {tasks.map((task: Task) => (
-          <>
-            {/* <Link key={task.id} href={`/tasks/${task.id}`}> */}
-            <TaskCard key={task.id} task={task} />
-            {/* </Link> */}
-            {/* <Button>
-              <Link href={`/tasks/${task.id}/edit`}>
-                Edit Task
-              </Link>
-            </Button> */}
-          </>
-        ))}
-      </div>
-      <TaskPagination />
-    </div>
-  );
-}
+export { MOCK_TASKS, MANY_TASKS, TOO_MANY_TASKS };
