@@ -6,6 +6,21 @@ import { Button } from '@/components/ui/button';
 import Profile from './Profile';
 import Logo from './Logo';
 
+import { ButtonHTMLAttributes, ReactNode } from 'react';
+
+interface SideBarButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode;
+}
+
+const SideBarButton = ({ children, ...props }: SideBarButtonProps) => {
+  return (
+    <Button variant="ghost" className="w-full text-left py-8 text-md" {...props}>
+      {children}
+    </Button>
+  );
+};
+
+
 async function Sidebar() {
   const session = await auth();
   const user = session?.user;
@@ -20,32 +35,16 @@ async function Sidebar() {
           <ul>
             <li>
               <Link href="/">
-                <Button variant="ghost" className="w-full text-left">
+                <SideBarButton>
                   Home
-                </Button>
+                </SideBarButton>
               </Link>
             </li>
             <li>
-              <Link href="/statistics">
-                <Button variant="ghost" className="w-full text-left">
-                  Statistics
-                </Button>
-              </Link>
+              <SideBarButton disabled>
+                Statistics (Coming Soon)
+              </SideBarButton>
             </li>
-            {/* <li className="mt-2">
-              <Link href="/settings">
-                <Button variant="ghost" className="w-full text-left">
-                  Settings
-                </Button>
-              </Link>
-            </li>
-            <li className="mt-2">
-              <Link href="/profile">
-                <Button variant="ghost" className="w-full text-left">
-                  Profile
-                </Button>
-              </Link>
-            </li> */}
           </ul>
         </nav>
       </div>

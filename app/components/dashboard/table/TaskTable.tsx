@@ -30,12 +30,12 @@ export default function TaskTable({
   );
   return (
     <div>
-      <div className="grid grid-cols-2 gap-2 mb-4">
+      <TaskPagination currentPage={currentPage} totalPages={totalPages} onCurrentPageChange={handleCurrentPageChange} />
+      <div className="grid grid-cols-2 gap-2 mt-4">
         {paginatedTasks.map((task: Task) => (
           <TaskCard key={task.id} task={task} />
         ))}
       </div>
-      <TaskPagination currentPage={currentPage} totalPages={totalPages} onCurrentPageChange={handleCurrentPageChange} />
     </div>
   );
 }

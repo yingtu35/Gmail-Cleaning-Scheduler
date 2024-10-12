@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Task } from "@/app/lib/definitions";
 import {
   Card,
@@ -14,8 +15,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button";
+import { deleteTask } from "@/app/lib/actions";
 
 const CardDropdown = ({ id }: { id: string | undefined }) => {
+  const onDeleteCard = async () => {
+    if (!id) return;
+    confirm("Are you sure you want to delete this task?") && await deleteTask(id);
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="pr-6">&#8942;</DropdownMenuTrigger>
@@ -24,10 +31,10 @@ const CardDropdown = ({ id }: { id: string | undefined }) => {
           <a href={`/tasks/${id}`}>View</a>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <a href={`/tasks/${id}/edit`}>Edit</a>
+          <Link href={`/tasks/${id}/edit`}>Edit</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <span className="text-red-600">Delete</span>
+        <DropdownMenuItem className="cursor-pointer" onClick={onDeleteCard}>
+          <span className="text-red-500">Delete</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -49,12 +56,7 @@ export default function TaskCard({ task }: { task: Task }) {
         <CardDescription>{formValues.occurrence.Occurrence === "One-time" ? "One-time" : "Recurring"}</CardDescription>
       </CardContent>
       <CardFooter className="flex gap-4">
-        <Button variant="destructive">
-          Delete
-        </Button>
-        <Button>
-          <a href={`/tasks/${task.id}/edit`}>Edit</a>
-        </Button>
+        This is a footer
       </CardFooter>
     </Card>
   )
