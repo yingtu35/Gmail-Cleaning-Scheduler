@@ -16,7 +16,7 @@ import { subscribe, confirmSubscription } from "@/app/aws/sns";
 
 import { UserInDB, Task, FormValues, AIPromptValues } from "@/app/lib/definitions";
 import { convertToUTCDate, createCommandInput } from "@/app/utils/schedule";
-import { isValidUser } from "@/app/utils/database";
+import { isValidUser, isValidUUID } from "@/app/utils/database";
 
 import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/app/openai/chat";
 import log from "../utils/log";
@@ -121,6 +121,10 @@ export async function createUserOnSignIn(user: UserInDB) {
 export async function getTaskById(taskId: string): Promise<Task | null> {
   const user = await getUser();
   if (!isValidUser(user)) {
+    return null;
+  }
+  // check if taskId follows the correct format
+  if (!isValidUUID(taskId)) {
     return null;
   }
   const task = await db.query.UserTasksTable.findFirst({

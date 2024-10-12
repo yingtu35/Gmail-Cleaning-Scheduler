@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Sidebar from './components/sidebar';
 
-import Header from "./components/header/header";
 import Footer from "./components/footer";
-
+import { getAuthenticatedUser } from "./lib/actions";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,16 +13,17 @@ export const metadata: Metadata = {
   description: "Clean up your Gmail inbox with ease.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { isAuthenticated } = await getAuthenticatedUser();
   return (
     <html lang="en">
       <body className={inter.className}>
-        {/* <Header /> */}
-        <main className="flex-auto w-full px-1 py-4 mx-auto sm:px-6 md:py-6">
+        <main className="flex flex-row h-screen">
+          {isAuthenticated && <Sidebar />}
           {children}
         </main>
         {/* <Footer /> */}

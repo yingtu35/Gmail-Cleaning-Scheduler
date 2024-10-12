@@ -145,13 +145,13 @@ export type FormValues = {
   title: TitleType;
   emailIs: EmailIsType;
   doesntHave: DoesntHaveType;
-  has: HasType;
-  labels: LabelsType;
-  category: CategoryType;
-  size: SizeType;
-  age: AgeType;
-  time: TimeType;
-  emailIn: EmailInType;
+  has?: HasType;
+  labels?: LabelsType;
+  category?: CategoryType;
+  size?: SizeType;
+  age?: AgeType;
+  time?: TimeType;
+  emailIn?: EmailInType;
 }
 
 export type LambdaInput = {
