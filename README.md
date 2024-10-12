@@ -143,20 +143,11 @@ Simply connect your Gmail account and let the AI assistant do the rest!
 <p></p>Our current AI assistant is a faster and more straightforward way for you to schedule a Gmail deletion task. Instead of working on a lot of setting options, simply describe the details of the Gmails you want to delete and let our AI assistant handle the rest of the work!</p>
 <p>You can review your prompt and the AI generated schedule setting, and do further adjustment if you want to tune it even more.</p>
 
-<style>
-flex-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-</style>
-<flex-container>
+<div align="center">
   <img src="https://github.com/user-attachments/assets/4db0a019-f386-4f1c-ba2a-e38a6f130cdf" alt="AI assistant Page 1" width="400px" />
   <img src="https://github.com/user-attachments/assets/08d07b61-aac2-4357-a7af-447671bd844e " alt="AI assistant Page 2" width="400px" />
   <img src="https://github.com/user-attachments/assets/718dddfe-2f4c-4cc6-be70-fc599c9b4b1e" alt="AI assistant Page 3" />
-</flex-container>
+</div>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -224,11 +215,11 @@ Project Link: [https://github.com/yingtu35/Gmail-Cleaning-Scheduler](https://git
 
 
 <!-- ACKNOWLEDGMENTS -->
-<!-- ## Acknowledgments -->
+<!-- ## Acknowledgments
 
 
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">back to top</a>)</p> -->
 
 
 
