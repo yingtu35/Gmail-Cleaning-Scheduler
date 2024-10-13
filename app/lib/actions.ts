@@ -1,18 +1,15 @@
 'use server'
-// specify all server actions here
+
 import { auth, signIn, signOut } from "@/auth";
-import { AdapterSession, AdapterUser } from "next-auth/adapters";
-import { Session } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers'
 
 import { db } from "@/app/drizzle/db";
 import { UserTable, UserTasksTable } from "@/app/drizzle/schema";
 import { eq, and, count } from "drizzle-orm";
 
 import { createSchedule, updateSchedule, deleteSchedule } from "@/app/aws/scheduler";
-import { subscribe, confirmSubscription } from "@/app/aws/sns";
+import { subscribe } from "@/app/aws/sns";
 
 import { UserInDB, Task, FormValues, AIPromptValues } from "@/app/lib/definitions";
 import { convertToUTCDate, createCommandInput } from "@/app/utils/schedule";
@@ -86,12 +83,6 @@ export async function updateUserOnSignIn(user: UserInDB) {
     refreshToken: user.refreshToken,
   })
   .where(eq(UserTable.email, user.email))
-  // .returning({
-  //   id: UserTable.id,
-  //   name: UserTable.name,
-  //   email: UserTable.email,
-  //   image: UserTable.image,
-  // })
   return;
 }
 
@@ -108,12 +99,6 @@ export async function createUserOnSignIn(user: UserInDB) {
       refreshToken: user.refreshToken,
     }
   })
-  // .returning({
-  //   id: UserTable.id,
-  //   name: UserTable.name,
-  //   email: UserTable.email,
-  //   image: UserTable.image,
-  // })
   return;
 }
 
@@ -185,12 +170,6 @@ export async function createTask(data: FormValues) {
   }
   const result = await db.insert(UserTasksTable).values(newTask).returning({
     id: UserTasksTable.id,
-    // createdAt: UserTasksTable.createdAt,
-    // updatedAt: UserTasksTable.updatedAt,
-    // expiresAt: UserTasksTable.expiresAt,
-    // repeatCount: UserTasksTable.repeatCount,
-    // formValues: UserTasksTable.formValues,
-    // userId: UserTasksTable.userId,
   })
   if (!result) {
     log.error("error creating task");
@@ -225,15 +204,7 @@ export async function updateTask(data: FormValues, taskId: string) {
       formValues: data,
     })
     .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
-    // .returning({
-    //   id: UserTasksTable.id,
-    //   createdAt: UserTasksTable.createdAt,
-    //   updatedAt: UserTasksTable.updatedAt,
-    //   expiresAt: UserTasksTable.expiresAt,
-    //   repeatCount: UserTasksTable.repeatCount,
-    //   formValues: UserTasksTable.formValues,
-    //   userId: UserTasksTable.userId,
-    // });
+
     revalidatePath(`/tasks/${taskId}`);
     redirect(`/tasks/${taskId}`);
   } catch (error) {
@@ -256,6 +227,7 @@ export async function deleteTask(taskId: string) {
   if (task.userId !== user.id) {
     return;
   }
+  // TODO: should ensure task is both deleted from the database and the schedule
   const result = await db.delete(UserTasksTable)
     .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id)))
     .returning({
@@ -294,20 +266,6 @@ export async function subscribeEmailNotification(email: string) {
     throw new Error("Error subscribing");
   }
   return;
-}
-
-
-export async function confirmSubscriptionByToken(prevState: any, token: string) {
-  const cookieStore = cookies();
-  // confirm the subscription
-  const response = await confirmSubscription(token);
-  log.debug("confirming subscription response", response);
-  if (response.$metadata.httpStatusCode !== 200) {
-    console.error("error confirming subscription", response);
-    return "error";
-  }
-  cookieStore.set("isSubscribed", "true");
-  return "success";
 }
 
 export async function getSearchQueryExplanation(prevState: any, query: string) {

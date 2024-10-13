@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import useMultiStepForm from '@/app/hooks/useMultiStepForm';
 import { ScheduleForm } from './scheduleForm';
@@ -10,13 +10,15 @@ import { createTask } from '@/app/lib/actions';
 
 import {
   FormValues,
+  OneTimeSchedule,
+  RecurringSchedule,
 } from '@/app/lib/definitions';
 
 
-const CreateForm = ({ 
+const CreateForm = ({
   formValues,
   setFormValues,
-} : { 
+}: {
   formValues: FormValues;
   setFormValues: React.Dispatch<React.SetStateAction<FormValues>>;
 }) => {
@@ -30,9 +32,13 @@ const CreateForm = ({
     <ReviewForm key="Review" formValues={formValues} />,
   ]);
 
-  function validateForm() {
+  function isScheduleRecurring(schedule: OneTimeSchedule | RecurringSchedule): schedule is RecurringSchedule {
+    return 'startDate' in schedule;
+  }
+
+  function isFormValid() {
     if (currentStep === 0) {
-      if ('startDate' in formValues.occurrence.Schedule && !isEndDateLarger(formValues.occurrence.Schedule.startDate, formValues.occurrence.Schedule.endDate)) {
+      if (isScheduleRecurring(formValues.occurrence.Schedule) && !isEndDateLarger(formValues.occurrence.Schedule.startDate, formValues.occurrence.Schedule.endDate)) {
         return false;
       }
     }
@@ -41,10 +47,12 @@ const CreateForm = ({
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!isFormValid()) {
+      return;
+    }
     if (!isLastStep) return nextStep();
-    // TODO: Create Task
-    alert('Task Created');
     createTask(formValues);
+    // TODO: Add notification
   };
   return (
     <form id="task-form" onSubmit={onSubmit}>

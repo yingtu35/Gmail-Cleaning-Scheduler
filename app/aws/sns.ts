@@ -3,9 +3,6 @@ import {
   SubscribeCommand, 
   SubscribeCommandInput,
   SubscribeCommandOutput,
-  ConfirmSubscriptionCommand,
-  ConfirmSubscriptionCommandInput,
-  ConfirmSubscriptionCommandOutput
  } from '@aws-sdk/client-sns';
  import log from '@/app/utils/log';
 
@@ -26,15 +23,5 @@ import {
   const command = new SubscribeCommand(input);
   const response: SubscribeCommandOutput = await client.send(command);
   log.debug("Subscription response:", response);
-  return response;
- }
-
- export const confirmSubscription = async (token: string) => {
-  const input: ConfirmSubscriptionCommandInput = {
-    Token: token,
-    TopicArn: process.env.SNS_TOPIC_ARN,
-  };
-  const command = new ConfirmSubscriptionCommand(input);
-  const response: ConfirmSubscriptionCommandOutput = await client.send(command);
   return response;
  }

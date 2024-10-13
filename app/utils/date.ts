@@ -6,5 +6,8 @@ export const epochToDate = (epoch: number | undefined) => {
 }
 
 export const isEndDateLarger = (startDate: string, endDate: string): Boolean => {
+  if (!endDate || !startDate) {
+    return true;
+  }
   return new Date(startDate) < new Date(endDate);
 }

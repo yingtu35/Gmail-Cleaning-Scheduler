@@ -1,7 +1,7 @@
 import { AgeType, AgeValue, CategoryType, DoesntHaveType, EmailInType, EmailIsType, FormValues, FromType, HasType, LabelsType, OccurrenceType, SizeType, SizeValue, TimeType, TimeValue, TitleType, ToType } from "@/app/lib/definitions"
 import { FormWrapper } from "./formWrapper"
 import { formatFields } from "@/app/utils/schedule";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormState } from "react-dom";
 import { getSearchQueryExplanation } from "@/app/lib/actions";
 
 function RenderComplexKeyValue({ keyField, value }: { keyField: string, value: any }) {
@@ -123,17 +123,6 @@ export function ReviewForm({
     <FormWrapper title="Schedule Review">
       <ScheduleDetail scheduleEntries={scheduleEntries} />
       <TaskDetail taskEntries={taskEntries} formValues={formValues} />
-      {/* <div className="space-y-4 p-4 border">
-        <h3 className="text-2xl">Task Detail</h3>
-        <div className="grid grid-cols-3">
-          {aggregatedEntries.map(([key, value]) => (
-            <div key={key}>
-              <p className="font-light">{key}</p>
-              <p className="break-words">{String(value) === "" ? "-" : String(value)}</p>
-            </div>
-          ))}
-        </div>
-      </div> */}
     </FormWrapper>
   )
 }
