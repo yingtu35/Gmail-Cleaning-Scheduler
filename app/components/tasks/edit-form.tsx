@@ -8,7 +8,7 @@ import { ReviewForm } from './reviewForm';
 import {
   FormValues,
 } from '@/app/lib/definitions';
-import { isEndDateLarger } from '@/app/utils/date';
+import { isFormValid } from '@/app/utils/form';
 import { updateTask } from '@/app/lib/actions';
 
 const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
@@ -23,17 +23,11 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
     <ReviewForm key="Review" formValues={formValues} />,
   ]);
 
-  function validateForm() {
-    if (currentStep === 0) {
-      if ('startDate' in formValues.occurrence.Schedule && !isEndDateLarger(formValues.occurrence.Schedule.startDate, formValues.occurrence.Schedule.endDate)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!isFormValid(currentStep, formValues)) {
+      return;
+    }
     if (!isLastStep) return nextStep();
     // TODO: Edit Task
     alert('Task Edited');

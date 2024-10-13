@@ -5,13 +5,11 @@ import useMultiStepForm from '@/app/hooks/useMultiStepForm';
 import { ScheduleForm } from './scheduleForm';
 import { TaskForm } from './taskForm';
 import { ReviewForm } from './reviewForm';
-import { isEndDateLarger } from '@/app/utils/date';
+import { isFormValid } from '@/app/utils/form';
 import { createTask } from '@/app/lib/actions';
 
 import {
   FormValues,
-  OneTimeSchedule,
-  RecurringSchedule,
 } from '@/app/lib/definitions';
 
 
@@ -32,22 +30,11 @@ const CreateForm = ({
     <ReviewForm key="Review" formValues={formValues} />,
   ]);
 
-  function isScheduleRecurring(schedule: OneTimeSchedule | RecurringSchedule): schedule is RecurringSchedule {
-    return 'startDate' in schedule;
-  }
 
-  function isFormValid() {
-    if (currentStep === 0) {
-      if (isScheduleRecurring(formValues.occurrence.Schedule) && !isEndDateLarger(formValues.occurrence.Schedule.startDate, formValues.occurrence.Schedule.endDate)) {
-        return false;
-      }
-    }
-    return true;
-  }
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isFormValid()) {
+    if (!isFormValid(currentStep, formValues)) {
       return;
     }
     if (!isLastStep) return nextStep();

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FormWrapper } from "./formWrapper"
-import { OccurrenceType, rateUnit, OneTimeSchedule, RecurringSchedule } from "@/app/lib/definitions";
-import { isEndDateLarger } from "@/app/utils/date";
+import { OccurrenceType } from "@/app/lib/definitions";
+import { isEndDateLarger, isScheduleOneTime } from "@/app/utils/form";
 import timezones from "timezones-list";
 
 type ScheduleData = {
@@ -46,9 +46,6 @@ export function ScheduleForm({
     }
   };
 
-  const isScheduleOneTime = (schedule: OneTimeSchedule | RecurringSchedule): schedule is OneTimeSchedule => {
-    return 'date' in schedule;
-  }
 
   const updateRecurringSchedule = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, key: string) => {
     if (!isScheduleOneTime(occurrence.Schedule)) {
