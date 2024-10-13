@@ -160,7 +160,7 @@ Simply connect your Gmail account and let the AI assistant do the rest!
 
 <!-- ROADMAP -->
 ## Roadmap
-- [ ] Limit to 5 tasks per user for free version
+- [x] Limit to 5 tasks per user for free version
 - [ ] Revamp Task Creation UI
 - [ ] Revamp Task Page UI
 - [ ] Notification before Task Start

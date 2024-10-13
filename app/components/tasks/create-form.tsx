@@ -1,11 +1,11 @@
 "use client"
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import useMultiStepForm from '@/app/hooks/useMultiStepForm';
 import { ScheduleForm } from './scheduleForm';
 import { TaskForm } from './taskForm';
 import { ReviewForm } from './reviewForm';
-import { isEndDateLarger } from '@/app/utils/date';
+import { isFormValid } from '@/app/utils/form';
 import { createTask } from '@/app/lib/actions';
 
 import {
@@ -13,10 +13,10 @@ import {
 } from '@/app/lib/definitions';
 
 
-const CreateForm = ({ 
+const CreateForm = ({
   formValues,
   setFormValues,
-} : { 
+}: {
   formValues: FormValues;
   setFormValues: React.Dispatch<React.SetStateAction<FormValues>>;
 }) => {
@@ -30,21 +30,16 @@ const CreateForm = ({
     <ReviewForm key="Review" formValues={formValues} />,
   ]);
 
-  function validateForm() {
-    if (currentStep === 0) {
-      if ('startDate' in formValues.occurrence.Schedule && !isEndDateLarger(formValues.occurrence.Schedule.startDate, formValues.occurrence.Schedule.endDate)) {
-        return false;
-      }
-    }
-    return true;
-  }
+
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!isFormValid(currentStep, formValues)) {
+      return;
+    }
     if (!isLastStep) return nextStep();
-    // TODO: Create Task
-    alert('Task Created');
     createTask(formValues);
+    // TODO: Add notification
   };
   return (
     <form id="task-form" onSubmit={onSubmit}>
