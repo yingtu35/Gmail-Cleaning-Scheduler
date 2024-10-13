@@ -47,3 +47,8 @@ export enum TEMPLATE_DESCRIPTION {
   NOT_PRIMARY = 'This will delete all emails that are not in the primary tab.',
   AI = 'Use our AI to generate a form for you.'
 }
+
+export enum MAX_TASKS_COUNT {
+  FREE = 5,
+  PRO = 20,
+}

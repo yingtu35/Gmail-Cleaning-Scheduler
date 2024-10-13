@@ -105,9 +105,14 @@ export function convertToUTCDate(dateString: string, timezone: string): Date | n
   return utcDate;
 }
 
+function formatName(name: string): string {
+  // format the name so that it satisfies the regex pattern [0-9a-zA-Z-_.]+
+  return name.replace(/[^0-9a-zA-Z-_.]/g, '-');
+}
+
 export function createCommandInput(data: FormValues, user: UserInDB) {
   let commandInput;
-  const name = data.name;
+  const name = formatName(user.name) + '-' + formatName(data.name);
   let scheduleExpression = '';
   const description = data.description;
   const scheduleExpressionTimezone = data.occurrence.TimeZone;
