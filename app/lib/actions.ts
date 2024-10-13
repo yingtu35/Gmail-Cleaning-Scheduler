@@ -9,14 +9,14 @@ import { cookies } from 'next/headers'
 
 import { db } from "@/app/drizzle/db";
 import { UserTable, UserTasksTable } from "@/app/drizzle/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 
 import { createSchedule, updateSchedule, deleteSchedule } from "@/app/aws/scheduler";
 import { subscribe, confirmSubscription } from "@/app/aws/sns";
 
 import { UserInDB, Task, FormValues, AIPromptValues } from "@/app/lib/definitions";
 import { convertToUTCDate, createCommandInput } from "@/app/utils/schedule";
-import { isValidUser, isValidUUID } from "@/app/utils/database";
+import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/app/utils/database";
 
 import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/app/openai/chat";
 import log from "../utils/log";
@@ -146,11 +146,27 @@ export async function getTasks(): Promise<Task[]> {
   return tasks;
 }
 
+export async function getTasksCount(user: UserInDB): Promise<number> {
+  const numOfTasks = await db
+    .select({
+      value: count(UserTasksTable.id),
+    })
+    .from(UserTasksTable)
+    .where(eq(UserTasksTable.userId, user.id as string))
+  return numOfTasks[0].value;
+}
+
 // create a new task for the user in the database
 export async function createTask(data: FormValues) {
   // TODO: parse the data using zod
   const user = await getUser();
   if (!isValidUser(user)) {
+    return;
+  }
+
+  // check if user has reached the limit of tasks
+  const numOfTasks = await getTasksCount(user);
+  if (hasReachedTaskLimit(numOfTasks)) {
     return;
   }
   // create a schedule for the task
