@@ -10,6 +10,13 @@ const nextConfig = {
       },
     ],
   },
+  // CI will handle eslint and typescript errors
+  eslint: {
+    ignoreDuringBuilds: true, // Disable eslint during build
+  },
+  typescript: {
+    ignoreBuildErrors: true, // Ignore TypeScript errors
+  }
 };
 
 export default nextConfig;
