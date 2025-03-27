@@ -11,7 +11,7 @@ export default function useLoadingButton(action: () => Promise<void>){
     if (loading) {
       action();
     }
-  }, [loading]);
+  }, [loading, action]);
 
   return {
     loading,

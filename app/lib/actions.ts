@@ -19,7 +19,7 @@ import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/app/openai/c
 import log from "../utils/log";
 
 export async function authenticate() {
-  await signIn('google');
+  await signIn('google', { callbackUrl: '/' });
 }
 
 export async function logOut() {
