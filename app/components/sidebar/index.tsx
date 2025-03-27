@@ -31,6 +31,11 @@ async function Sidebar() {
         <div className="bg-white p-1">
           <Logo />
         </div>
+        <div className="text-center mt-4 text-sm text-gray-400 hover:text-white">
+        <a href='https://github.com/yingtu35/Gmail-Cleaning-Scheduler' target="_blank" rel="noopener noreferrer">
+          Github
+        </a>
+        </div>
         <nav className="mt-10">
           <ul>
             <li>
