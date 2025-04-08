@@ -10,6 +10,13 @@ export const TEMPLATES: Template[] = [
     description: TEMPLATE_DESCRIPTION.EMPTY,
   },
   {
+    title: TEMPLATE_TITLE.AI,
+    formType: TEMPLATE_FORM_TYPE.AI,
+    templateType: TEMPLATE_TYPE.AI,
+    backgroundColor: TEMPLATE_BACKGROUND_COLOR.AI,
+    description: TEMPLATE_DESCRIPTION.AI,
+  },
+  {
     title: TEMPLATE_TITLE.OLD_UNREAD,
     formType: TEMPLATE_FORM_TYPE.OLD_UNREAD,
     templateType: TEMPLATE_TYPE.OLD_UNREAD,
@@ -43,12 +50,5 @@ export const TEMPLATES: Template[] = [
     templateType: TEMPLATE_TYPE.NOT_PRIMARY,
     backgroundColor: TEMPLATE_BACKGROUND_COLOR.NOT_PRIMARY,
     description: TEMPLATE_DESCRIPTION.NOT_PRIMARY,
-  },
-  {
-    title: TEMPLATE_TITLE.AI,
-    formType: TEMPLATE_FORM_TYPE.AI,
-    templateType: TEMPLATE_TYPE.AI,
-    backgroundColor: TEMPLATE_BACKGROUND_COLOR.AI,
-    description: TEMPLATE_DESCRIPTION.AI,
   },
 ]

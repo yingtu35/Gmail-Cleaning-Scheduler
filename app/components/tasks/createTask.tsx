@@ -30,16 +30,19 @@ export default function CreateTask() {
 
   if (selectedTemplate === null) {
     return (
-      <div className='min-h-screen flex items-center justify-center bg-gray-100'>
-        {/* TODO: Use grid to display cards */}
-        <div className='flex flex-wrap justify-center gap-4'>
-          {TEMPLATES.map((template: Template) => (
-            <TemplateCard
-              key={template.title}
-              template={template}
-              onSelectTemplate={onSelectTemplate}
-            />
-          ))}
+      <div className='min-h-screen flex items-center justify-center bg-gray-100 w-full'>
+        <div className="flex flex-col items-center w-full">
+          <h1 className="text-6xl font-bold mb-8 text-center">Select a Template</h1>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full px-4'>
+            {TEMPLATES.map((template: Template) => (
+              <div key={template.title}>
+                <TemplateCard
+                  template={template}
+                  onSelectTemplate={onSelectTemplate}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     )
