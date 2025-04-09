@@ -31,7 +31,7 @@ function TemplateCard({
             isHovered ? 'transform translate-x-[-50%]' : 'transform translate-x-0'
           }`}
         >
-          <TemplateIcon />
+          <TemplateIcon src={template.src} />
         </div>
         <div
           className={`absolute top-0 right-0 h-full w-1/2 ${backgroundColor} bg-opacity-75 flex items-center p-4 transition-transform duration-300 ease-in-out ${

@@ -48,6 +48,16 @@ export enum TEMPLATE_DESCRIPTION {
   AI = 'Use our AI to generate a form for you.'
 }
 
+export enum TEMPLATE_IMAGE_SRC {
+  EMPTY = '/template-icons/basic-email.png',
+  OLD_UNREAD = '/template-icons/old-unread.png',
+  LARGE_READ = '/template-icons/large-read.png',
+  LAST_YEAR = '/template-icons/last-year.png',
+  DRAFTS = '/template-icons/drafts.png',
+  NOT_PRIMARY = '/template-icons/not-primary.png',
+  AI = '/template-icons/ai.png',
+}
+
 export enum MAX_TASKS_COUNT {
   FREE = 5,
   PRO = 20,
