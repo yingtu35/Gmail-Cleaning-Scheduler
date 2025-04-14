@@ -28,9 +28,11 @@ async function Sidebar() {
     <div className="flex flex-col justify-between h-screen w-64 bg-gray-800 text-white">
       {/* Top Section */}
       <div className="p-4">
-        <div className="bg-white p-1">
-          <Logo />
-        </div>
+        <Link href="/">
+          <div className="bg-white p-1">
+            <Logo />
+          </div>
+        </Link>
         <div className="text-center mt-4 text-sm text-gray-400 hover:text-white">
         <a href='https://github.com/yingtu35/Gmail-Cleaning-Scheduler' target="_blank" rel="noopener noreferrer">
           Github

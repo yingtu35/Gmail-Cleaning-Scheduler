@@ -161,9 +161,10 @@ Simply connect your Gmail account and let the AI assistant do the rest!
 <!-- ROADMAP -->
 ## Roadmap
 - [x] Limit to 5 tasks per user for free version
-- [ ] Fix old refresh token invalidation issue
+- [ ] Revamp Home Page UI
 - [ ] Revamp Task Creation UI
 - [ ] Revamp Task Page UI
+- [ ] Fix old refresh token invalidation issue
 - [ ] Notification before Task Start
 - [ ] Statistics System
 - [ ] Enhance AI assistant

@@ -2,6 +2,7 @@ import React, { Suspense } from 'react'
 import { auth } from "@/auth"
 import Table from './table'
 import Overview from './overview';
+import { LoadingSpinner } from '@/components/ui/loadingSpinner';
 
 
 export default async function Dashboard() {
@@ -12,7 +13,7 @@ export default async function Dashboard() {
   return (
     <div className='flex flex-col grow m-4'>
       <Overview />
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<LoadingSpinner className="m-auto" />}>
         <Table />
       </Suspense>
     </div>
