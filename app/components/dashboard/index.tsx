@@ -13,7 +13,11 @@ export default async function Dashboard() {
   return (
     <div className='flex flex-col grow m-4 gap-4'>
       <Overview />
-      <Suspense fallback={<LoadingSpinner className="m-auto" />}>
+      <Suspense fallback={
+        <div className="flex items-center justify-center w-full h-32">
+          <LoadingSpinner />
+        </div>
+      }>
         <Table />
       </Suspense>
     </div>

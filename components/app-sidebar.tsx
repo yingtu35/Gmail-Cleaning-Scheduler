@@ -49,13 +49,15 @@ const navSecondary = [
 
 export async function AppSidebar({
   user,
+  className,
 }: {
   user: ({
     id?: string;
-} & User) | null
+} & User) | null,
+  className?: string,
 }) {
   return (
-    <SidebarMain>
+    <SidebarMain className={className}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className='bg-sidebar hover:bg-sidebar-accent'>

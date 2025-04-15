@@ -21,9 +21,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <main className="flex flex-row h-screen">
-          {isAuthenticated && <AppSidebar user={user} />}
-          {children}
+        <main className="flex flex-row">
+          {isAuthenticated && <AppSidebar user={user} className="h-screen sticky top-0" />}
+          <div className="flex-1 overflow-y-auto">
+            {children}
+          </div>
         </main>
       </body>
     </html>

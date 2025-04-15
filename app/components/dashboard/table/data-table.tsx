@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from 'next/link'
 import {
   ColumnDef,
@@ -52,6 +52,8 @@ import { Input } from "@/components/ui/input"
 
 import { hasReachedTaskLimit } from '@/app/utils/database';
 
+const DEFAULT_PAGE_SIZE = 5
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -86,6 +88,11 @@ export function DataTable<TData, TValue>({
   })
 
   const shouldShowTableFooter = table.getFilteredRowModel().rows.length > 0
+  const isReachedTaskLimit = hasReachedTaskLimit(data.length)
+
+  useEffect(() => {
+    table.setPageSize(DEFAULT_PAGE_SIZE)
+  }, [table])
 
   return (
     <div>
@@ -171,24 +178,21 @@ export function DataTable<TData, TValue>({
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link href='/tasks/create'>
-                  <Button 
-                    variant='default' 
-                    disabled={hasReachedTaskLimit(data.length)}
-                  >
-                    <AlarmClockPlus />
-                      Create Task
-                  </Button>     
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Upgrade Plan to create more tasks</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>      
+          {!isReachedTaskLimit && (
+            <Link href='/tasks/create'>
+              <Button variant='default'>
+                <AlarmClockPlus />
+                  Create Task
+              </Button>     
+            </Link>  
+          )}
+          {isReachedTaskLimit && (
+            <Link href='/upgrade'>
+              <Button variant='destructive'>
+                  Upgrade Plan
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
       <div className="w-full rounded-md border">
@@ -213,18 +217,32 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              <>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+                {/* Add empty rows to maintain consistent height */}
+                {table.getRowModel().rows.length < table.getState().pagination.pageSize && 
+                  Array(table.getState().pagination.pageSize - table.getRowModel().rows.length)
+                    .fill(null)
+                    .map((_, index) => (
+                      <TableRow key={`empty-${index}`} className="h-[46px]">
+                        {columns.map((_, colIndex) => (
+                          <TableCell key={`empty-cell-${colIndex}`}></TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                }
+              </>
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
