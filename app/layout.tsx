@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Sidebar from './components/sidebar';
+import { AppSidebar } from "@/components/app-sidebar";
 
-import Footer from "./components/footer";
 import { getAuthenticatedUser } from "./lib/actions";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -18,15 +17,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { isAuthenticated } = await getAuthenticatedUser();
+  const { isAuthenticated, user } = await getAuthenticatedUser();
   return (
     <html lang="en">
       <body className={inter.className}>
-        <main className="flex flex-row h-screen">
-          {isAuthenticated && <Sidebar />}
-          {children}
+        <main className="flex flex-row">
+          {isAuthenticated && <AppSidebar user={user} className="h-screen sticky top-0" />}
+          <div className="flex-1 overflow-y-auto">
+            {children}
+          </div>
         </main>
-        {/* <Footer /> */}
       </body>
     </html>
   );
