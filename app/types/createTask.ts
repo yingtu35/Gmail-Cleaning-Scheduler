@@ -6,4 +6,5 @@ export type Template = {
   templateType: TEMPLATE_TYPE;
   backgroundColor: TEMPLATE_BACKGROUND_COLOR;
   description: TEMPLATE_DESCRIPTION;
+  src: string;
 }

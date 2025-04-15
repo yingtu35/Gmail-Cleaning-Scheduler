@@ -1,14 +1,21 @@
 import React from 'react'
+import Image from 'next/image'
 
 interface TemplateIconProps {
-  isHovered: boolean
+  src: string;
 }
-function TemplateIcon({
-  isHovered
-}: TemplateIconProps) {
+
+function TemplateIcon({ src }: TemplateIconProps) {
   return (
-    <div className={`h-48 w-48 m-4 bg-blue-300 rounded-full transition-opacity duration-300 ${isHovered ? 'opacity-0' : 'opacity-100'
-      }`}></div>
+    <div className="h-48 w-48 m-4 bg-blue-300 rounded-full flex items-center justify-center overflow-hidden relative">
+      <Image 
+        src={src}
+        alt="Basic Email Template" 
+        fill
+        sizes="192px"
+        className="object-cover"
+      />
+    </div>
   )
 }
 
