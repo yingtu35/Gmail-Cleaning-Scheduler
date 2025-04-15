@@ -14,6 +14,11 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import {
+  ColumnsIcon,
+  ChevronDownIcon,
+  AlarmClockPlus,
+} from "lucide-react"
 
 import {
   Table,
@@ -138,7 +143,10 @@ export function DataTable<TData, TValue>({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
-                Columns
+                <ColumnsIcon />
+                  <span className="hidden lg:inline">Customize Columns</span>
+                  <span className="lg:hidden">Columns</span>
+                  <ChevronDownIcon />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -166,12 +174,15 @@ export function DataTable<TData, TValue>({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button 
-                  variant='default' 
-                  disabled={hasReachedTaskLimit(data.length)}
-                >
-                  <Link href='/tasks/create'>Create Task</Link>
-                </Button>     
+                <Link href='/tasks/create'>
+                  <Button 
+                    variant='default' 
+                    disabled={hasReachedTaskLimit(data.length)}
+                  >
+                    <AlarmClockPlus />
+                      Create Task
+                  </Button>     
+                </Link>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Upgrade Plan to create more tasks</p>
