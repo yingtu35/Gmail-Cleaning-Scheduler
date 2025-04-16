@@ -10,9 +10,7 @@ import {
 import { QUERY_TEMPLATE } from '@/app/constants/formValues';
 import { INITIAL_AI_STATE } from '@/app/constants/aiPromptValues';
 import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
-import { TEMPLATES } from '@/app/constants/template';
-import TemplateCard from './templateCard';
-import { Template } from '@/app/types/createTask';
+import TemplateSelection from './TemplateSelection';
 
 export default function CreateTask() {
   const [formValues, setFormValues] = useState<FormValues>(QUERY_TEMPLATE.QUERY_EMPTY_FORM);
@@ -28,24 +26,8 @@ export default function CreateTask() {
     setSelectedTemplate(TEMPLATE_TYPE.EMPTY);
   }
 
-  if (selectedTemplate === null) {
-    return (
-      <div className='min-h-screen flex items-center justify-center bg-gray-100 w-full'>
-        <div className="flex flex-col items-center w-full">
-          <h1 className="text-6xl font-bold mb-8 text-center">Select a Template</h1>
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full px-4'>
-            {TEMPLATES.map((template: Template) => (
-              <div key={template.title}>
-                <TemplateCard
-                  template={template}
-                  onSelectTemplate={onSelectTemplate}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
+  if (selectedTemplate === null || selectedTemplate === TEMPLATE_TYPE.GENERAL) {
+    return <TemplateSelection onSelectTemplate={onSelectTemplate} />;
   }
 
   switch (selectedTemplate) {

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import logo from '@/public/logo.svg';
 import {
   BarChartIcon,
-  LayoutDashboardIcon,
+  House,
   SettingsIcon,
   Github,
 } from "lucide-react"
@@ -26,7 +26,7 @@ import { User } from 'next-auth';
 const navItems = [
   { title: 'Home',
     href: '/',
-    icon: LayoutDashboardIcon,
+    icon: House,
   },
   { title: 'Statistics (Coming Soon)', 
     href: '/',
