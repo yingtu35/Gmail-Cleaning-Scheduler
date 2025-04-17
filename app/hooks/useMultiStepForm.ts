@@ -1,7 +1,9 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useState, useEffect } from "react";
 
 export default function useMultiStepForm(steps: ReactElement[]) {
   const [currentStep, setCurrentStep] = useState(0);
+  // track highest unlocked step (initially 0)
+  const [maxStep, setMaxStep] = useState(0);
 
   function nextStep() {
     setCurrentStep(i => {
@@ -18,7 +20,6 @@ export default function useMultiStepForm(steps: ReactElement[]) {
         return i;
       }
       return i - 1;
-    
     });
   }
 
@@ -26,10 +27,18 @@ export default function useMultiStepForm(steps: ReactElement[]) {
     setCurrentStep(step);
   }
 
+  // whenever currentStep grows, unlock that panel
+  useEffect(() => {
+    if (currentStep > maxStep) {
+      setMaxStep(currentStep);
+    }
+  }, [currentStep, maxStep]);
+
   return {
     currentStep,
     step: steps[currentStep],
     steps,
+    maxStep,
     isFirstStep: currentStep === 0,
     isLastStep: currentStep === steps.length - 1,
     goToStep,
