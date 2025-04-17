@@ -19,7 +19,7 @@ function TemplateCard({
   template,
   onSelectTemplate
 }: TemplateCardProps) {
-  const { title, formType, templateType, backgroundColor, description, src } = template;
+  const { title, formType, templateType, description, src } = template;
 
   return (
     <Card 
@@ -28,7 +28,7 @@ function TemplateCard({
     >
       <div className="flex p-4 items-center">
         <div className="flex-shrink-0 mr-4">
-          <TemplateIcon src={src} />
+          <TemplateIcon src={src} title={title} />
         </div>
         <div className="flex-grow">
           <CardHeader className="p-0">

@@ -26,7 +26,7 @@ export default function CreateTask() {
     setSelectedTemplate(TEMPLATE_TYPE.EMPTY);
   }
 
-  if (selectedTemplate === null || selectedTemplate === TEMPLATE_TYPE.GENERAL) {
+  if (selectedTemplate === null) {
     return <TemplateSelection onSelectTemplate={onSelectTemplate} />;
   }
 

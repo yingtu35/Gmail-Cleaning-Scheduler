@@ -10,7 +10,7 @@ const EMPTY_TEMPLATE_CARD: Template = {
   src: TEMPLATE_IMAGE_SRC.EMPTY,
 }
 
-const AI_TEMPLATE_CARD: Template = {
+export const AI_TEMPLATE_CARD: Template = {
   title: TEMPLATE_TITLE.AI,
   formType: TEMPLATE_FORM_TYPE.AI,
   templateType: TEMPLATE_TYPE.AI,
@@ -19,22 +19,8 @@ const AI_TEMPLATE_CARD: Template = {
   src: TEMPLATE_IMAGE_SRC.AI,
 }
 
-export const GENERAL_TEMPLATE_CARD: Template = {
-  title: TEMPLATE_TITLE.GENERAL,
-  formType: TEMPLATE_FORM_TYPE.GENERAL,
-  templateType: TEMPLATE_TYPE.GENERAL,
-  backgroundColor: TEMPLATE_BACKGROUND_COLOR.GENERAL,
-  description: TEMPLATE_DESCRIPTION.GENERAL,
-  src: TEMPLATE_IMAGE_SRC.GENERAL,
-}
-
-export const TASK_CREATION_OPTIONS: Template[] = [
-  EMPTY_TEMPLATE_CARD,
-  GENERAL_TEMPLATE_CARD,
-  AI_TEMPLATE_CARD,
-]
-
 export const TEMPLATES: Template[] = [
+  EMPTY_TEMPLATE_CARD,
   {
     title: TEMPLATE_TITLE.OLD_UNREAD,
     formType: TEMPLATE_FORM_TYPE.OLD_UNREAD,

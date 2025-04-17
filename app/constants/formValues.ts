@@ -197,8 +197,8 @@ const QUERY_LARGE_READ: FormValues = {
     enabled: true,
     size: {
       comparison: 'greater than',
-      value: 500,
-      unit: 'KB'
+      value: 1,
+      unit: 'MB'
     }
   },
   age: {
