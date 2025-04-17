@@ -197,8 +197,8 @@ const QUERY_LARGE_READ: FormValues = {
     enabled: true,
     size: {
       comparison: 'greater than',
-      value: 500,
-      unit: 'KB'
+      value: 1,
+      unit: 'MB'
     }
   },
   age: {
@@ -441,7 +441,14 @@ const QUERY_NOT_PRIMARY: FormValues = {
   },
 }
 
-export type QueryName = 'QUERY_EMPTY_FORM' | 'QUERY_OLD_UNREAD_FORM' | 'QUERY_LARGE_READ_FORM' | 'QUERY_LAST_YEAR_FORM' | 'QUERY_DRAFTS_FORM' | 'QUERY_NOT_PRIMARY_FORM';
+export type QueryName = 'QUERY_EMPTY_FORM' | 
+'QUERY_OLD_UNREAD_FORM' | 
+'QUERY_LARGE_READ_FORM' | 
+'QUERY_LAST_YEAR_FORM' | 
+'QUERY_DRAFTS_FORM' | 
+'QUERY_NOT_PRIMARY_FORM' |
+'QUERY_GENERAL_FORM';
+
 export const QUERY_TEMPLATE: Record<QueryName, FormValues> = {
   QUERY_EMPTY_FORM: QUERY_EMPTY,
   QUERY_OLD_UNREAD_FORM: QUERY_OLD_UNREAD,
@@ -449,4 +456,5 @@ export const QUERY_TEMPLATE: Record<QueryName, FormValues> = {
   QUERY_LAST_YEAR_FORM: QUERY_LAST_YEAR,
   QUERY_DRAFTS_FORM: QUERY_DRAFTS,
   QUERY_NOT_PRIMARY_FORM: QUERY_NOT_PRIMARY,
+  QUERY_GENERAL_FORM: QUERY_EMPTY,
 }

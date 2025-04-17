@@ -1,23 +1,26 @@
 import { TEMPLATE_BACKGROUND_COLOR, TEMPLATE_DESCRIPTION, TEMPLATE_FORM_TYPE, TEMPLATE_TITLE, TEMPLATE_TYPE, TEMPLATE_IMAGE_SRC } from "./createTask"
 import { Template } from "../types/createTask"
 
+const EMPTY_TEMPLATE_CARD: Template = {
+  title: TEMPLATE_TITLE.EMPTY,
+  formType: TEMPLATE_FORM_TYPE.EMPTY,
+  templateType: TEMPLATE_TYPE.EMPTY,
+  backgroundColor: TEMPLATE_BACKGROUND_COLOR.EMPTY,
+  description: TEMPLATE_DESCRIPTION.EMPTY,
+  src: TEMPLATE_IMAGE_SRC.EMPTY,
+}
+
+export const AI_TEMPLATE_CARD: Template = {
+  title: TEMPLATE_TITLE.AI,
+  formType: TEMPLATE_FORM_TYPE.AI,
+  templateType: TEMPLATE_TYPE.AI,
+  backgroundColor: TEMPLATE_BACKGROUND_COLOR.AI,
+  description: TEMPLATE_DESCRIPTION.AI,
+  src: TEMPLATE_IMAGE_SRC.AI,
+}
+
 export const TEMPLATES: Template[] = [
-  {
-    title: TEMPLATE_TITLE.EMPTY,
-    formType: TEMPLATE_FORM_TYPE.EMPTY,
-    templateType: TEMPLATE_TYPE.EMPTY,
-    backgroundColor: TEMPLATE_BACKGROUND_COLOR.EMPTY,
-    description: TEMPLATE_DESCRIPTION.EMPTY,
-    src: TEMPLATE_IMAGE_SRC.EMPTY,
-  },
-  {
-    title: TEMPLATE_TITLE.AI,
-    formType: TEMPLATE_FORM_TYPE.AI,
-    templateType: TEMPLATE_TYPE.AI,
-    backgroundColor: TEMPLATE_BACKGROUND_COLOR.AI,
-    description: TEMPLATE_DESCRIPTION.AI,
-    src: TEMPLATE_IMAGE_SRC.AI,
-  },
+  EMPTY_TEMPLATE_CARD,
   {
     title: TEMPLATE_TITLE.OLD_UNREAD,
     formType: TEMPLATE_FORM_TYPE.OLD_UNREAD,

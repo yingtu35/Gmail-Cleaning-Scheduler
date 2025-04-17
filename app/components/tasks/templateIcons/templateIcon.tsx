@@ -1,18 +1,22 @@
 import React from 'react'
 import Image from 'next/image'
+import { TEMPLATE_TITLE } from '@/app/constants/createTask';
 
 interface TemplateIconProps {
   src: string;
+  title: TEMPLATE_TITLE;
 }
 
-function TemplateIcon({ src }: TemplateIconProps) {
+function TemplateIcon({ 
+  src,
+  title,
+}: TemplateIconProps) {
   return (
-    <div className="h-48 w-48 m-4 bg-blue-300 rounded-full flex items-center justify-center overflow-hidden relative">
+    <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center overflow-hidden relative">
       <Image 
         src={src}
-        alt="Basic Email Template" 
+        alt={`${title} icon`}
         fill
-        sizes="192px"
         className="object-cover"
       />
     </div>

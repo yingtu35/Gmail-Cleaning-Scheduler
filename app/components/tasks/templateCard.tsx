@@ -2,6 +2,13 @@ import { useState } from 'react';
 import { Template } from '@/app/types/createTask';
 import TemplateIcon from './templateIcons/templateIcon';
 import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 
 interface TemplateCardProps {
   template: Template;
@@ -12,37 +19,30 @@ function TemplateCard({
   template,
   onSelectTemplate
 }: TemplateCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const { title, formType, templateType, backgroundColor, description } = template;
+  const { title, formType, templateType, description, src } = template;
 
   return (
-    <div
-      className={`max-w-lg ${backgroundColor} text-white text-lg font-semibold rounded-lg shadow-lg transition-all duration-200 flex flex-col items-center justify-center space-y-4 cursor-pointer ${
-        isHovered ? 'z-10 shadow-xl/30 shadow-gray-600/30 scale-105' : ''
-      }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <Card 
+      className="cursor-pointer transition-colors"
       onClick={() => onSelectTemplate(formType, templateType)}
     >
-      <p className='text-4xl pt-4'>{title}</p>
-      <div className="relative w-full h-full rounded-lg flex items-center justify-center overflow-hidden">
-        <div 
-          className={`transition-all duration-300 ease-in-out ${
-            isHovered ? 'transform translate-x-[-50%]' : 'transform translate-x-0'
-          }`}
-        >
-          <TemplateIcon src={template.src} />
+      <div className="flex p-4 items-center">
+        <div className="flex-shrink-0 mr-4">
+          <TemplateIcon src={src} title={title} />
         </div>
-        <div
-          className={`absolute top-0 right-0 h-full w-1/2 ${backgroundColor} bg-opacity-75 flex items-center p-4 transition-transform duration-300 ease-in-out ${
-            isHovered ? 'transform translate-x-0' : 'transform translate-x-full'
-          }`}
-        >
-          <p className='text-lg'>{description}</p>
+        <div className="flex-grow">
+          <CardHeader className="p-0">
+            <CardTitle className="text-2xl font-semibold text-card-foreground">
+              {title}
+            </CardTitle>
+            <CardDescription className="text-sm mt-2 text-muted-foreground">
+              {description}
+            </CardDescription>
+          </CardHeader>
         </div>
       </div>
-    </div>
-  )
+    </Card>
+  );
 }
 
 export default TemplateCard
