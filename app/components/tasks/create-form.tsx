@@ -1,19 +1,127 @@
 "use client"
-import React, { useRef, useEffect } from 'react';
+
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+
+import { cn } from '@/lib/utils';
 import useMultiStepForm from '@/app/hooks/useMultiStepForm';
 import { isFormValid } from '@/app/utils/form';
 import { createTask } from '@/app/lib/actions';
 import {
   FormValues,
 } from '@/app/lib/definitions';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Button } from '@/components/ui/button';
+
 
 import StepIndicator, { StepConfig } from './StepIndicator';
 import { ScheduleForm } from './scheduleForm';
 import { TaskForm } from './taskForm';
 import { ReviewForm } from './reviewForm';
+
+interface FormControlGroupProps {
+  isFirstStep: boolean;
+  isLastStep: boolean;
+  onBackClicked: () => void;
+  onCancelClicked: () => void;
+}
+
+const FormControlGroup = ({
+  isFirstStep,
+  isLastStep,
+  onBackClicked,
+  onCancelClicked,
+  className,
+}: FormControlGroupProps & {
+  className?: string;
+}) => {
+  const backButton = isFirstStep ? (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="secondary"
+          type="button"
+        >
+          Back
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you sure you want to go back?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This will take you back to template selection and you will lose all your progress.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={onBackClicked}>Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ) : (
+    <Button
+      variant="secondary"
+      type="button"
+      onClick={onBackClicked}
+    >
+      Back
+    </Button>
+  )
+
+  return (
+    <div className={cn("flex items-center space-x-4", className)}>
+      <Link href="https://support.google.com/mail/answer/7190?hl=en" target="_blank" className="text-blue-600 hover:underline">Help</Link>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button
+            variant="destructive"
+            type="button"
+          >
+            Cancel
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to cancel?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will cancel the task creation process and you will lose all your progress.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onCancelClicked}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      {backButton}
+      <Button
+        variant="default"
+        type="submit"
+        disabled={isLastStep}
+      >
+        Next
+      </Button>
+      <Button
+        variant="default"
+        type="submit"
+        disabled={!isLastStep}
+      >
+        Create
+      </Button>
+    </div>
+  )
+}
 
 interface CreateFormProps {
   formValues: FormValues;
@@ -39,33 +147,19 @@ const CreateForm = ({
     { label: 'Review', element: <ReviewForm key="Review" formValues={formValues} /> },
   ];
   const stepConfigs: StepConfig[] = stepDefinitions.map(d => ({ label: d.label }));
-  const { steps, currentStep, maxStep, isFirstStep, isLastStep, nextStep, prevStep, goToStep } =
+  const { stepRefs, visibleSteps, currentStep, maxStep, isFirstStep, isLastStep, nextStep, prevStep, goToStep } =
     useMultiStepForm(stepDefinitions.map(d => d.element));
-
-  // create refs for each step panel
-  const stepRefs = useRef(steps.map(() => React.createRef<HTMLDivElement>()));
-
-  const visibleSteps = steps.slice(0, maxStep + 1);
-
-  // scroll to active panel on step change
-  useEffect(() => {
-    // scroll only when currentStep or maxStep changes, so panel is rendered
-    const panel = stepRefs.current[currentStep]?.current;
-    if (panel) {
-      panel.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [currentStep, maxStep]);
 
   const onBackClicked = () => {
     if (isFirstStep) {
-      confirm('This will reset the form. Are you sure?') && resetTemplate();
+      resetTemplate();
     } else {
       prevStep();
     }
   }
 
   const onCancelClicked = () => {
-    confirm('Are you sure you want to cancel?') && router.push('/');
+    router.push('/');
   }
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -88,37 +182,12 @@ const CreateForm = ({
             goToStep={goToStep}
           />
         </div>
-        <div className="flex items-center gap-4">
-          <Link href="https://support.google.com/mail/answer/7190?hl=en" target="_blank" className="text-blue-600 hover:underline">Help</Link>
-          <Button
-            variant="destructive"
-            type="button"
-            onClick={onCancelClicked}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="secondary"
-            type="button"
-            onClick={onBackClicked}
-          >
-            Back
-          </Button>
-          <Button
-            variant="default"
-            type="submit"
-            disabled={isLastStep}
-          >
-            Next
-          </Button>
-          <Button
-            variant="default"
-            type="submit"
-            disabled={!isLastStep}
-          >
-            Create
-          </Button>
-        </div>
+        <FormControlGroup
+          isFirstStep={isFirstStep}
+          isLastStep={isLastStep}
+          onBackClicked={onBackClicked}
+          onCancelClicked={onCancelClicked}
+        />
       </div>
       <div className="flex-1 overflow-hidden min-h-0">
         {visibleSteps.map((stepElement, idx) => (

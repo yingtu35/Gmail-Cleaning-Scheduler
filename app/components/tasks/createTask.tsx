@@ -45,6 +45,7 @@ export default function CreateTask() {
           setFormValues={setFormValues}
           aiPromptValues={aiPromptValues}
           setAIPromptValues={setAIPromptValues}
+          resetTemplate={resetTemplate}
         />
       );
     default:
