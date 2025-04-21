@@ -1,25 +1,34 @@
 import { z } from 'zod';
 
+import {
+  SIZE_COMPARISON_ENUM,
+  SIZE_UNIT_ENUM,
+  AGE_COMPARISON_ENUM,
+  AGE_UNIT_ENUM,
+  TIME_COMPARISON_ENUM,
+  RATE_UNIT_ENUM,
+  EMAIL_IS_ENUM,
+  HAS_ENUM,
+  CATEGORY_ENUM,
+  EMAIL_IN_ENUM,
+} from '@/app/constants/formValues';
+
 // primitive enums
-const SizeComparison = z.enum(['greater than', 'less than'] as const);
-const SizeUnit       = z.enum(['MB', 'KB', 'Bytes'] as const);
-const AgeComparison  = z.enum(['older than', 'newer than'] as const);
-const AgeUnit        = z.enum(['days', 'months', 'years'] as const);
-const TimeComparison = z.enum(['after', 'before'] as const);
-const RateUnit       = z.enum(['minutes', 'hours', 'days'] as const);
-const EmailIsEnum    = z.enum(['unread', 'read', 'starred', 'important'] as const);
-const HasEnum        = z.enum([
-  'attachment','drive','document','spreadsheet','presentation','image','video'
-] as const);
-const CategoryEnum   = z.enum([
-  'primary','social','promotions','updates','forums','reservations','purchases'
-] as const);
-const EmailInEnum    = z.enum(['inbox', 'draft', 'sent', 'chats', 'scheduled'] as const);
+const SizeComparison = z.enum(SIZE_COMPARISON_ENUM);
+const SizeUnit       = z.enum(SIZE_UNIT_ENUM);
+const AgeComparison  = z.enum(AGE_COMPARISON_ENUM);
+const AgeUnit        = z.enum(AGE_UNIT_ENUM);
+const TimeComparison = z.enum(TIME_COMPARISON_ENUM);
+const RateUnit       = z.enum(RATE_UNIT_ENUM);
+const EmailIsEnum    = z.enum(EMAIL_IS_ENUM);
+const HasEnum        = z.enum(HAS_ENUM);
+const CategoryEnum   = z.enum(CATEGORY_ENUM);
+const EmailInEnum    = z.enum(EMAIL_IN_ENUM);
 
 // schedule schemas
 const OneTimeScheduleSchema = z.object({ date: z.date(), time: z.string() }).required();
 const RecurringScheduleSchema = z.object({
-  rate: z.object({ value: z.number(), unit: RateUnit }).required(),
+  rate: z.object({ value: z.coerce.number(), unit: RateUnit }).required(),
   startDate: z.date(),
   startTime: z.string(),
   endDate: z.date(),
@@ -88,15 +97,15 @@ const LabelsSchema      = z.object({ enabled: z.boolean(), labels: z.string() })
 const CategorySchema    = z.object({ enabled: z.boolean(), category: CategoryEnum.array() });
 const SizeSchema        = z.object({
   enabled: z.boolean(),
-  size: z.object({ comparison: SizeComparison, value: z.number(), unit: SizeUnit }),
+  size: z.object({ comparison: SizeComparison, value: z.coerce.number(), unit: SizeUnit }),
 });
 const AgeSchema         = z.object({
   enabled: z.boolean(),
-  age: z.object({ comparison: AgeComparison, value: z.number(), unit: AgeUnit }),
+  age: z.object({ comparison: AgeComparison, value: z.coerce.number(), unit: AgeUnit }),
 });
 const TimeSchemaField   = z.object({
   enabled: z.boolean(),
-  time: z.object({ comparison: TimeComparison, value: z.string() }),
+  time: z.object({ comparison: TimeComparison, value: z.date() }),
 });
 const EmailInSchema     = z.object({ enabled: z.boolean(), emailIn: EmailInEnum.array() });
 

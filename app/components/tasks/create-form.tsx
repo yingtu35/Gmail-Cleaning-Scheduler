@@ -128,13 +128,11 @@ const FormControlGroup = ({
 
 interface CreateFormProps {
   formValues: FormValues;
-  setFormValues: React.Dispatch<React.SetStateAction<FormValues>>;
   resetTemplate: () => void;
 }
 
 const CreateForm = ({
   formValues,
-  setFormValues,
   resetTemplate
 }: CreateFormProps) => {
   const router = useRouter();
@@ -149,17 +147,12 @@ const CreateForm = ({
   // define steps with labels and components
   const stepDefinitions = [
     { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Schedule Details" control={control} watch={watch} /> },
-    { label: 'Task', element: <TaskForm key="Task" {...formValues} updateFields={updateFields} /> },
+    { label: 'Task', element: <TaskForm key="Task" control={control} watch={watch} /> },
     { label: 'Review', element: <ReviewForm key="Review" formValues={formValues} /> },
   ];
   const stepConfigs: StepConfig[] = stepDefinitions.map(d => ({ label: d.label }));
   const { stepRefs, visibleSteps, currentStep, maxStep, isFirstStep, isLastStep, nextStep, prevStep, goToStep } =
   useMultiStepForm(stepDefinitions.map(d => d.element));
-
-  
-  function updateFields(fields: Partial<FormValues>) {
-    setFormValues({ ...formValues, ...fields });
-  }
 
   const onBackClicked = () => {
     if (isFirstStep) {

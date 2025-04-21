@@ -52,7 +52,6 @@ export default function CreateTask() {
       return (
         <CreateForm
           formValues={formValues}
-          setFormValues={setFormValues}
           resetTemplate={resetTemplate}
         />
       );

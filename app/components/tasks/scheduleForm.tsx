@@ -292,53 +292,53 @@ export function ScheduleForm({
             )}
           />
           <div className="flex items-center space-x-4">
-          <FormField
-            control={control}
-            name="occurrence.Schedule.rate.value"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Rate Value</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="30"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Value
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name="occurrence.Schedule.rate.unit"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Unit</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <FormField
+              control={control}
+              name="occurrence.Schedule.rate.value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Rate Value</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="days" />
-                    </SelectTrigger>
+                    <Input
+                      type="number"
+                      placeholder="30"
+                      {...field}
+                    />
                   </FormControl>
-                  <SelectContent>
-                    {["minutes", "hours", "days"].map((unit) => (
-                      <SelectItem key={unit} value={unit}>
-                        {unit}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  Unit
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormDescription>
+                    Value
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="occurrence.Schedule.rate.unit"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Unit</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="days" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {["minutes", "hours", "days"].map((unit) => (
+                        <SelectItem key={unit} value={unit}>
+                          {unit}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Unit
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
           <FormField
             control={control}
