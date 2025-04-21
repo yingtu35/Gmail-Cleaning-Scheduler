@@ -41,7 +41,7 @@ export default function StepIndicator({ steps, currentStep, maxStep, goToStep }:
                 >
                   {idx + 1}
                 </Button>
-                <span className="ml-2 text-sm text-gray-700 hidden sm:inline-block">
+                <span className={`ml-2 text-sm text-gray-700 hidden sm:inline-block ${isActive ? 'font-semibold' : ''}`}>
                   {step.label}
                 </span>
               </div>

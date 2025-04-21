@@ -74,15 +74,15 @@ const QUERY_EMPTY: FormValues = {
   },
   from: {
     enabled: false,
-    from: '',
+    from: [],
   },
   to: {
     enabled: false,
-    to: '',
+    to: [],
   },
   title: {
     enabled: false,
-    title: '',
+    title: [],
   },
   emailIs: {
     enabled: false,
@@ -90,7 +90,7 @@ const QUERY_EMPTY: FormValues = {
   },
   doesntHave: {
     enabled: false,
-    doesntHave: '',
+    doesntHave: [],
   },
   has: {
     enabled: false,
@@ -98,7 +98,7 @@ const QUERY_EMPTY: FormValues = {
   },
   labels: {
     enabled: false,
-    labels: '',
+    labels: [],
   },
   category: {
     enabled: false,
@@ -152,15 +152,15 @@ const QUERY_OLD_UNREAD: FormValues = {
   },
   from: {
     enabled: false,
-    from: '',
+    from: [],
   },
   to: {
     enabled: false,
-    to: '',
+    to: [],
   },
   title: {
     enabled: false,
-    title: '',
+    title: [],
   },
   emailIs: {
     enabled: true,
@@ -168,7 +168,7 @@ const QUERY_OLD_UNREAD: FormValues = {
   },
   doesntHave: {
     enabled: false,
-    doesntHave: '',
+    doesntHave: [],
   },
   has: {
     enabled: false,
@@ -176,7 +176,7 @@ const QUERY_OLD_UNREAD: FormValues = {
   },
   labels: {
     enabled: false,
-    labels: '',
+    labels: [],
   },
   category: {
     enabled: false,
@@ -224,15 +224,15 @@ const QUERY_LARGE_READ: FormValues = {
   },
   from: {
     enabled: false,
-    from: '',
+    from: [],
   },
   to: {
     enabled: false,
-    to: '',
+    to: [],
   },
   title: {
     enabled: false,
-    title: '',
+    title: [],
   },
   emailIs: {
     enabled: true,
@@ -240,7 +240,7 @@ const QUERY_LARGE_READ: FormValues = {
   },
   doesntHave: {
     enabled: false,
-    doesntHave: '',
+    doesntHave: [],
   },
   has: {
     enabled: false,
@@ -248,7 +248,7 @@ const QUERY_LARGE_READ: FormValues = {
   },
   labels: {
     enabled: false,
-    labels: '',
+    labels: [],
   },
   category: {
     enabled: false,
@@ -296,15 +296,15 @@ const QUERY_LAST_YEAR: FormValues = {
   },
   from: {
     enabled: false,
-    from: '',
+    from: [],
   },
   to: {
     enabled: false,
-    to: '',
+    to: [],
   },
   title: {
     enabled: false,
-    title: '',
+    title: [],
   },
   emailIs: {
     enabled: false,
@@ -312,7 +312,7 @@ const QUERY_LAST_YEAR: FormValues = {
   },
   doesntHave: {
     enabled: false,
-    doesntHave: '',
+    doesntHave: [],
   },
   has: {
     enabled: false,
@@ -320,7 +320,7 @@ const QUERY_LAST_YEAR: FormValues = {
   },
   labels: {
     enabled: false,
-    labels: '',
+    labels: [],
   },
   category: {
     enabled: false,
@@ -369,15 +369,15 @@ const QUERY_DRAFTS: FormValues = {
   },
   from: {
     enabled: false,
-    from: '',
+    from: [],
   },
   to: {
     enabled: false,
-    to: '',
+    to: [],
   },
   title: {
     enabled: false,
-    title: '',
+    title: [],
   },
   emailIs: {
     enabled: false,
@@ -385,7 +385,7 @@ const QUERY_DRAFTS: FormValues = {
   },
   doesntHave: {
     enabled: false,
-    doesntHave: '',
+    doesntHave: [],
   },
   has: {
     enabled: false,
@@ -393,7 +393,7 @@ const QUERY_DRAFTS: FormValues = {
   },
   labels: {
     enabled: false,
-    labels: '',
+    labels: [],
   },
   category: {
     enabled: false,
@@ -442,15 +442,15 @@ const QUERY_NOT_PRIMARY: FormValues = {
   },
   from: {
     enabled: false,
-    from: '',
+    from: [],
   },
   to: {
     enabled: false,
-    to: '',
+    to: [],
   },
   title: {
     enabled: false,
-    title: '',
+    title: [],
   },
   emailIs: {
     enabled: false,
@@ -458,7 +458,7 @@ const QUERY_NOT_PRIMARY: FormValues = {
   },
   doesntHave: {
     enabled: false,
-    doesntHave: '',
+    doesntHave: [],
   },
   has: {
     enabled: false,
@@ -466,7 +466,7 @@ const QUERY_NOT_PRIMARY: FormValues = {
   },
   labels: {
     enabled: false,
-    labels: '',
+    labels: [],
   },
   category: {
     enabled: true,

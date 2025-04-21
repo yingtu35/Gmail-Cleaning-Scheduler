@@ -87,13 +87,13 @@ const OccurrenceSchema = z.discriminatedUnion('Occurrence', [
 ]);
 
 // field schemas
-const FromSchema        = z.object({ enabled: z.boolean(), from: z.string() });
-const ToSchema          = z.object({ enabled: z.boolean(), to: z.string() });
-const TitleSchema       = z.object({ enabled: z.boolean(), title: z.string() });
+const FromSchema        = z.object({ enabled: z.boolean(), from: z.string().array() });
+const ToSchema          = z.object({ enabled: z.boolean(), to: z.string().array() });
+const TitleSchema       = z.object({ enabled: z.boolean(), title: z.string().array() });
 const EmailIsSchema     = z.object({ enabled: z.boolean(), emailIs: EmailIsEnum.array() });
-const DoesntHaveSchema  = z.object({ enabled: z.boolean(), doesntHave: z.string() });
+const DoesntHaveSchema  = z.object({ enabled: z.boolean(), doesntHave: z.string().array() });
 const HasSchema         = z.object({ enabled: z.boolean(), has: HasEnum.array() });
-const LabelsSchema      = z.object({ enabled: z.boolean(), labels: z.string() });
+const LabelsSchema      = z.object({ enabled: z.boolean(), labels: z.string().array() });
 const CategorySchema    = z.object({ enabled: z.boolean(), category: CategoryEnum.array() });
 const SizeSchema        = z.object({
   enabled: z.boolean(),

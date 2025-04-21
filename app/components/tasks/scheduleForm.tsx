@@ -263,7 +263,7 @@ export function ScheduleForm({
       )}
       {/* Recurring schedule pattern */}
       {occurrenceType === "Recurring" && (
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
           <FormField
             control={control}
             name="occurrence.TimeZone"
@@ -291,12 +291,12 @@ export function ScheduleForm({
               </FormItem>
             )}
           />
-          <div className="flex items-center space-x-4">
+          <div className="flex items-start space-x-4">
             <FormField
               control={control}
               name="occurrence.Schedule.rate.value"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel>Rate Value</FormLabel>
                   <FormControl>
                     <Input
@@ -305,10 +305,10 @@ export function ScheduleForm({
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    Value
-                  </FormDescription>
                   <FormMessage />
+                  <FormDescription>
+                    How often the schedule should repeat
+                  </FormDescription>
                 </FormItem>
               )}
             />
@@ -332,142 +332,137 @@ export function ScheduleForm({
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormDescription>
-                    Unit
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-          <FormField
-            control={control}
-            name="occurrence.Schedule.startDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Start Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "flex items-center h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a start date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date < new Date()
-                      }
-                      initialFocus
+          <div className="flex items-start space-x-4">
+            <FormField
+              control={control}
+              name="occurrence.Schedule.startDate"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Start Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "flex items-center h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a start date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date < new Date()
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                  <FormDescription>
+                    Describe when the schedule should start
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="occurrence.Schedule.startTime"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Time</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="time"
+                      placeholder="Select your time"
+                      {...field}
                     />
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>
-                  Start date for the schedule to be executed
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name="occurrence.Schedule.startTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Start Time</FormLabel>
-                <FormControl>
-                  <Input
-                    type="time"
-                    placeholder="Select your time"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Start time for the schedule to be executed
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name="occurrence.Schedule.endDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>End Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "flex items-center h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a end date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date < new Date() || date > DATE_THREE_YEARS_FROM_NOW
-                      }
-                      initialFocus
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex items-start space-x-4">
+            <FormField
+              control={control}
+              name="occurrence.Schedule.endDate"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>End Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "flex items-center h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a end date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date < new Date() || date > DATE_THREE_YEARS_FROM_NOW
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                  <FormDescription>
+                    Describe when the schedule should end
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="occurrence.Schedule.endTime"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Time</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="time"
+                      placeholder="Select your time"
+                      {...field}
                     />
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>
-                  End date for the schedule to be executed
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={control}
-            name="occurrence.Schedule.endTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>End Time</FormLabel>
-                <FormControl>
-                  <Input
-                    type="time"
-                    placeholder="Select your time"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  End time for the schedule to be executed
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
       )}
     </FormWrapper>
