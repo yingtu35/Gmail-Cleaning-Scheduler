@@ -1,5 +1,7 @@
 // This file contains type definitions for the data.
 // It describes the shape of the data, and what data type each property should accept.
+import { z } from 'zod';
+import { formValuesSchema } from './validation/form';
 
 export type UserIconType = {
   name: string;
@@ -136,23 +138,7 @@ export type EmailInType = {
   emailIn: EmailInValue[];
 }
 
-export type FormValues = {
-  name: string;
-  description: string;
-  occurrence: OccurrenceType;
-  from: FromType;
-  to: ToType;
-  title: TitleType;
-  emailIs: EmailIsType;
-  doesntHave: DoesntHaveType;
-  has: HasType;
-  labels: LabelsType;
-  category: CategoryType;
-  size: SizeType;
-  age: AgeType;
-  time: TimeType;
-  emailIn: EmailInType;
-}
+export type FormValues = z.infer<typeof formValuesSchema>
 
 export type LambdaInput = {
   email: string;

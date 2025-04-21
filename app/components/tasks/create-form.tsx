@@ -1,16 +1,16 @@
 "use client"
 
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/lib/utils';
 import useMultiStepForm from '@/app/hooks/useMultiStepForm';
-import { isFormValid } from '@/app/utils/form';
 import { createTask } from '@/app/lib/actions';
-import {
-  FormValues,
-} from '@/app/lib/definitions';
+import { formValuesSchema }  from '@/app/lib/validation/form'
+import type { FormValues }    from '@/app/lib/definitions'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +22,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  Form,
+} from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
 
 
@@ -136,19 +139,27 @@ const CreateForm = ({
 }: CreateFormProps) => {
   const router = useRouter();
 
-  function updateFields(fields: Partial<FormValues>) {
-    setFormValues({ ...formValues, ...fields });
-  }
-
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formValuesSchema),
+    defaultValues: formValues,
+    mode: 'onChange'
+  });
+  const { handleSubmit, control, watch } = form;
+  
   // define steps with labels and components
   const stepDefinitions = [
-    { label: 'Schedule', element: <ScheduleForm key="Schedule" {...formValues} updateFields={updateFields} isEditing={false} /> },
+    { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Schedule Details" control={control} watch={watch} /> },
     { label: 'Task', element: <TaskForm key="Task" {...formValues} updateFields={updateFields} /> },
     { label: 'Review', element: <ReviewForm key="Review" formValues={formValues} /> },
   ];
   const stepConfigs: StepConfig[] = stepDefinitions.map(d => ({ label: d.label }));
   const { stepRefs, visibleSteps, currentStep, maxStep, isFirstStep, isLastStep, nextStep, prevStep, goToStep } =
-    useMultiStepForm(stepDefinitions.map(d => d.element));
+  useMultiStepForm(stepDefinitions.map(d => d.element));
+
+  
+  function updateFields(fields: Partial<FormValues>) {
+    setFormValues({ ...formValues, ...fields });
+  }
 
   const onBackClicked = () => {
     if (isFirstStep) {
@@ -162,46 +173,44 @@ const CreateForm = ({
     router.push('/');
   }
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!isFormValid(currentStep, formValues)) {
-      return;
-    }
+  const onSubmit = (values: FormValues) => {
     if (!isLastStep) return nextStep();
-    createTask(formValues);
-    // TODO: Add notification
-  };
+    createTask(values);
+  }
   return (
-    <form id="task-form" onSubmit={onSubmit} className="flex flex-col h-screen">
-      <div className="sticky top-0 bg-white flex items-center justify-between p-4 z-10 shadow">
-        <div className="flex-1">
-          <StepIndicator
-            steps={stepConfigs}
-            currentStep={currentStep}
-            maxStep={maxStep}
-            goToStep={goToStep}
+    <Form {...form}>
+      <form id="task-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-screen">
+        {/* Form header */}
+        <div className="sticky top-0 bg-white flex items-center justify-between p-4 z-10 shadow">
+          <div className="flex-1">
+            <StepIndicator
+              steps={stepConfigs}
+              currentStep={currentStep}
+              maxStep={maxStep}
+              goToStep={goToStep}
+            />
+          </div>
+          <FormControlGroup
+            isFirstStep={isFirstStep}
+            isLastStep={isLastStep}
+            onBackClicked={onBackClicked}
+            onCancelClicked={onCancelClicked}
           />
         </div>
-        <FormControlGroup
-          isFirstStep={isFirstStep}
-          isLastStep={isLastStep}
-          onBackClicked={onBackClicked}
-          onCancelClicked={onCancelClicked}
-        />
-      </div>
-      <div className="flex-1 overflow-hidden min-h-0">
-        {visibleSteps.map((stepElement, idx) => (
-          <div
-            key={idx}
-            ref={stepRefs.current[idx]}
-            className="h-full snap-start relative flex flex-col overflow-y-auto m-4 p-4 space-y-4"
-          >
-            {/* Step content */}
-            {stepElement}
-          </div>
-        ))}
-      </div>
-    </form>
+        <div className="flex-1 overflow-hidden min-h-0">
+          {visibleSteps.map((stepElement, idx) => (
+            <div
+              key={idx}
+              ref={stepRefs.current[idx]}
+              className="h-full snap-start relative flex flex-col overflow-y-auto m-4 p-4 space-y-4"
+            >
+              {/* Step content */}
+              {stepElement}
+            </div>
+          ))}
+        </div>
+      </form>
+    </Form>
   );
 };
 
