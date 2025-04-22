@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button"
 import { DEFAULT_SCHEDULE, DATE_THREE_YEARS_FROM_NOW } from "@/app/constants/formValues";
 import { FormValues } from "@/app/lib/definitions";
 
+import { SectionWrapper } from "./sectionWrapper";
 import { FormWrapper } from "./formWrapper"
 
 
@@ -65,45 +66,48 @@ export function ScheduleForm({
   return (
     <FormWrapper title={title}>
       {/* Schedule Detail */}
-      {/* Name */}
-      <FormField
-        control={control}
-        name="name"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              Name
-            </FormLabel>
-            <FormControl>
-              <Input placeholder="Enter your schedule name" {...field} />
-            </FormControl>
-            <FormDescription>
-              Use only letters, numbers, dashes, dots or underscores. Max 64 characters
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={control}
-        name="description"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Description - optional</FormLabel>
-            <FormControl>
-              <Textarea 
-                placeholder="Enter your schedule description"
-                rows={8} 
-                {...field} 
-              />
-            </FormControl>
-            <FormDescription>
-              Maximum length is 512 characters
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <SectionWrapper title="Schedule name and description">
+        {/* Name */}
+        <FormField
+          control={control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Name
+              </FormLabel>
+              <FormControl>
+                <Input placeholder="Enter your schedule name" {...field} />
+              </FormControl>
+              <FormDescription>
+                Use only letters, numbers, dashes, dots or underscores. Max 64 characters
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description - optional</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Enter your schedule description"
+                  rows={6} 
+                  {...field} 
+                />
+              </FormControl>
+              <FormDescription>
+                Maximum length is 512 characters
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </SectionWrapper>
+      <SectionWrapper title="Schedule pattern">
       {/* Schedule */}
       <FormField
         control={control}
@@ -144,7 +148,7 @@ export function ScheduleForm({
                   <FormControl>
                     <RadioGroupItem value="One-time" />
                   </FormControl>
-                  <FormLabel className="font-normal">
+                  <FormLabel className="font-normal cursor-pointer">
                     One Time Schedule
                   </FormLabel>
                 </FormItem>
@@ -152,7 +156,7 @@ export function ScheduleForm({
                   <FormControl>
                     <RadioGroupItem value="Recurring" />
                   </FormControl>
-                  <FormLabel className="font-normal">
+                  <FormLabel className="font-normal cursor-pointer">
                     Recurring Schedule
                   </FormLabel>
                 </FormItem>
@@ -160,7 +164,7 @@ export function ScheduleForm({
             </FormControl>
             <FormMessage />
             <FormDescription>
-              Select the schedule type. One-time or Recurring
+              Select the schedule type
             </FormDescription>
           </FormItem>
         )}
@@ -465,6 +469,7 @@ export function ScheduleForm({
           </div>
         </div>
       )}
+      </SectionWrapper>
     </FormWrapper>
   )
 }
