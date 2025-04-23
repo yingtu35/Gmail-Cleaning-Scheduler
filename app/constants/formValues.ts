@@ -1,8 +1,9 @@
 import {
   FormValues,
 } from '@/app/lib/definitions';
+import { start } from 'repl';
 
-const DEFAULT_TIME_ZONE = 'America/Los_Angeles';
+export const DEFAULT_TIME_ZONE = '(UTC-08:00) America/Los_Angeles';
 
 const DATE_ONE_DAY_FROM_NOW = new Date(Date.now() + 24 * 60 * 60 * 1000);
 const DATE_THREE_MONTHS_FROM_NOW = new Date(Date.now() + 3 * 30 * 24 * 60 * 60 * 1000);
@@ -22,10 +23,14 @@ const DEFAULT_RECURRING_SCHEDULE = {
     value: 90,
     unit: 'days'
   },
-  startDate: new Date(),
-  startTime: DEFAULT_TIME,
-  endDate: DATE_THREE_MONTHS_FROM_NOW,
-  endTime: DEFAULT_TIME,
+  startDateAndTime: {
+    date: DATE_ONE_DAY_FROM_NOW,
+    time: DEFAULT_TIME,
+  },
+  endDateAndTime: {
+    date: DATE_THREE_MONTHS_FROM_NOW,
+    time: DEFAULT_TIME,
+  }
 }
 
 export const SIZE_COMPARISON_ENUM = ['greater than', 'less than'] as const;
@@ -144,10 +149,14 @@ const QUERY_OLD_UNREAD: FormValues = {
         value: 90,
         unit: 'days'
       },
-      startDate: new Date(),
-      startTime: DEFAULT_TIME,
-      endDate: DATE_THREE_MONTHS_FROM_NOW, 
-      endTime: DEFAULT_TIME,
+      startDateAndTime: {
+        date: new Date(),
+        time: DEFAULT_TIME,
+      },
+      endDateAndTime: {
+        date: DATE_THREE_MONTHS_FROM_NOW, 
+        time: DEFAULT_TIME,
+      },
     }
   },
   from: {

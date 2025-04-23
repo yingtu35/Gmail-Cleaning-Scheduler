@@ -29,14 +29,12 @@ const EmailInEnum    = z.enum(EMAIL_IN_ENUM);
 const OneTimeScheduleSchema = z.object({ date: z.date(), time: z.string() }).required();
 const RecurringScheduleSchema = z.object({
   rate: z.object({ value: z.coerce.number(), unit: RateUnit }).required(),
-  startDate: z.date(),
-  startTime: z.string(),
-  endDate: z.date(),
-  endTime: z.string(),
-})
-// validate that start date and time is before end date and time
-.superRefine((obj, ctx) => {
-  const { startDate, startTime, endDate, endTime } = obj; 
+  startDateAndTime: z.object({ date: z.date(), time: z.string() }),
+  endDateAndTime: z.object({ date: z.date(), time: z.string() }),
+}).superRefine((obj, ctx) => {
+  const { startDateAndTime, endDateAndTime } = obj; 
+  const { date: startDate, time: startTime } = startDateAndTime;
+  const { date: endDate, time: endTime } = endDateAndTime;
   const [sh, sm] = startTime.split(':').map(Number);
   const [eh, em] = endTime.split(':').map(Number);
   const startTs = new Date(

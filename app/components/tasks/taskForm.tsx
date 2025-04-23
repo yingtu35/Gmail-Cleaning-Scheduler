@@ -73,7 +73,7 @@ export function TaskForm({
 
   return (
     <FormWrapper title={title}>
-      <SectionWrapper title="Gmail Participants">
+      <SectionWrapper title="Participant Filters">
         <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="flex space-x-4">
             <FormField
@@ -145,7 +145,7 @@ export function TaskForm({
           </div>
         </div>
       </SectionWrapper>
-      <SectionWrapper title="Gmail Content">
+      <SectionWrapper title="Content Filters">
         <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="flex space-x-4">
             <FormField
@@ -243,7 +243,7 @@ export function TaskForm({
           </div>
         </div>
       </SectionWrapper>
-      <SectionWrapper title="Gmail Classification">
+      <SectionWrapper title="Classification Filters">
         <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="flex space-x-4">
             <FormField
@@ -377,7 +377,7 @@ export function TaskForm({
           </div>
         </div>
       </SectionWrapper>
-      <SectionWrapper title="Gmail Quantitative Filters">
+      <SectionWrapper title="Quantitative Filters">
         <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="flex space-x-4">
             <FormField

@@ -186,7 +186,7 @@ export function ScheduleForm({
                 </FormControl>
                 <SelectContent>
                   {timezones.map((tz) => (
-                    <SelectItem key={tz.tzCode} value={tz.tzCode}>
+                    <SelectItem key={tz.tzCode} value={`(UTC${tz.utc}) ${tz.tzCode}`}>
                       (UTC{tz.utc}) {tz.tzCode}
                     </SelectItem>
                   ))}
@@ -282,7 +282,7 @@ export function ScheduleForm({
                   </FormControl>
                   <SelectContent>
                     {timezones.map((tz) => (
-                      <SelectItem key={tz.tzCode} value={tz.tzCode}>
+                      <SelectItem key={tz.tzCode} value={`(UTC${tz.utc}) ${tz.tzCode}`}>
                         (UTC{tz.utc}) {tz.tzCode}
                       </SelectItem>
                     ))}
@@ -344,7 +344,7 @@ export function ScheduleForm({
           <div className="flex items-start space-x-4">
             <FormField
               control={control}
-              name="occurrence.Schedule.startDate"
+              name="occurrence.Schedule.startDateAndTime.date"
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormLabel>Start Date</FormLabel>
@@ -388,7 +388,7 @@ export function ScheduleForm({
             />
             <FormField
               control={control}
-              name="occurrence.Schedule.startTime"
+              name="occurrence.Schedule.startDateAndTime.time"
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormLabel>Time</FormLabel>
@@ -407,7 +407,7 @@ export function ScheduleForm({
           <div className="flex items-start space-x-4">
             <FormField
               control={control}
-              name="occurrence.Schedule.endDate"
+              name="occurrence.Schedule.endDateAndTime.date"
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormLabel>End Date</FormLabel>
@@ -451,7 +451,7 @@ export function ScheduleForm({
             />
             <FormField
               control={control}
-              name="occurrence.Schedule.endTime"
+              name="occurrence.Schedule.endDateAndTime.time"
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormLabel>Time</FormLabel>

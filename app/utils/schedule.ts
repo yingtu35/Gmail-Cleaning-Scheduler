@@ -63,13 +63,15 @@ export function formatFields(jsonObj: FormValues): string {
       }
   }
 
-  processField('from', jsonObj.from, value => formatStringField('from', value));
-  processField('to', jsonObj.to, value => formatStringField('to', value));
-  processField('title', jsonObj.title, value => formatStringField('title', value));
+  processField('from', jsonObj.from, value => formatArrayField('from', value));
+  processField('to', jsonObj.to, value => formatArrayField('to', value));
+  // TODO: title should be "subject"
+  processField('title', jsonObj.title, value => formatArrayField('title', value));
   processField('emailIs', jsonObj.emailIs, value => formatArrayField('is', value));
-  processField('doesntHave', jsonObj.doesntHave, value => formatStringField('doesntHave', value));
+  // TODO: doesntHave should be "-"
+  processField('doesntHave', jsonObj.doesntHave, value => formatArrayField('doesntHave', value));
   processField('has', jsonObj.has, value => formatArrayField('has', value));
-  processField('labels', jsonObj.labels, value => formatStringField('label', value));
+  processField('labels', jsonObj.labels, value => formatArrayField('label', value));
   processField('category', jsonObj.category, value => formatArrayField('category', value));
   processField('size', jsonObj.size, value => formatSizeField(value));
   processField('age', jsonObj.age, value => formatAgeField(value));

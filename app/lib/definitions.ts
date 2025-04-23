@@ -49,7 +49,7 @@ export type AgeValue = {
 export type TimeComparison = 'after' | 'before';
 export type TimeValue = {
   comparison: TimeComparison;
-  value: string;
+  value: Date;
 }
 
 export type OneTimeSchedule = {
