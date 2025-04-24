@@ -13,44 +13,23 @@ export const mockTasks: Task[] = [
       description: "Remove old marketing emails",
       occurrence: {
         Occurrence: "Recurring",
-        TimeZone: "America/Los_Angeles",
+        TimeZone: "(UTC-08:00) America/Los_Angeles",
         Schedule: {
           rate: {
             value: 7,
             unit: "days"
           },
-          startDate: "2025-03-10",
-          endDate: "2025-05-10"
+          startDateAndTime: { date: new Date("2025-03-10"), time: "00:00" },
+          endDateAndTime: { date: new Date("2025-05-10"), time: "00:00" }
         }
       },
-      from: {
-        enabled: true,
-        from: "newsletter@example.com"
-      },
-      to: {
-        enabled: false,
-        to: ""
-      },
-      title: {
-        enabled: false,
-        title: ""
-      },
-      emailIs: {
-        enabled: true,
-        emailIs: ["read"]
-      },
-      doesntHave: {
-        enabled: false,
-        doesntHave: ""
-      },
-      has: {
-        enabled: false,
-        has: []
-      },
-      labels: {
-        enabled: false,
-        labels: ""
-      },
+      from: { enabled: true, from: ["newsletter@example.com"] },
+      to: { enabled: false, to: [] },
+      title: { enabled: false, title: [] },
+      emailIs: { enabled: true, emailIs: ["read"] },
+      doesntHave: { enabled: false, doesntHave: [] },
+      has: { enabled: false, has: [] },
+      labels: { enabled: false, labels: [] },
       category: {
         enabled: true,
         category: ["promotions"]
@@ -75,7 +54,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -98,21 +77,21 @@ export const mockTasks: Task[] = [
         Occurrence: "One-time",
         TimeZone: "America/New_York",
         Schedule: {
-          date: "2025-04-01",
+          date: new Date("2025-04-01"),
           time: "14:30"
         }
       },
       from: {
         enabled: false,
-        from: ""
+        from: []
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: false,
-        title: ""
+        title: []
       },
       emailIs: {
         enabled: false,
@@ -120,7 +99,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: true,
@@ -128,7 +107,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: false,
@@ -154,7 +133,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -181,21 +160,21 @@ export const mockTasks: Task[] = [
             value: 1,
             unit: "days"
           },
-          startDate: "2025-03-01",
-          endDate: "2025-12-31"
+          startDateAndTime: { date: new Date("2025-03-01"), time: "00:00" },
+          endDateAndTime: { date: new Date("2025-12-31"), time: "00:00" }
         }
       },
       from: {
         enabled: false,
-        from: ""
+        from: []
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: false,
-        title: ""
+        title: []
       },
       emailIs: {
         enabled: false,
@@ -203,7 +182,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -211,7 +190,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: true,
@@ -237,7 +216,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -260,21 +239,21 @@ export const mockTasks: Task[] = [
         Occurrence: "One-time",
         TimeZone: "Asia/Tokyo",
         Schedule: {
-          date: "2025-04-20",
+          date: new Date("2025-04-20"),
           time: "16:45"
         }
       },
       from: {
         enabled: false,
-        from: ""
+        from: []
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: false,
-        title: ""
+        title: []
       },
       emailIs: {
         enabled: false,
@@ -282,7 +261,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -290,7 +269,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: false,
@@ -316,7 +295,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -339,21 +318,21 @@ export const mockTasks: Task[] = [
         Occurrence: "One-time",
         TimeZone: "America/Chicago",
         Schedule: {
-          date: "2025-04-10",
+          date: new Date("2025-04-10"),
           time: "08:30"
         }
       },
       from: {
         enabled: false,
-        from: ""
+        from: []
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: false,
-        title: ""
+        title: []
       },
       emailIs: {
         enabled: false,
@@ -361,7 +340,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -369,7 +348,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: true,
@@ -395,7 +374,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -416,27 +395,27 @@ export const mockTasks: Task[] = [
       description: "Move purchase receipts to a special folder",
       occurrence: {
         Occurrence: "Recurring",
-        TimeZone: "America/Los_Angeles",
+        TimeZone: "(UTC-08:00) America/Los_Angeles",
         Schedule: {
           rate: {
             value: 1,
             unit: "days"
           },
-          startDate: "2025-02-28",
-          endDate: "2026-02-28"
+          startDateAndTime: { date: new Date("2025-02-28"), time: "00:00" },
+          endDateAndTime: { date: new Date("2026-02-28"), time: "00:00" }
         }
       },
       from: {
         enabled: false,
-        from: ""
+        from: []
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: false,
-        title: ""
+        title: []
       },
       emailIs: {
         enabled: false,
@@ -444,7 +423,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -452,7 +431,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: true,
@@ -478,7 +457,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -501,21 +480,21 @@ export const mockTasks: Task[] = [
         Occurrence: "One-time",
         TimeZone: "Europe/Berlin",
         Schedule: {
-          date: "2025-04-05",
+          date: new Date("2025-04-05"),
           time: "11:20"
         }
       },
       from: {
         enabled: true,
-        from: "noreply@unwanted-sender.com"
+        from: ["noreply@unwanted-sender.com"]
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: false,
-        title: ""
+        title: []
       },
       emailIs: {
         enabled: false,
@@ -523,7 +502,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -531,7 +510,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: false,
@@ -557,7 +536,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -584,21 +563,21 @@ export const mockTasks: Task[] = [
             value: 12,
             unit: "hours"
           },
-          startDate: "2025-01-05",
-          endDate: "2025-12-31"
+          startDateAndTime: { date: new Date("2025-01-05"), time: "00:00" },
+          endDateAndTime: { date: new Date("2025-12-31"), time: "00:00" }
         }
       },
       from: {
         enabled: false,
-        from: ""
+        from: []
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: false,
-        title: ""
+        title: []
       },
       emailIs: {
         enabled: true,
@@ -606,7 +585,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -614,7 +593,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: false,
@@ -640,7 +619,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -663,21 +642,21 @@ export const mockTasks: Task[] = [
         Occurrence: "One-time",
         TimeZone: "UTC",
         Schedule: {
-          date: "2025-05-20",
+          date: new Date("2025-05-20"),
           time: "10:10"
         }
       },
       from: {
         enabled: false,
-        from: ""
+        from: []
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: false,
-        title: ""
+        title: []
       },
       emailIs: {
         enabled: false,
@@ -685,7 +664,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -693,7 +672,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: false,
@@ -719,7 +698,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -746,21 +725,21 @@ export const mockTasks: Task[] = [
             value: 3,
             unit: "days"
           },
-          startDate: "2025-03-30",
-          endDate: "2025-04-30"
+          startDateAndTime: { date: new Date("2025-03-30"), time: "00:00" },
+          endDateAndTime: { date: new Date("2025-04-30"), time: "00:00" }
         }
       },
       from: {
         enabled: false,
-        from: ""
+        from: []
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: false,
-        title: ""
+        title: []
       },
       emailIs: {
         enabled: false,
@@ -768,7 +747,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -776,7 +755,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: true,
@@ -802,7 +781,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -829,21 +808,21 @@ export const mockTasks: Task[] = [
             value: 2,
             unit: "hours"
           },
-          startDate: "2025-02-05",
-          endDate: "2025-12-31"
+          startDateAndTime: { date: new Date("2025-02-05"), time: "00:00" },
+          endDateAndTime: { date: new Date("2025-12-31"), time: "00:00" }
         }
       },
       from: {
         enabled: false,
-        from: ""
+        from: []
       },
       to: {
         enabled: true,
-        to: "me@example.com"
+        to: ["me@example.com"]
       },
       title: {
         enabled: true,
-        title: "invite|meeting|calendar"
+        title: ["invite", "meeting", "calendar"]
       },
       emailIs: {
         enabled: true,
@@ -851,7 +830,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -859,7 +838,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: true,
@@ -885,7 +864,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -906,23 +885,23 @@ export const mockTasks: Task[] = [
       description: "Move travel-related emails to a dedicated folder",
       occurrence: {
         Occurrence: "One-time",
-        TimeZone: "America/Los_Angeles",
+        TimeZone: "(UTC-08:00) America/Los_Angeles",
         Schedule: {
-          date: "2025-06-12",
+          date: new Date("2025-06-12"),
           time: "11:30"
         }
       },
       from: {
         enabled: false,
-        from: ""
+        from: []
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: true,
-        title: "reservation|booking|ticket|itinerary|confirmation"
+        title: ["reservation", "booking", "ticket", "itinerary", "confirmation"]
       },
       emailIs: {
         enabled: false,
@@ -930,7 +909,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -938,7 +917,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: true,
@@ -964,7 +943,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -987,21 +966,21 @@ export const mockTasks: Task[] = [
         Occurrence: "One-time",
         TimeZone: "UTC",
         Schedule: {
-          date: "2025-04-10",
+          date: new Date("2025-04-10"),
           time: "14:15"
         }
       },
       from: {
         enabled: true,
-        from: "drive-shares-noreply@google.com"
+        from: ["drive-shares-noreply@google.com"]
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: false,
-        title: ""
+        title: []
       },
       emailIs: {
         enabled: false,
@@ -1009,7 +988,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: true,
@@ -1017,7 +996,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: false,
@@ -1043,7 +1022,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -1070,21 +1049,21 @@ export const mockTasks: Task[] = [
             value: 12,
             unit: "hours"
           },
-          startDate: "2025-01-15",
-          endDate: "2026-01-15"
+          startDateAndTime: { date: new Date("2025-01-15"), time: "00:00" },
+          endDateAndTime: { date: new Date("2026-01-15"), time: "00:00" }
         }
       },
       from: {
         enabled: true,
-        from: "boss@company.com,clients@company.com"
+        from: ["boss@company.com", "clients@company.com"]
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: true,
-        title: "urgent|important|priority|deadline"
+        title: ["urgent", "important", "priority", "deadline"]
       },
       emailIs: {
         enabled: true,
@@ -1092,7 +1071,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -1100,7 +1079,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: true,
@@ -1126,7 +1105,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -1153,21 +1132,21 @@ export const mockTasks: Task[] = [
             value: 7,
             unit: "days"
           },
-          startDate: "2025-03-08",
-          endDate: "2025-04-08"
+          startDateAndTime: { date: new Date("2025-03-08"), time: "00:00" },
+          endDateAndTime: { date: new Date("2025-04-08"), time: "00:00" }
         }
       },
       from: {
         enabled: false,
-        from: ""
+        from: []
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: true,
-        title: "newsletter|subscribe|weekly digest"
+        title: ["newsletter", "subscribe", "weekly digest"]
       },
       emailIs: {
         enabled: false,
@@ -1175,7 +1154,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: true,
-        doesntHave: "important"
+        doesntHave: ["important"]
       },
       has: {
         enabled: false,
@@ -1183,7 +1162,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: true,
@@ -1209,7 +1188,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -1236,21 +1215,21 @@ export const mockTasks: Task[] = [
             value: 30,
             unit: "days"
           },
-          startDate: "2025-02-25",
-          endDate: "2025-12-31"
+          startDateAndTime: { date: new Date("2025-02-25"), time: "00:00" },
+          endDateAndTime: { date: new Date("2025-12-31"), time: "00:00" }
         }
       },
       from: {
         enabled: false,
-        from: ""
+        from: []
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: true,
-        title: "project-X|project-Y|QXZ-123"
+        title: ["project-X", "project-Y", "QXZ-123"]
       },
       emailIs: {
         enabled: false,
@@ -1258,7 +1237,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: true,
@@ -1266,7 +1245,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: true,
-        labels: "completed-projects"
+        labels: ["completed-projects"]
       },
       category: {
         enabled: false,
@@ -1292,7 +1271,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -1315,21 +1294,21 @@ export const mockTasks: Task[] = [
         Occurrence: "One-time",
         TimeZone: "America/Chicago",
         Schedule: {
-          date: "2025-05-28",
+          date: new Date("2025-05-28"),
           time: "16:35"
         }
       },
       from: {
         enabled: true,
-        from: "notifications@|noreply@|no-reply@"
+        from: ["notifications@", "noreply@", "no-reply@"]
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: false,
-        title: ""
+        title: []
       },
       emailIs: {
         enabled: true,
@@ -1337,7 +1316,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -1345,7 +1324,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: true,
@@ -1371,7 +1350,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {
@@ -1394,21 +1373,21 @@ export const mockTasks: Task[] = [
         Occurrence: "One-time",
         TimeZone: "Asia/Tokyo",
         Schedule: {
-          date: "2025-04-01",
+          date: new Date("2025-04-01"),
           time: "10:00"
         }
       },
       from: {
         enabled: true,
-        from: "chat@teams.com,chat@slack.com,notifications@discord.com"
+        from: ["chat@teams.com", "chat@slack.com", "notifications@discord.com"]
       },
       to: {
         enabled: false,
-        to: ""
+        to: []
       },
       title: {
         enabled: false,
-        title: ""
+        title: []
       },
       emailIs: {
         enabled: false,
@@ -1416,7 +1395,7 @@ export const mockTasks: Task[] = [
       },
       doesntHave: {
         enabled: false,
-        doesntHave: ""
+        doesntHave: []
       },
       has: {
         enabled: false,
@@ -1424,7 +1403,7 @@ export const mockTasks: Task[] = [
       },
       labels: {
         enabled: false,
-        labels: ""
+        labels: []
       },
       category: {
         enabled: true,
@@ -1450,7 +1429,7 @@ export const mockTasks: Task[] = [
         enabled: false,
         time: {
           comparison: "before",
-          value: ""
+          value: new Date()
         }
       },
       emailIn: {

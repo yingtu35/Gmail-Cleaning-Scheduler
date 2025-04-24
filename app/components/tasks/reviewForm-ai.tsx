@@ -49,7 +49,7 @@ export default function ReviewFormAI({
       {isResultGenerated ? (
         <>
           <ScheduleDetail scheduleEntries={scheduleEntries} />
-          <TaskDetail taskEntries={taskEntries} formValues={formValues} />
+          <TaskDetail taskEntries={taskEntries} />
         </>
       ) : (
         <GenerateScheduleForm onGenerate={onGenerate} error={error} />

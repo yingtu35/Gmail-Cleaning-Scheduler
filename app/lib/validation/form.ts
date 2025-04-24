@@ -109,11 +109,11 @@ const EmailInSchema     = z.object({ enabled: z.boolean(), emailIn: EmailInEnum.
 
 // main form schema
 export const formValuesSchema = z.object({
-  // name should use only letters, numbers, dashes, dots or underscores. Max 64 characters.
+  // name should use only letters, numbers, dashes, dots, underscores or spaces. Max 64 characters.
   name:        z.string()
                 .min(1, "Name is required.")
                 .max(64, "Name should be less than 64 characters.")
-                .regex(/^[a-zA-Z0-9._-]+$/, "Name should only contain letters, numbers, dashes, dots or underscores."),
+                .regex(/^[a-zA-Z0-9._\-\s]+$/, "Name should only contain letters, numbers, dashes, dots, underscores or spaces."),
   description: z.string()
                 .max(512, "Description should be less than 512 characters.")
                 .optional(),
