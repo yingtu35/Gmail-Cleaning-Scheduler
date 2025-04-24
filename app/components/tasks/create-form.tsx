@@ -112,6 +112,7 @@ const FormControlGroup = ({
         variant="default"
         type="submit"
         disabled={isLastStep}
+        className={cn(isLastStep ? "cursor-not-allowed" : "cursor-pointer")}
       >
         Next
       </Button>
@@ -119,6 +120,7 @@ const FormControlGroup = ({
         variant="default"
         type="submit"
         disabled={!isLastStep}
+        className={cn(isLastStep ? "cursor-pointer" : "cursor-not-allowed")}
       >
         Create
       </Button>

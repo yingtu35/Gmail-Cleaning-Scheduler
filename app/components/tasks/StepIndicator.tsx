@@ -28,7 +28,7 @@ export default function StepIndicator({ steps, currentStep, maxStep, goToStep }:
             >
               <div
                 onClick ={() => isUnlocked && goToStep(idx)}
-                className="flex items-center cursor-pointer"
+                className={`flex items-center ${isUnlocked ? 'cursor-pointer' : 'cursor-not-allowed'}`}
               >
                 <Button
                   variant={isActive ? 'default' : isUnlocked ? 'outline' : 'ghost'}
