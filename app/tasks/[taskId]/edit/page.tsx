@@ -4,7 +4,7 @@ import EditForm from "@/app/components/tasks/edit-form";
 
 import { mockTasks } from "@/app/data/mock-task";
 
-export async function getMockTask() {
+async function getMockTask() {
   await new Promise(resolve => setTimeout(resolve, 2000));
   return mockTasks[0];
 }
