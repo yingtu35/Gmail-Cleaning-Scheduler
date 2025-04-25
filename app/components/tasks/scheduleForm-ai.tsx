@@ -1,81 +1,153 @@
-import { AIPromptValues, SchedulePromptType } from '@/app/lib/definitions';
+import { useEffect, useRef } from 'react';
+import { Control, UseFormWatch, useFormContext } from 'react-hook-form';
+
+import { AIFormValues } from '@/app/lib/definitions';
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Textarea } from "@/components/ui/textarea";
+
 import { FormWrapper } from './formWrapper';
+import { SectionWrapper } from './sectionWrapper';
 
 type ScheduleFormAIProps = {
-  schedulePrompt: SchedulePromptType;
-  updatePromptFields: (fields: Partial<AIPromptValues>) => void;
+  title: string;
+  control: Control<AIFormValues>;
+  watch: UseFormWatch<AIFormValues>;
 }
 
 export default function ScheduleFormAI({
-  schedulePrompt,
-  updatePromptFields,
+  title,
+  control,
+  watch,
 }: ScheduleFormAIProps) {
+  const { setValue } = useFormContext<AIFormValues>();
+  // refs to remember user-entered values
+  const oneTimeRef = useRef<any>();
+  const recurringRef = useRef<any>();
+  const occurrenceType = watch("prompt.schedulePrompt.Occurrence");
+  const prompt = watch("prompt.schedulePrompt.Prompt");
+
+// update refs whenever schedule changes
+  useEffect(() => {
+    if (occurrenceType === 'One-time') {
+      oneTimeRef.current = prompt;
+    } else {
+      recurringRef.current = prompt;
+    }
+  }, [prompt, occurrenceType]);
   return (
-    <FormWrapper title="Describe your schedule">
-      <div className="flex flex-col items-center justify-center bg-gray-100 p-4">
-        <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-md space-y-6">
-          {/* Choose between One-time schedule or Recurring schedule */}
-          <div className="space-y-2">
-            <p className="text-lg font-medium">Do you want your schedule one-time only or recurring?</p>
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => updatePromptFields({ schedulePrompt: { ...schedulePrompt, isOneTime: true } })}
-                className={`flex-1 p-2 rounded-lg focus:outline-none focus:ring-2 ${schedulePrompt.isOneTime ? 'bg-blue-500 text-white' : 'border'} transition-colors`}
+    <FormWrapper title={title}>
+      <SectionWrapper title="Schedule Description">
+        <FormField
+          control={control}
+          name="prompt.schedulePrompt.Occurrence"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Do you want your schedule one-time only or recurring?</FormLabel>
+              <FormControl>
+              <RadioGroup
+                onValueChange={(val) => {
+                  // swap to preserved values or defaults
+                  if (val === 'One-time') {
+                    setValue('prompt.schedulePrompt.Prompt', oneTimeRef.current ?? "");
+                  } else {
+                    setValue('prompt.schedulePrompt.Prompt', recurringRef.current ?? "");
+                  }
+                  field.onChange(val);
+                }}
+                value={field.value}
+                className="flex space-x-4"
               >
-                One Time
-              </button>
-              <button
-                type="button"
-                onClick={() => updatePromptFields({ schedulePrompt: { ...schedulePrompt, isOneTime: false } })}
-                className={`flex-1 p-2 rounded-lg focus:outline-none focus:ring-2 ${!schedulePrompt.isOneTime ? 'bg-blue-500 text-white' : 'border'} transition-colors`}
-              >
-                Recurring
-              </button>
-            </div>
-          </div>
-          { schedulePrompt.isOneTime ? 
-            <OneTimeFormAI schedulePrompt={schedulePrompt} updatePromptFields={updatePromptFields} /> : 
-            <RecurringFormAI schedulePrompt={schedulePrompt} updatePromptFields={updatePromptFields} /> 
-          }
-        </div>
-      </div>
+                <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormControl>
+                    <RadioGroupItem value="One-time" />
+                  </FormControl>
+                  <FormLabel className="font-normal cursor-pointer">
+                    One Time
+                  </FormLabel>
+                </FormItem>
+                <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormControl>
+                    <RadioGroupItem value="Recurring" />
+                  </FormControl>
+                  <FormLabel className="font-normal cursor-pointer">
+                    Recurring
+                  </FormLabel>
+                </FormItem>
+              </RadioGroup>
+            </FormControl>
+            <FormMessage />
+            <FormDescription>
+              Select the schedule type
+            </FormDescription>
+          </FormItem>
+          )}
+        />
+        {occurrenceType === 'One-time' ? (
+          <OneTimeFormAI control={control} />
+        ) : (
+          <RecurringFormAI control={control} />
+        )}
+      </SectionWrapper>
     </FormWrapper>
   )
 }
 
 function OneTimeFormAI({ 
-  schedulePrompt,
-  updatePromptFields 
-} : ScheduleFormAIProps) {
+  control
+} : {
+  control: Control<AIFormValues>;
+}) {
   return (
-    <div className={`${schedulePrompt.isOneTime ? "opacity-100" : "opacity-0" } space-y-2 transition ease-in-out duration-500`}>
-      <p className="text-lg font-medium">When do you want to schedule your task?</p>
-      <p className="text-gray-600">e.g. 2024-12-31 23:59, 3 days from now, same time next month, etc.</p>
-      <textarea
-        placeholder="Enter your schedule description here"
-        value={schedulePrompt.oneTimePrompt}
-        onChange={(e) => updatePromptFields({ schedulePrompt: { ...schedulePrompt, oneTimePrompt: e.target.value } })}
-        className="border p-2 w-full h-24 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-      />
-    </div>
+    <FormField
+      control={control}
+      name="prompt.schedulePrompt.Prompt"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>When do you want to schedule your task?</FormLabel>
+          <FormControl>
+            <Textarea 
+              placeholder="e.g. 2024-12-31 23:59, 3 days from now, same time next month, etc."
+              rows={6} 
+              {...field} 
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   )
 }
 
 function RecurringFormAI({ 
-  schedulePrompt,
-  updatePromptFields 
-} : ScheduleFormAIProps) {
+  control
+} : {
+  control: Control<AIFormValues>;
+}) {
   return (
-    <div className={`${schedulePrompt.isOneTime ? "opacity-0" : "opacity-100" } space-y-2 transition ease-in-out duration-500`}>
-      <p className="text-lg font-medium">How often do you want to repeat this schedule?</p>
-      <p className="text-gray-600">e.g. every 3 months, starting from next month, and ending in 6 months</p>
-      <textarea
-        value={schedulePrompt.recurringPrompt}
-        onChange={(e) => updatePromptFields({ schedulePrompt: { ...schedulePrompt, recurringPrompt: e.target.value } })}
-        placeholder="Enter your schedule description here"
-        className="border p-2 w-full h-24 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-      />
-    </div>
+    <FormField
+      control={control}
+      name="prompt.schedulePrompt.Prompt"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>How often do you want to repeat this schedule?</FormLabel>
+          <FormControl>
+            <Textarea 
+              placeholder="e.g. every 3 months, starting from next month, and ending in 6 months"
+              rows={6} 
+              {...field} 
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   )
 }

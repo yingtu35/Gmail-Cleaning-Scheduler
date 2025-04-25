@@ -1,52 +1,55 @@
 import {
   FormValues,
-  AIPromptValues,
+  AIFormValues,
   SchedulePromptType,
 } from '@/app/lib/definitions';
 import { FormWrapper } from './formWrapper';
 import { ScheduleDetail, TaskDetail } from './reviewForm';
 import { useState } from 'react';
 import { generateScheduleByPrompt } from '@/app/lib/actions';
+import { UseFormSetValue, UseFormWatch } from 'react-hook-form';
 
 type ReviewFormAIProps = {
-  formValues: FormValues;
-  aiPromptValues: AIPromptValues;
-  updateFields: (fields: FormValues) => void;
-  isResultGenerated: boolean;
-  setIsResultGenerated: React.Dispatch<React.SetStateAction<boolean>>;
+  setValue: UseFormSetValue<AIFormValues>;
+  watch: UseFormWatch<AIFormValues>;
 }
 
 export default function ReviewFormAI({
-  formValues,
-  aiPromptValues,
-  updateFields,
-  isResultGenerated,
-  setIsResultGenerated
+  setValue,
+  watch
 }: ReviewFormAIProps) {
+  const aiFormValues = watch();
+
+  const { prompt, formValues } = aiFormValues;
+  const { isGenerated, value: formValuesValue } = formValues;
   const [error, setError] = useState<string | null>(null);
-  const promptEntries = Object.entries(aiPromptValues)
 
   // convert formValues to an array of key-value pairs
-  const aggregatedEntries = Object.entries(formValues)
+  const aggregatedEntries = Object.entries(formValuesValue)
   // extract the first 3 entries
   const scheduleEntries = aggregatedEntries.slice(0, 3)
   const taskEntries = aggregatedEntries.slice(3)
 
   async function onGenerate() {
-    alert('Generating Schedule');
-    // TODO: Call action to generate schedule
-    const result = await generateScheduleByPrompt(aiPromptValues);
+    const result = await generateScheduleByPrompt(prompt);
     if (typeof result === "string") {
       setError(result);
     } else {
-      setIsResultGenerated(true);
-      updateFields(result);
+      setValue("formValues", {
+        isGenerated: true,
+        value: result,
+      });
+
+      setError(null);
     }
   }
+  
   return (
     <FormWrapper title="Schedule Review">
-      <PromptDetail promptEntries={promptEntries} />
-      {isResultGenerated ? (
+      <PromptDetail 
+        prompt={prompt}
+      />
+      {isGenerated ? (
         <>
           <ScheduleDetail scheduleEntries={scheduleEntries} />
           <TaskDetail taskEntries={taskEntries} />
@@ -82,27 +85,28 @@ function GenerateScheduleForm({
   )
 }
 
+interface PromptDetailProps {
+  prompt: {
+    taskPrompt: string;
+    schedulePrompt: {
+      Occurrence: string;
+      Prompt: string;
+    }
+  }
+}
+
 function PromptDetail({
-  promptEntries
-}: {
-  promptEntries: [string, string | SchedulePromptType][]
-}) {
+  prompt
+}: PromptDetailProps) {
+  const { taskPrompt, schedulePrompt } = prompt;
   return (
     <div className="space-y-4 p-4 border">
       <h3 className="text-2xl">Prompt Detail</h3>
       <div className="grid grid-cols-3 gap-2">
-        {promptEntries.map(([key, value]) => {
-          if (typeof value === "object") {
-            return (
-              <RenderSchedulePrompt key={key} value={value} />
-            )
-          } else {
-            return (
-              <RenderValuePrompt key={key} keyField={key} value={value} />
-            )
-          }
-        })}
+        {taskPrompt}
       </div>
+      <p>{schedulePrompt.Occurrence}</p>
+      <p>{schedulePrompt.Prompt}</p>
     </div>
   )
 }

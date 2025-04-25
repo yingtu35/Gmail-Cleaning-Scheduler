@@ -11,11 +11,12 @@ import { eq, and, count } from "drizzle-orm";
 import { createSchedule, updateSchedule, deleteSchedule } from "@/app/aws/scheduler";
 import { subscribe } from "@/app/aws/sns";
 
-import { UserInDB, Task, FormValues, AIPromptValues } from "@/app/lib/definitions";
+import { UserInDB, Task, FormValues, AIFormValues, AIPromptType } from "@/app/lib/definitions";
 import { convertToUTCDate, createCommandInput } from "@/app/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/app/utils/database";
 
 import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/app/openai/chat";
+import { QUERY_TEMPLATE } from "@/app/constants/formValues";
 import log from "../utils/log";
 
 export async function authenticate() {
@@ -273,12 +274,17 @@ export async function getSearchQueryExplanation(prevState: any, query: string) {
   return result;
 }
 
-export async function generateScheduleByPrompt(prompt: AIPromptValues): Promise<FormValues | string>{
-  const result = await getScheduleByPrompt(prompt);
-  if (!result) {
-    return "Sorry, There was an error processing your request. Please try again later.";
-  }
-  const formValues = JSON.parse(result) as FormValues;
-  log.debug("generated schedule", formValues);
+export async function generateScheduleByPrompt(prompt: AIPromptType): Promise<FormValues | string>{
+  // const result = await getScheduleByPrompt(prompt);
+  // if (!result) {
+  //   return "Sorry, There was an error processing your request. Please try again later.";
+  // }
+  // const formValues = JSON.parse(result) as FormValues;
+  // log.debug("generated schedule", formValues);
+
+  // TODO: remove this mock data
+  // returns the mock data after 1 second
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  const formValues = QUERY_TEMPLATE.QUERY_AI_TEMPLATE;
   return formValues;
 }
