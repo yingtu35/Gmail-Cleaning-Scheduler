@@ -1,31 +1,51 @@
-import { AIPromptValues } from "@/app/lib/definitions";
+import { Control } from "react-hook-form";
+
+import { AIFormValues } from "@/app/lib/definitions";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Textarea } from "@/components/ui/textarea";
 
 import { FormWrapper } from "./formWrapper"
-
+import { SectionWrapper } from "./sectionWrapper";
 
 type TaskFormAIProps = {
-  taskPrompt: string;
-  updatePromptFields: (fields: Partial<AIPromptValues>) => void;
+  title: string;
+  control: Control<AIFormValues>;
 };
 
 export default function TaskFormAI({
-  taskPrompt,
-  updatePromptFields
+  title,
+  control
 }: TaskFormAIProps) {
   return (
-    <FormWrapper title="Describe your task">
-      <div className="flex flex-col items-center justify-center bg-gray-100 p-4">
-        <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-md">
-          <p className="text-xl font-semibold mb-2">What kind of emails would you like to delete?</p>
-          <p className="text-gray-600 mb-4">e.g. emails from John Doe, and emails older than 3 months</p>
-          <textarea 
-            value={taskPrompt}
-            onChange={(e) => updatePromptFields({ taskPrompt: e.target.value })}
-            placeholder="Enter your task description here"
-            className="border p-2 w-full h-40 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-          />
-        </div>
-      </div>
+    <FormWrapper title={title}>
+      <SectionWrapper title="What kind of emails would you like to delete?">
+        <FormField
+          control={control}
+          name="prompt.taskPrompt"
+          render={({ field }) => (
+            <FormItem>
+              <FormDescription>
+                e.g. emails from John Doe, and emails older than 3 months
+              </FormDescription>
+              <FormControl>
+                <Textarea 
+                  placeholder="emails from John Doe, and emails older than 3 months"
+                  rows={6} 
+                  {...field} 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </SectionWrapper>
     </FormWrapper>
   )
 }

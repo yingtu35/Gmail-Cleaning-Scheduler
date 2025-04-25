@@ -510,6 +510,28 @@ const QUERY_NOT_PRIMARY: FormValues = {
     emailIn: [],
   },
 }
+// Simple template satisfying formValuesSchema
+export const QUERY_AI_TEMPLATE: FormValues = {
+  name: 'a',
+  description: '',
+  occurrence: {
+    Occurrence: 'One-time',
+    TimeZone: DEFAULT_TIME_ZONE,
+    Schedule: { date: new Date(), time: DEFAULT_TIME },
+  },
+  from: { enabled: false, from: [] },
+  to: { enabled: false, to: [] },
+  title: { enabled: false, title: [] },
+  emailIs: { enabled: false, emailIs: [] },
+  doesntHave: { enabled: false, doesntHave: [] },
+  has: { enabled: false, has: [] },
+  labels: { enabled: false, labels: [] },
+  category: { enabled: false, category: [] },
+  size: { enabled: false, size: { comparison: 'greater than', value: 0, unit: 'MB' } },
+  age: { enabled: false, age: { comparison: 'older than', value: 0, unit: 'days' } },
+  time: { enabled: false, time: { comparison: 'before', value: new Date() } },
+  emailIn: { enabled: false, emailIn: [] },
+};
 
 export type QueryName = 'QUERY_EMPTY_FORM' | 
 'QUERY_OLD_UNREAD_FORM' | 
@@ -517,7 +539,7 @@ export type QueryName = 'QUERY_EMPTY_FORM' |
 'QUERY_LAST_YEAR_FORM' | 
 'QUERY_DRAFTS_FORM' | 
 'QUERY_NOT_PRIMARY_FORM' |
-'QUERY_GENERAL_FORM';
+'QUERY_AI_TEMPLATE';
 
 export const QUERY_TEMPLATE: Record<QueryName, FormValues> = {
   QUERY_EMPTY_FORM: QUERY_EMPTY,
@@ -526,7 +548,7 @@ export const QUERY_TEMPLATE: Record<QueryName, FormValues> = {
   QUERY_LAST_YEAR_FORM: QUERY_LAST_YEAR,
   QUERY_DRAFTS_FORM: QUERY_DRAFTS,
   QUERY_NOT_PRIMARY_FORM: QUERY_NOT_PRIMARY,
-  QUERY_GENERAL_FORM: QUERY_EMPTY,
+  QUERY_AI_TEMPLATE: QUERY_AI_TEMPLATE,
 }
 
 export const DEFAULT_SCHEDULE = {

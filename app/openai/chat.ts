@@ -2,7 +2,7 @@ import { openai } from "./client";
 import { PROMPT_TYPES } from "@/app/constants/prompt-types";
 import { QUERY_TEMPLATE } from "../constants/formValues";
 import {
-  AIPromptValues
+  AIPromptType
 } from '@/app/lib/definitions';
 import log from "../utils/log";
 
@@ -29,7 +29,7 @@ export async function getEmailSearchesExplanation(query: string) {
   }
 }
 
-export async function getScheduleByPrompt(prompt: AIPromptValues) {
+export async function getScheduleByPrompt(prompt: AIPromptType) {
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",

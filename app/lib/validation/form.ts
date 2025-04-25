@@ -131,3 +131,39 @@ export const formValuesSchema = z.object({
   time:        TimeSchemaField,
   emailIn:     EmailInSchema,
 });
+
+const ScheduleOneTimeSchema = z.object({
+  Occurrence: z.literal('One-time'),
+  Prompt: z.string()
+    .min(1, "Task prompt is required.")
+    .max(512, "Task prompt should be less than 512 characters."),
+});
+const ScheduleRecurringSchema = z.object({
+  Occurrence: z.literal('Recurring'),
+  Prompt: z.string()
+    .min(1, "Task prompt is required.")
+    .max(512, "Task prompt should be less than 512 characters."),
+});
+
+const SchedulePromptSchema = z.discriminatedUnion('Occurrence', [
+  ScheduleOneTimeSchema,
+  ScheduleRecurringSchema,
+]);
+
+export const PromptSchema = z.object({
+  taskPrompt : z.string()
+    .min(1, "Task prompt is required.")
+    .max(512, "Task prompt should be less than 512 characters."),
+  schedulePrompt: SchedulePromptSchema,
+})
+
+export const AIFormValuesSchema = z.object({
+  prompt: PromptSchema,
+  formValues: z.object({
+    isGenerated: z.boolean({
+      required_error: "Please generate a schedule first.",
+      invalid_type_error: "Unexpected error occurred. Please try again.",
+    }),
+    value: formValuesSchema,
+  }),
+});
