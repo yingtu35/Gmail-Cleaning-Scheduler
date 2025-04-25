@@ -28,7 +28,7 @@ export default function StepIndicator({ steps, currentStep, maxStep, goToStep }:
             >
               <div
                 onClick ={() => isUnlocked && goToStep(idx)}
-                className="flex items-center cursor-pointer"
+                className={`flex items-center ${isUnlocked ? 'cursor-pointer' : 'cursor-not-allowed'}`}
               >
                 <Button
                   variant={isActive ? 'default' : isUnlocked ? 'outline' : 'ghost'}
@@ -41,7 +41,7 @@ export default function StepIndicator({ steps, currentStep, maxStep, goToStep }:
                 >
                   {idx + 1}
                 </Button>
-                <span className="ml-2 text-sm text-gray-700 hidden sm:inline-block">
+                <span className={`ml-2 text-sm text-gray-700 hidden sm:inline-block ${isActive ? 'font-semibold' : ''}`}>
                   {step.label}
                 </span>
               </div>

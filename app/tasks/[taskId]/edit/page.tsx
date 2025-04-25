@@ -2,6 +2,13 @@ import { FormValues, Task as TaskType } from "@/app/lib/definitions";
 import { getTaskById } from "@/app/lib/actions";
 import EditForm from "@/app/components/tasks/edit-form";
 
+import { mockTasks } from "@/app/data/mock-task";
+
+async function getMockTask() {
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  return mockTasks[0];
+}
+
 export default async function Page({
   params
 }: {
@@ -10,6 +17,7 @@ export default async function Page({
   }
 }) {
   const task: TaskType | null = await getTaskById(params.taskId);
+  // const task: TaskType | null = await getMockTask();
   if (!task) {
     return <div>Task not found</div>
   }

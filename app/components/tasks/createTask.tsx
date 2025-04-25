@@ -45,13 +45,13 @@ export default function CreateTask() {
           setFormValues={setFormValues}
           aiPromptValues={aiPromptValues}
           setAIPromptValues={setAIPromptValues}
+          resetTemplate={resetTemplate}
         />
       );
     default:
       return (
         <CreateForm
           formValues={formValues}
-          setFormValues={setFormValues}
           resetTemplate={resetTemplate}
         />
       );
