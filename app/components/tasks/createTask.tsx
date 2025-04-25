@@ -26,6 +26,12 @@ export default function CreateTask() {
     setSelectedTemplate(TEMPLATE_TYPE.EMPTY);
   }
 
+  function resetTemplate() {
+    setSelectedTemplate(null);
+    setFormValues(QUERY_TEMPLATE.QUERY_EMPTY_FORM);
+    setAIPromptValues(INITIAL_AI_STATE);
+  }
+
   if (selectedTemplate === null) {
     return <TemplateSelection onSelectTemplate={onSelectTemplate} />;
   }
@@ -39,13 +45,14 @@ export default function CreateTask() {
           setFormValues={setFormValues}
           aiPromptValues={aiPromptValues}
           setAIPromptValues={setAIPromptValues}
+          resetTemplate={resetTemplate}
         />
       );
     default:
       return (
         <CreateForm
           formValues={formValues}
-          setFormValues={setFormValues}
+          resetTemplate={resetTemplate}
         />
       );
   }

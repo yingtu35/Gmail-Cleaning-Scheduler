@@ -63,13 +63,15 @@ export function formatFields(jsonObj: FormValues): string {
       }
   }
 
-  processField('from', jsonObj.from, value => formatStringField('from', value));
-  processField('to', jsonObj.to, value => formatStringField('to', value));
-  processField('title', jsonObj.title, value => formatStringField('title', value));
+  processField('from', jsonObj.from, value => formatArrayField('from', value));
+  processField('to', jsonObj.to, value => formatArrayField('to', value));
+  // TODO: title should be "subject"
+  processField('title', jsonObj.title, value => formatArrayField('title', value));
   processField('emailIs', jsonObj.emailIs, value => formatArrayField('is', value));
-  processField('doesntHave', jsonObj.doesntHave, value => formatStringField('doesntHave', value));
+  // TODO: doesntHave should be "-"
+  processField('doesntHave', jsonObj.doesntHave, value => formatArrayField('doesntHave', value));
   processField('has', jsonObj.has, value => formatArrayField('has', value));
-  processField('labels', jsonObj.labels, value => formatStringField('label', value));
+  processField('labels', jsonObj.labels, value => formatArrayField('label', value));
   processField('category', jsonObj.category, value => formatArrayField('category', value));
   processField('size', jsonObj.size, value => formatSizeField(value));
   processField('age', jsonObj.age, value => formatAgeField(value));
@@ -89,20 +91,20 @@ function createLambdaInput(q: string, user:UserInDB): LambdaInput {
   };
 }
 
-export function convertToUTCDate(dateString: string, timezone: string): Date | null {
-  // Parse the date string using moment-timezone with the specified timezone
-  const parsedDate = moment.tz(dateString, timezone);
-  
-  // Validate if the parsedDate is valid
-  if (!parsedDate.isValid()) {
-      console.error('Invalid date or timezone');
-      return null;
+export function convertToUTCDate(
+  dateTime: { date: Date; time: string },
+  timezone: string
+): Date | null {
+  // Construct ISO string from date and time, interpret in given timezone
+  const iso = `${dateTime.date.toISOString().split('T')[0]}T${dateTime.time}`;
+  const parsed = moment.tz(iso, timezone);
+  // Validate parsed date
+  if (!parsed.isValid()) {
+    console.error('Invalid date or timezone');
+    return null;
   }
-  
-  // Get the UTC date object
-  const utcDate = parsedDate.toDate();
-  
-  return utcDate;
+  // Convert to UTC and return Date object
+  return parsed.utc().toDate();
 }
 
 function formatName(name: string): string {
@@ -131,8 +133,10 @@ export function createCommandInput(data: FormValues, user: UserInDB) {
     } as CommandInput;
   } else {
     scheduleExpression = `rate(${data.occurrence.Schedule.rate.value} ${data.occurrence.Schedule.rate.unit})`;
-    const startDate = convertToUTCDate(data.occurrence.Schedule.startDate, scheduleExpressionTimezone);
-    const endDate = convertToUTCDate(data.occurrence.Schedule.endDate, scheduleExpressionTimezone);
+    // convert start/end dateTime objects to UTC
+    const { startDateAndTime, endDateAndTime } = data.occurrence.Schedule;
+    const startDate = convertToUTCDate(startDateAndTime, scheduleExpressionTimezone);
+    const endDate = convertToUTCDate(endDateAndTime, scheduleExpressionTimezone);
     commandInput = {
       name,
       scheduleExpression,

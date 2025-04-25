@@ -1,58 +1,209 @@
 "use client"
+
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+
 import useMultiStepForm from '@/app/hooks/useMultiStepForm';
-import { ScheduleForm } from './scheduleForm';
-import { TaskForm } from './taskForm';
-import { ReviewForm } from './reviewForm';
+import { cn } from '@/lib/utils';
 import {
   FormValues,
 } from '@/app/lib/definitions';
-import { isFormValid } from '@/app/utils/form';
 import { updateTask } from '@/app/lib/actions';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { formValuesSchema }  from '@/app/lib/validation/form'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import {
+  Form,
+} from "@/components/ui/form"
+import { Button } from '@/components/ui/button';
+
+import { ScheduleForm } from './scheduleForm';
+import { TaskForm } from './taskForm';
+import { ReviewForm } from './reviewForm';
+import StepIndicator, { StepConfig } from './StepIndicator';
+
+interface FormControlGroupProps {
+  isFirstStep: boolean;
+  isLastStep: boolean;
+  onBackClicked: () => void;
+  onCancelClicked: () => void;
+}
+
+const FormControlGroup = ({
+  isFirstStep,
+  isLastStep,
+  onBackClicked,
+  onCancelClicked,
+  className,
+}: FormControlGroupProps & {
+  className?: string;
+}) => {
+  const backButton = isFirstStep ? (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="secondary"
+          type="button"
+        >
+          Back
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you sure you want to go back?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This will take you back to task page and you will lose all your progress.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={onBackClicked}>Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ) : (
+    <Button
+      variant="secondary"
+      type="button"
+      onClick={onBackClicked}
+    >
+      Back
+    </Button>
+  )
+
+  return (
+    <div className={cn("flex items-center space-x-4", className)}>
+      <Link href="https://support.google.com/mail/answer/7190?hl=en" target="_blank" className="text-blue-600 hover:underline">Help</Link>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button
+            variant="destructive"
+            type="button"
+          >
+            Cancel
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to cancel?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will cancel the editing process and you will lose all your progress.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onCancelClicked}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      {backButton}
+      <Button
+        variant="default"
+        type="submit"
+        disabled={isLastStep}
+        className={cn(isLastStep ? "cursor-not-allowed" : "cursor-pointer")}
+      >
+        Next
+      </Button>
+      <Button
+        variant="default"
+        type="submit"
+        disabled={!isLastStep}
+        className={cn(isLastStep ? "cursor-pointer" : "cursor-not-allowed")}
+      >
+        Update
+      </Button>
+    </div>
+  )
+}
 
 const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
+  const router = useRouter();
+  
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formValuesSchema),
+    defaultValues: task,
+    mode: 'onChange'
+  });
+  const { handleSubmit, control, watch } = form;
   const [formValues, setFormValues] = useState<FormValues>(task);
   function updateFields(fields: Partial<FormValues>) {
     setFormValues({ ...formValues, ...fields });
   }
 
-  const { steps, step, currentStep, isFirstStep, isLastStep, nextStep, prevStep, goToStep } = useMultiStepForm([
-    <ScheduleForm key="Schedule" {...formValues} updateFields={updateFields} isEditing={true} />,
-    <TaskForm key="Task" {...formValues} updateFields={updateFields} />,
-    <ReviewForm key="Review" formValues={formValues} />,
-  ]);
+  const stepDefinitions = [
+      { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Step 1: Schedule Details" control={control} watch={watch} /> },
+      { label: 'Task', element: <TaskForm key="Task" title="Step 2: Task Details" control={control} watch={watch} /> },
+      { label: 'Review', element: <ReviewForm key="Review" watch={watch} /> },
+    ];
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!isFormValid(currentStep, formValues)) {
-      return;
+  const stepConfigs: StepConfig[] = stepDefinitions.map(d => ({ label: d.label }));
+    const { stepRefs, visibleSteps, currentStep, maxStep, isFirstStep, isLastStep, nextStep, prevStep, goToStep } =
+    useMultiStepForm(stepDefinitions.map(d => d.element));
+
+  const onBackClicked = () => {
+    if (isFirstStep) {
+      router.back();
+    } else {
+      prevStep();
     }
-    if (!isLastStep) return nextStep();
-    // TODO: Edit Task
-    alert('Task Edited');
-    updateTask(formValues, taskId);
-  };
+  }
+
+  const onCancelClicked = () => {
+    router.back();
+  }
+
+  const onSubmit = (values: FormValues) => {
+      if (!isLastStep) return nextStep();
+      updateTask(values, taskId);
+  }
+
   return (
-    <form id="task-form" onSubmit={onSubmit}>
-      <div className="relative space-y-4 p-4">
-        <div className='absolute top-0 right-4'>
-          Step {currentStep + 1} of {steps.length}
+    <Form {...form}>
+      <form id="edit-task-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-screen">
+        {/* Form header */}
+        <div className="sticky top-0 bg-white flex items-center justify-between p-4 z-10 shadow">
+          <div className="flex-1">
+            <StepIndicator
+              steps={stepConfigs}
+              currentStep={currentStep}
+              maxStep={maxStep}
+              goToStep={goToStep}
+            />
+          </div>
+          <FormControlGroup
+            isFirstStep={isFirstStep}
+            isLastStep={isLastStep}
+            onBackClicked={onBackClicked}
+            onCancelClicked={onCancelClicked}
+          />
         </div>
-        {step}
-        <div className="flex items-center justify-end mt-4 gap-4">
-          <Link href="https://support.google.com/mail/answer/7190?hl=en" target='_blank' className="text-blue-600">Help</Link>
-          <Link href={`/tasks/${taskId}`}>
-            <button type="button" className="px-4 py-2 hover:bg-gray-200 transition text-gray-700 rounded-md">Cancel</button>
-          </Link>
-          {!isLastStep && <button type="button" onClick={() => goToStep(steps.length - 1)} className="px-4 py-2 bg-blue-600 text-white rounded-md">Skip to Review</button>}
-          {!isFirstStep && <button type="button" onClick={prevStep} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md">Back</button>}
-          <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md">
-            {isLastStep ? "Update" : "Next"}
-          </button>
+        <div className="flex-1 overflow-hidden min-h-0">
+          {visibleSteps.map((stepElement, idx) => (
+            <div
+              key={idx}
+              ref={stepRefs.current[idx]}
+              className="h-full snap-start relative flex flex-col overflow-y-auto m-4 p-4 space-y-4"
+            >
+              {/* Step content */}
+              {stepElement}
+            </div>
+          ))}
         </div>
-      </div>
-    </form>
+      </form>
+    </Form>
   );
 };
 
