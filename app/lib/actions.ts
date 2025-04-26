@@ -163,7 +163,7 @@ export async function createTask(data: FormValues) {
   }
   // create a new task in the database
   const newTask: Task = {
-    expiresAt: 'endDate' in data.occurrence.Schedule ? convertToUTCDate(data.occurrence.Schedule.endDate, data.occurrence.TimeZone) : null,
+    expiresAt: data.occurrence.Occurrence === 'Recurring' ? convertToUTCDate(data.occurrence.Schedule.endDateAndTime, data.occurrence.TimeZone) : null,
     repeatCount: 0,
     formValues: data,
     userId: user.id as string,
@@ -199,7 +199,7 @@ export async function updateTask(data: FormValues, taskId: string) {
     await db.update(UserTasksTable)
     .set({
       updatedAt: new Date(),
-      expiresAt: 'endDate' in data.occurrence.Schedule ? convertToUTCDate(data.occurrence.Schedule.endDate, data.occurrence.TimeZone) : null,
+      expiresAt: data.occurrence.Occurrence === 'Recurring' ? convertToUTCDate(data.occurrence.Schedule.endDateAndTime, data.occurrence.TimeZone) : null,
       repeatCount: 0,
       formValues: data,
     })

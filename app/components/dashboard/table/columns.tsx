@@ -124,7 +124,7 @@ export const columns: ColumnDef<Task>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <a href={`/tasks/edit/${task.id}`}>Edit</a>
+              <a href={`/tasks/${task.id}/edit`}>Edit</a>
             </DropdownMenuItem>
             <DropdownMenuItem className="text-red-500">
               Delete

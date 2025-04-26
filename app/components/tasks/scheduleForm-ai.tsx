@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { AIPromptValues, SchedulePromptType } from '@/app/lib/definitions';
+import { FormWrapper } from './formWrapper';
 
 type ScheduleFormAIProps = {
   schedulePrompt: SchedulePromptType;
@@ -11,34 +11,36 @@ export default function ScheduleFormAI({
   updatePromptFields,
 }: ScheduleFormAIProps) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-md space-y-6">
-        {/* Choose between One-time schedule or Recurring schedule */}
-        <div className="space-y-2">
-          <p className="text-lg font-medium">Do you want your schedule one-time only or recurring?</p>
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={() => updatePromptFields({ schedulePrompt: { ...schedulePrompt, isOneTime: true } })}
-              className={`flex-1 p-2 rounded-lg focus:outline-none focus:ring-2 ${schedulePrompt.isOneTime ? 'bg-blue-500 text-white' : 'border'} transition-colors`}
-            >
-              One Time
-            </button>
-            <button
-              type="button"
-              onClick={() => updatePromptFields({ schedulePrompt: { ...schedulePrompt, isOneTime: false } })}
-              className={`flex-1 p-2 rounded-lg focus:outline-none focus:ring-2 ${!schedulePrompt.isOneTime ? 'bg-blue-500 text-white' : 'border'} transition-colors`}
-            >
-              Recurring
-            </button>
+    <FormWrapper title="Describe your schedule">
+      <div className="flex flex-col items-center justify-center bg-gray-100 p-4">
+        <div className="w-full max-w-2xl bg-white p-8 rounded-lg shadow-md space-y-6">
+          {/* Choose between One-time schedule or Recurring schedule */}
+          <div className="space-y-2">
+            <p className="text-lg font-medium">Do you want your schedule one-time only or recurring?</p>
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => updatePromptFields({ schedulePrompt: { ...schedulePrompt, isOneTime: true } })}
+                className={`flex-1 p-2 rounded-lg focus:outline-none focus:ring-2 ${schedulePrompt.isOneTime ? 'bg-blue-500 text-white' : 'border'} transition-colors`}
+              >
+                One Time
+              </button>
+              <button
+                type="button"
+                onClick={() => updatePromptFields({ schedulePrompt: { ...schedulePrompt, isOneTime: false } })}
+                className={`flex-1 p-2 rounded-lg focus:outline-none focus:ring-2 ${!schedulePrompt.isOneTime ? 'bg-blue-500 text-white' : 'border'} transition-colors`}
+              >
+                Recurring
+              </button>
+            </div>
           </div>
+          { schedulePrompt.isOneTime ? 
+            <OneTimeFormAI schedulePrompt={schedulePrompt} updatePromptFields={updatePromptFields} /> : 
+            <RecurringFormAI schedulePrompt={schedulePrompt} updatePromptFields={updatePromptFields} /> 
+          }
         </div>
-        { schedulePrompt.isOneTime ? 
-          <OneTimeFormAI schedulePrompt={schedulePrompt} updatePromptFields={updatePromptFields} /> : 
-          <RecurringFormAI schedulePrompt={schedulePrompt} updatePromptFields={updatePromptFields} /> 
-        }
       </div>
-    </div>
+    </FormWrapper>
   )
 }
 

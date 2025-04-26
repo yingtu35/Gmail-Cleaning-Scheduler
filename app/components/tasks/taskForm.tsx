@@ -1,311 +1,655 @@
-import { useState } from "react";
-import { FormWrapper } from "./formWrapper"
-import { AgeComparison, AgeUnit, AgeType, CategoryType, DoesntHaveType, EmailInType, EmailIsType, FromType, HasType, LabelsType, SizeComparison, SizeType, SizeUnit, TimeComparison, TimeType, TitleType, ToType } from "@/app/lib/definitions";
-type TaskData = {
-  from: FromType;
-  to: ToType;
-  title: TitleType;
-  emailIs: EmailIsType;
-  doesntHave: DoesntHaveType;
-  has: HasType;
-  labels: LabelsType;
-  category: CategoryType;
-  size: SizeType;
-  age: AgeType;
-  time: TimeType;
-  emailIn: EmailInType;
-}
-type TaskFormProps = TaskData & {
-  updateFields: (fields: Partial<TaskData>) => void;
+'use client'
+
+import { Control, UseFormWatch } from "react-hook-form";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { InputTags } from "@/components/ui/input-tags";
+import { 
+  EMAIL_IS_OPTIONS,
+  HAS_OPTIONS,
+  CATEGORY_OPTIONS,
+  EMAIL_IN_OPTIONS,
+  SIZE_COMPARISON_ENUM,
+  SIZE_UNIT_ENUM,
+  AGE_COMPARISON_ENUM,
+  AGE_UNIT_ENUM,
+  TIME_COMPARISON_ENUM,
+ } from "@/app/constants/formValues";
+ import { FormValues } from "@/app/lib/definitions";
+ import { cn } from "@/lib/utils";
+
+ import { SectionWrapper } from "./sectionWrapper";
+ import { FormWrapper } from "./formWrapper"
+
+interface TaskFormProps {
+  title: string;
+  control: Control<FormValues>;
+  watch: UseFormWatch<FormValues>;
 }
 
 export function TaskForm({
-  from,
-  to,
   title,
-  emailIs,
-  doesntHave,
-  has,
-  labels,
-  category,
-  size,
-  age,
-  time,
-  emailIn,
-  updateFields
+  control,
+  watch,
 }: TaskFormProps) {
-  const handleMultipleSelect = (e: React.ChangeEvent<HTMLSelectElement>, obj: EmailInType | EmailIsType | HasType | CategoryType) => {
-    const key = e.target.name as keyof TaskData;
-    const value = Array.from(e.target.selectedOptions, (option) => option.value);
-    updateFields({ [key]: { ...obj, [key]: value } });
-  }
+  const watchFromEnabled = watch("from.enabled");
+  const watchToEnabled = watch("to.enabled");
+  const watchTitleEnabled = watch("title.enabled");
+  const watchDoesntHaveEnabled = watch("doesntHave.enabled");
+  const watchLabelsEnabled = watch("labels.enabled");
+  const watchEmailIsEnabled = watch("emailIs.enabled");
+  const watchEmailInEnabled = watch("emailIn.enabled");
+  const watchHasEnabled = watch("has.enabled");
+  const watchCategoryEnabled = watch("category.enabled");
+  const watchSizeEnabled = watch("size.enabled");
+  const watchAgeEnabled = watch("age.enabled");
+  const watchTimeEnabled = watch("time.enabled");
+
   return (
-    <FormWrapper title="Task Details">
-      <div className="flex items-center space-x-4">
-        <input 
-          type="checkbox" 
-          id="enableFrom" 
-          checked={from.enabled} 
-          onChange={() => updateFields({ from: { ...from, enabled: !from.enabled } })}
-          className="h-4 w-4 text-blue-600 border-gray-300 rounded" 
-          />
-        <label htmlFor="from" className="w-24 text-sm font-medium text-gray-700">From</label>
-        <input
-          type="text"
-          id="from"
-          name="from"
-          disabled={!from.enabled}
-          required={from.enabled}
-          value={from.from}
-          onChange={(e) => updateFields({ from: { ...from, from: e.target.value } })}
-          className="flex-1 border border-gray-300 rounded-md p-2" 
-          />
-      </div>
-      <div className="flex items-center space-x-4">
-        <input type="checkbox" id="enableTo" checked={to.enabled} onChange={() => updateFields({ to: { ...to, enabled: !to.enabled } })} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-        <label htmlFor="to" className="w-24 text-sm font-medium text-gray-700">To</label>
-        <input
-          type="text"
-          id="to"
-          name="to"
-          disabled={!to.enabled}
-          required={to.enabled}
-          value={to.to}
-          onChange={(e) => updateFields({ to: { ...to, to: e.target.value } })}
-          className="flex-1 border border-gray-300 rounded-md p-2"
-        />
-      </div>
-      <div className="flex items-center space-x-4">
-        <input type="checkbox" id="enableTitle" checked={title.enabled} onChange={() => updateFields({ title: { ...title, enabled: !title.enabled } })} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-        <label htmlFor="title" className="w-24 text-sm font-medium text-gray-700">Title</label>
-        <input
-          type="text"
-          id="title"
-          name="title"
-          disabled={!title.enabled}
-          required={title.enabled}
-          value={title.title}
-          onChange={(e) => updateFields({ title: { ...title, title: e.target.value } })}
-          className="flex-1 border border-gray-300 rounded-md p-2"
-        />
-      </div>
-      <div className="flex items-center space-x-4">
-        <input type="checkbox" id="enableIs" checked={emailIs.enabled} onChange={() => updateFields({ emailIs: { ...emailIs, enabled: !emailIs.enabled } })} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-        <label htmlFor="emailIs" className="w-24 text-sm font-medium text-gray-700">Emails are?</label>
-        <select
-          name="emailIs"
-          id="emailIs"
-          disabled={!emailIs.enabled}
-          required={emailIs.enabled}
-          value={emailIs.emailIs}
-          onChange={(e) => handleMultipleSelect(e, emailIs)}
-          className="flex-1 border border-gray-300 rounded-md p-2"
-          multiple
-        >
-          <option value="unread">unread</option>
-          <option value="read">read</option>
-          <option value="starred">starred</option>
-          <option value="important">important</option>
-        </select>
-      </div>
-      <div className="flex items-center space-x-4">
-        <input type="checkbox" id="enableDoesntHave" checked={doesntHave.enabled} onChange={() => updateFields({ doesntHave: { ...doesntHave, enabled: !doesntHave.enabled } })} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-        <label htmlFor="doesntHave" className="w-24 text-sm font-medium text-gray-700">Doesn&apos;t have</label>
-        <input
-          type="text"
-          id="doesntHave"
-          name="doesntHave"
-          disabled={!doesntHave.enabled}
-          required={doesntHave.enabled}
-          value={doesntHave.doesntHave}
-          onChange={(e) => updateFields({ doesntHave: { ...doesntHave, doesntHave: e.target.value } })}
-          className="flex-1 border border-gray-300 rounded-md p-2"
-        />
-      </div>
-      <div className="flex items-center space-x-4">
-        <input type="checkbox" id="enableHas" checked={has.enabled} onChange={() => updateFields({ has: { ...has, enabled: !has.enabled } })} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-        <label htmlFor="has" className="w-24 text-sm font-medium text-gray-700">Has</label>
-        <select
-          name="has"
-          id="has"
-          disabled={!has.enabled}
-          required={has.enabled}
-          value={has.has}
-          onChange={(e) => handleMultipleSelect(e, has)}
-          className="flex-1 border border-gray-300 rounded-md p-2"
-          multiple
-        >
-          <option value="attachment">attachment</option>
-          <option value="drive">drive</option>
-          <option value="document">document</option>
-          <option value="spreadsheet">spreadsheet</option>
-          <option value="presentation">presentation</option>
-          <option value="image">image</option>
-          <option value="video">video</option>
-        </select>
-      </div>
-      <div className="flex items-center space-x-4">
-        <input type="checkbox" id="enableLabel" checked={labels.enabled} onChange={() => updateFields({ labels: { ...labels, enabled: !labels.enabled } })} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-        <label htmlFor="labels" className="w-24 text-sm font-medium text-gray-700">Labels</label>
-        <input
-          type="text"
-          id="labels"
-          name="labels"
-          disabled={!labels.enabled}
-          required={labels.enabled}
-          value={labels.labels}
-          onChange={(e) => updateFields({ labels: { ...labels, labels: e.target.value } })}
-          className="flex-1 border border-gray-300 rounded-md p-2"
-        />
-      </div>
-      <div className="flex items-center space-x-4">
-        <input type="checkbox" id="enableCategory" checked={category.enabled} onChange={() => updateFields({ category: { ...category, enabled: !category.enabled } })} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-        <label htmlFor="category" className="w-24 text-sm font-medium text-gray-700">Category</label>
-        <select
-          name="category"
-          id="category"
-          disabled={!category.enabled}
-          required={category.enabled}
-          value={category.category}
-          onChange={(e) => handleMultipleSelect(e, category)}
-          className="flex-1 border border-gray-300 rounded-md p-2"
-          multiple
-        >
-          <option value="primary">primary</option>
-          <option value="social">social</option>
-          <option value="updates">updates</option>
-          <option value="promotions">promotions</option>
-          <option value="forums">forums</option>
-          <option value="reservations">reservations</option>
-          <option value="purchases">purchases</option>
-        </select>
-      </div>
-      <div className="flex items-center space-x-4">
-        <input type="checkbox" id="enableSize" checked={size.enabled} onChange={() => updateFields({ size: { ...size, enabled: !size.enabled } })} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-        <label htmlFor="size" className="w-24 text-sm font-medium text-gray-700">Size</label>
-        <select
-          id="sizeComparison"
-          name="sizeComparison"
-          disabled={!size.enabled}
-          required={size.enabled}
-          value={size.size.comparison}
-          onChange={(e) => updateFields({ size: { ...size, size: { ...size.size, comparison: e.target.value as SizeComparison } } })}
-          className="border border-gray-300 rounded-md p-2"
-        >
-          <option value="greate than">greater than</option>
-          <option value="less than">less than</option>
-        </select>
-        <input 
-          type="number" 
-          id="size" 
-          name="size" 
-          min="1" 
-          value={size.size.value}
-          disabled={!size.enabled} 
-          required={size.enabled}
-          onChange={(e) => updateFields({ size: { ...size, size: { ...size.size, value: Number(e.target.value) } } })}
-          className="flex-1 border border-gray-300 rounded-md p-2" 
-          />
-        <select
-          id="sizeUnit"
-          name="sizeUnit"
-          disabled={!size.enabled}
-          required={size.enabled}
-          value={size.size.unit}
-          onChange={(e) => updateFields({ size: { ...size, size: { ...size.size, unit: e.target.value as SizeUnit } } })}
-          className="w-24 border border-gray-300 rounded-md p-2"
-        >
-          <option value="MB">MB</option>
-          <option value="KB">KB</option>
-          <option value="Bytes">Bytes</option>
-        </select>
-      </div>
-      <div className="flex items-center space-x-4">
-        <input type="checkbox" id="enableAge" checked={age.enabled} onChange={() => updateFields({ age: { ...age, enabled: !age.enabled } })} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-        <label htmlFor="age" className="w-24 text-sm font-medium text-gray-700">Age</label>
-        <select
-          id="ageComparison"
-          name="ageComparison"
-          disabled={!age.enabled}
-          required={age.enabled}
-          value={age.age.comparison}
-          onChange={(e) => updateFields({ age: { ...age, age: { ...age.age, comparison: e.target.value as AgeComparison } } })}
-          className="border border-gray-300 rounded-md p-2"
-        >
-          <option value="older than">older than</option>
-          <option value="newer than">newer than</option>
-        </select>
-        <input 
-          type="number" 
-          id="age" 
-          name="age" 
-          min="1" 
-          value={age.age.value}
-          disabled={!age.enabled} 
-          required={age.enabled}
-          onChange={(e) => updateFields({ age: { ...age, age: { ...age.age, value: Number(e.target.value) } } })}
-          className="flex-1 border border-gray-300 rounded-md p-2" 
-          />
-        <select
-          id="ageUnit"
-          name="ageUnit"
-          disabled={!age.enabled}
-          required={age.enabled}
-          value={age.age.unit}
-          onChange={(e) => updateFields({ age: { ...age, age: { ...age.age, unit: e.target.value as AgeUnit } } })}
-          className="w-24 border border-gray-300 rounded-md p-2"
-        >
-          <option value="days">days</option>
-          <option value="months">months</option>
-          <option value="years">years</option>
-        </select>
-      </div>
-      <div className="flex items-center space-x-4">
-        <input type="checkbox" id="enableTime" checked={time.enabled} onChange={() => updateFields({ time: { ...time, enabled: !time.enabled } })} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-        <label htmlFor="time" className="w-24 text-sm font-medium text-gray-700">Time</label>
-        <select
-          id="timeComparison"
-          name="timeComparison"
-          disabled={!time.enabled}
-          required={time.enabled}
-          value={time.time.comparison}
-          onChange={(e) => updateFields({ time: { ...time, time: { ...time.time, comparison: e.target.value as TimeComparison } } })}
-          className="border border-gray-300 rounded-md p-2"
-        >
-          <option value="after">after</option>
-          <option value="before">before</option>
-        </select>
-        <input
-          type="date"
-          id="time"
-          name="time"
-          disabled={!time.enabled}
-          required={time.enabled}
-          value={time.time.value}
-          onChange={(e) => updateFields({ time: { ...time, time: { ...time.time, value: e.target.value } } })}
-          className="flex-1 border border-gray-300 rounded-md p-2"
-        />
-      </div>
-      <div className="flex items-center space-x-4">
-        <input type="checkbox" id="enableIn" checked={emailIn.enabled} onChange={() => updateFields({ emailIn: { ...emailIn, enabled: !emailIn.enabled } })} className="h-4 w-4 text-blue-600 border-gray-300 rounded" />
-        <label htmlFor="emailIn" className="w-24 text-sm font-medium text-gray-700">Emails in?</label>
-        <select
-          name="emailIn"
-          id="emailIn"
-          disabled={!emailIn.enabled}
-          required={emailIn.enabled}
-          value={emailIn.emailIn}
-          onChange={(e) => handleMultipleSelect(e, emailIn)}
-          className="flex-1 border border-gray-300 rounded-md p-2"
-          multiple
-        >
-          <option value="inbox">inbox</option>
-          <option value="draft">draft</option>
-          <option value="sent">sent</option>
-          <option value="chats">chats</option>
-          <option value="scheduled">scheduled</option>
-        </select>
-      </div>
+    <FormWrapper title={title}>
+      <SectionWrapper title="Participant Filters">
+        <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="flex space-x-4">
+            <FormField
+              control={control}
+              name="from.enabled"
+              render={({field}) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox
+                      id="enableFrom"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="from.from"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>From</FormLabel>
+                  <FormControl>
+                    <InputTags
+                      id="fromField"
+                      disabled={!watchFromEnabled}
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Enter email addresses of the sender
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex space-x-4">
+            <FormField
+              control={control}
+              name="to.enabled"
+              render={({field}) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox id="enableTo" checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="to.to"
+              render={({field}) => (
+                <FormItem className="flex-1">
+                  <FormLabel>To</FormLabel>
+                  <FormControl>
+                    <InputTags
+                      id="toField"
+                      disabled={!watchToEnabled}
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <FormDescription>Enter the email address of the recipient</FormDescription>
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+      </SectionWrapper>
+      <SectionWrapper title="Content Filters">
+        <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="flex space-x-4">
+            <FormField
+              control={control}
+              name="title.enabled"
+              render={({field}) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox id="enableTitle" checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="title.title"
+              render={({field}) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <InputTags
+                      id="titleField"
+                      disabled={!watchTitleEnabled}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <FormDescription>Enter the title of the email</FormDescription>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex space-x-4">
+            <FormField
+              control={control}
+              name="has.enabled"
+              render={({field}) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox id="enableHas" checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="has.has"
+              render={({field}) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Has</FormLabel>
+                  <FormControl></FormControl>
+                    <MultiSelect
+                      id="hasField"
+                      options={HAS_OPTIONS}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={!watchHasEnabled}
+                    />
+                  <FormMessage />
+                  <FormDescription>Specify emails that include certain type of content</FormDescription>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex space-x-4">
+            <FormField
+              control={control}
+              name="doesntHave.enabled"
+              render={({field}) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox id="enableDoesntHave" checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="doesntHave.doesntHave"
+              render={({field}) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Doesn&apos;t have</FormLabel>
+                  <FormControl>
+                    <InputTags
+                      id="doesntHaveField"
+                      disabled={!watchDoesntHaveEnabled}
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <FormDescription>Enter text the email should not contain</FormDescription>
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+      </SectionWrapper>
+      <SectionWrapper title="Classification Filters">
+        <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="flex space-x-4">
+            <FormField
+              control={control}
+              name="emailIs.enabled"
+              render={({field}) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox id="enableEmailIs" checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="emailIs.emailIs"
+              render={({field}) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Emails are</FormLabel>
+                  <FormControl>
+                    <MultiSelect
+                      id="emailIsField"
+                      options={EMAIL_IS_OPTIONS}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={!watchEmailIsEnabled}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <FormDescription>Choose the status of the emails</FormDescription>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex space-x-4">
+            <FormField
+              control={control}
+              name="labels.enabled"
+              render={({field}) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox id="enableLabels" checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="labels.labels"
+              render={({field}) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Labels</FormLabel>
+                  <FormControl>
+                    <InputTags
+                      id="labelsField"
+                      disabled={!watchLabelsEnabled}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <FormDescription>Enter labels separated by commas</FormDescription>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex space-x-4">
+            <FormField
+              control={control}
+              name="category.enabled"
+              render={({field}) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox id="enableCategory" checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="category.category"
+              render={({field}) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Category</FormLabel>
+                  <FormControl>
+                    <MultiSelect
+                      id="categoryField"
+                      options={CATEGORY_OPTIONS}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={!watchCategoryEnabled}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <FormDescription>Specify categories to filter emails</FormDescription>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex space-x-4">
+            <FormField
+              control={control}
+              name="emailIn.enabled"
+              render={({field}) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox id="enableEmailIn" checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="emailIn.emailIn"
+              render={({field}) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Email In</FormLabel>
+                  <FormControl>
+                    <MultiSelect
+                      id="emailInField"
+                      options={EMAIL_IN_OPTIONS}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={!watchEmailInEnabled}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <FormDescription>Specify the location of the emails</FormDescription>
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+      </SectionWrapper>
+      <SectionWrapper title="Quantitative Filters">
+        <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="flex space-x-4">
+            <FormField
+              control={control}
+              name="time.enabled"
+              render={({field}) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox id="enableTime" checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <div className="flex items-start space-x-4 flex-1">
+              <FormField
+                control={control}
+                name="time.time.comparison"
+                render={({field}) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Time</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                      disabled={!watchTimeEnabled}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="size" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {TIME_COMPARISON_ENUM.map((unit) => (
+                          <SelectItem key={unit} value={unit}>
+                            {unit}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Specify a specific time to filter emails
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="time.time.value"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            disabled={!watchTimeEnabled}
+                            className={cn(
+                              "flex items-center h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a end date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+          <div className="flex space-x-4">
+            <FormField
+              control={control}
+              name="size.enabled"
+              render={({field}) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox id="enableSize" checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <div className="flex items-start space-x-4">
+              <FormField
+                control={control}
+                name="size.size.comparison"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Size</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                      disabled={!watchSizeEnabled}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="size" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {SIZE_COMPARISON_ENUM.map((unit) => (
+                          <SelectItem key={unit} value={unit}>
+                            {unit}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Specify the size of the email
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="size.size.value"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Value</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="sizeValueField"
+                        type="number"
+                        disabled={!watchSizeEnabled}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="size.size.unit"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Unit</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={!watchSizeEnabled}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SIZE_UNIT_ENUM.map((unit) => (
+                            <SelectItem key={unit} value={unit}>
+                              {unit}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+          <div className="flex space-x-4">
+            <FormField
+              control={control}
+              name="age.enabled"
+              render={({field}) => (
+                <FormItem>
+                  <FormControl>
+                    <Checkbox id="enableAge" checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <div className="flex items-start space-x-4">
+              <FormField
+                control={control}
+                name="age.age.comparison"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Age</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                      disabled={!watchAgeEnabled}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="size" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {AGE_COMPARISON_ENUM.map((unit) => (
+                          <SelectItem key={unit} value={unit}>
+                            {unit}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Specify how old the emails are
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="age.age.value"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Value</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="ageValueField"
+                        type="number"
+                        disabled={!watchAgeEnabled}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="age.age.unit"
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Unit</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={!watchAgeEnabled}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {AGE_UNIT_ENUM.map((unit) => (
+                            <SelectItem key={unit} value={unit}>
+                              {unit}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        </div>
+      </SectionWrapper>
     </FormWrapper>
   )
 }

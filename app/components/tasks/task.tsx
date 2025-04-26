@@ -35,7 +35,7 @@ export default function Task({ task }: { task: TaskType }) {
         <Button onClick={onDeleteTask}>Delete</Button>
       </div>
       <ScheduleDetail scheduleEntries={scheduleEntries} />
-      <TaskDetail taskEntries={taskEntries} formValues={formValues} />
+      <TaskDetail taskEntries={taskEntries}/>
     </div>
   )
 }
