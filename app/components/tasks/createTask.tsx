@@ -5,16 +5,13 @@ import CreateForm from './create-form';
 import CreateFormAI from './create-form-ai';
 import {
   FormValues,
-  AIPromptValues,
 } from '@/app/lib/definitions';
 import { QUERY_TEMPLATE } from '@/app/constants/formValues';
-import { INITIAL_AI_STATE } from '@/app/constants/aiPromptValues';
 import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
 import TemplateSelection from './TemplateSelection';
 
 export default function CreateTask() {
   const [formValues, setFormValues] = useState<FormValues>(QUERY_TEMPLATE.QUERY_EMPTY_FORM);
-  const [aiPromptValues, setAIPromptValues] = useState<AIPromptValues>(INITIAL_AI_STATE);
   const [selectedTemplate, setSelectedTemplate] = useState<TEMPLATE_TYPE | null>(null);
 
   function onSelectTemplate(templateFormType: TEMPLATE_FORM_TYPE, templateType: TEMPLATE_TYPE) {
@@ -22,14 +19,14 @@ export default function CreateTask() {
     setFormValues(QUERY_TEMPLATE[templateFormType]);
   }
 
-  function onEditAIGeneratedForm() {
+  function onEditAIGeneratedForm(generatedFormValues: FormValues) {
     setSelectedTemplate(TEMPLATE_TYPE.EMPTY);
+    setFormValues(generatedFormValues);
   }
 
   function resetTemplate() {
     setSelectedTemplate(null);
     setFormValues(QUERY_TEMPLATE.QUERY_EMPTY_FORM);
-    setAIPromptValues(INITIAL_AI_STATE);
   }
 
   if (selectedTemplate === null) {
@@ -40,11 +37,7 @@ export default function CreateTask() {
     case TEMPLATE_TYPE.AI:
       return (
         <CreateFormAI
-          formValues={formValues}
           onEditAIGeneratedForm={onEditAIGeneratedForm}
-          setFormValues={setFormValues}
-          aiPromptValues={aiPromptValues}
-          setAIPromptValues={setAIPromptValues}
           resetTemplate={resetTemplate}
         />
       );

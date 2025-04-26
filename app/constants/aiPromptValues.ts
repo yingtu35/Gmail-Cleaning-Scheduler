@@ -1,12 +1,18 @@
 import {
-  AIPromptValues
+  AIFormValues
 } from '@/app/lib/definitions';
+import { QUERY_TEMPLATE } from './formValues';
 
-export const INITIAL_AI_STATE: AIPromptValues = {
-  taskPrompt: 'emails from John Doe, and sizes greater than 1MB',
-  schedulePrompt: {
-    isOneTime: false,
-    oneTimePrompt: '3 days from now',
-    recurringPrompt: 'starting from next month, and ending in 6 months'
+export const INITIAL_AI_STATE: AIFormValues = {
+  prompt: {
+    taskPrompt: '',
+    schedulePrompt: {
+      Occurrence: 'One-time',
+      Prompt: '3 days from now',
+    },
+  },
+  formValues: {
+    isGenerated: false,
+    value: QUERY_TEMPLATE.QUERY_AI_TEMPLATE,
   }
 }
