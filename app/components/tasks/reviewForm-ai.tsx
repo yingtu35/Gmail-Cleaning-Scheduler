@@ -1,107 +1,147 @@
+import { useState } from 'react';
+import { UseFormSetValue, UseFormWatch } from 'react-hook-form';
+
 import {
   FormValues,
-  AIPromptValues,
+  AIFormValues,
   SchedulePromptType,
 } from '@/app/lib/definitions';
-import { FormWrapper } from './formWrapper';
-import { ScheduleDetail, TaskDetail } from './reviewForm';
-import { useState } from 'react';
 import { generateScheduleByPrompt } from '@/app/lib/actions';
 
+import { FormWrapper } from './formWrapper';
+import { SectionWrapper } from './sectionWrapper';
+import { ScheduleDetail, TaskDetail } from './reviewForm';
+import { Button } from '@/components/ui/button';
+
 type ReviewFormAIProps = {
-  formValues: FormValues;
-  aiPromptValues: AIPromptValues;
-  updateFields: (fields: FormValues) => void;
-  isResultGenerated: boolean;
-  setIsResultGenerated: React.Dispatch<React.SetStateAction<boolean>>;
+  title: string;
+  setValue: UseFormSetValue<AIFormValues>;
+  watch: UseFormWatch<AIFormValues>;
 }
 
 export default function ReviewFormAI({
-  formValues,
-  aiPromptValues,
-  updateFields,
-  isResultGenerated,
-  setIsResultGenerated
+  title,
+  setValue,
+  watch
 }: ReviewFormAIProps) {
+  const aiFormValues = watch();
+
+  const { prompt, formValues } = aiFormValues;
+  const { isGenerated, value: formValuesValue } = formValues;
+  const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const promptEntries = Object.entries(aiPromptValues)
 
   // convert formValues to an array of key-value pairs
-  const aggregatedEntries = Object.entries(formValues)
+  const aggregatedEntries = Object.entries(formValuesValue)
   // extract the first 3 entries
   const scheduleEntries = aggregatedEntries.slice(0, 3)
   const taskEntries = aggregatedEntries.slice(3)
 
   async function onGenerate() {
-    alert('Generating Schedule');
-    // TODO: Call action to generate schedule
-    const result = await generateScheduleByPrompt(aiPromptValues);
+    setLoading(true);
+    setError(null);
+    const result = await generateScheduleByPrompt(prompt);
     if (typeof result === "string") {
       setError(result);
     } else {
-      setIsResultGenerated(true);
-      updateFields(result);
+      setValue("formValues", {
+        isGenerated: true,
+        value: result,
+      });
     }
+    setLoading(false);
   }
+  
   return (
-    <FormWrapper title="Schedule Review">
-      <PromptDetail promptEntries={promptEntries} />
-      {isResultGenerated ? (
-        <>
-          <ScheduleDetail scheduleEntries={scheduleEntries} />
-          <TaskDetail taskEntries={taskEntries} />
-        </>
-      ) : (
-        <GenerateScheduleForm onGenerate={onGenerate} error={error} />
-      )}
+    <FormWrapper title={title}>
+      <SectionWrapper title="Prompt Detail">
+        <PromptDetail 
+          prompt={prompt}
+        />
+        { !isGenerated && (
+          <GenerateScheduleForm 
+            onGenerate={onGenerate} 
+            isLoading={isLoading} 
+            error={error}
+          />
+        )}
+      </SectionWrapper>
+        { isGenerated && (
+          <>
+            <SectionWrapper title="Schedule Detail">
+              <ScheduleDetail scheduleEntries={scheduleEntries} />
+            </SectionWrapper>
+            <SectionWrapper title="Task Detail">
+              <TaskDetail taskEntries={taskEntries} />
+            </SectionWrapper>
+          </>
+        )}
     </FormWrapper>
   )
 }
 
 function GenerateScheduleForm({
   onGenerate,
+  isLoading,
   error
 }: {
   onGenerate: () => void;
+  isLoading: boolean;
   error: string | null;
 }) {
   return (
     <>
       <div>
-        <p className="font-light">Generate Schedule from Prompt</p>
-        <button
-          type="button"
+        <p className="font-semibold">Ready to generate schedule?</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          Once you click generate, you cannot go back to the previous step.
+          <br />
+          You can edit the generated schedule later by clicking the edit button on the top right.
+        </p>
+        <Button
+          variant="default"
+          className="mt-2 w-full"
           onClick={onGenerate}
-          className={`bg-blue-600 text-white px-4 py-2 rounded-md`}
+          disabled={isLoading}
         >
-          Generate
-        </button>
+          {isLoading ? "Generating..." : "Generate"}
+        </Button>
       </div>
       {error && <p className="text-red-500">{error}</p>}
     </>
   )
 }
 
+interface PromptDetailProps {
+  prompt: {
+    taskPrompt: string;
+    schedulePrompt: {
+      Occurrence: string;
+      Prompt: string;
+    }
+  }
+}
+
 function PromptDetail({
-  promptEntries
-}: {
-  promptEntries: [string, string | SchedulePromptType][]
-}) {
+  prompt
+}: PromptDetailProps) {
+  const { taskPrompt, schedulePrompt } = prompt;
   return (
-    <div className="space-y-4 p-4 border">
-      <h3 className="text-2xl">Prompt Detail</h3>
-      <div className="grid grid-cols-3 gap-2">
-        {promptEntries.map(([key, value]) => {
-          if (typeof value === "object") {
-            return (
-              <RenderSchedulePrompt key={key} value={value} />
-            )
-          } else {
-            return (
-              <RenderValuePrompt key={key} keyField={key} value={value} />
-            )
-          }
-        })}
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold">Task Prompt</h3>
+        <p className="text-[0.8rem] text-muted-foreground">Description of how your task will be executed</p>
+        {taskPrompt}
+      </div>
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold">Schedule Type</h3>
+        <p className="text-[0.8rem] text-muted-foreground">Description of the schedule type</p>
+        <p className="break-words">{schedulePrompt.Occurrence}</p>
+        <div className="space-y-2">
+          <h3 className="font-semibold">Schedule Prompt</h3>
+          <p className="text-[0.8rem] text-muted-foreground">Description of the schedule for your task</p>
+          <p className="break-words">{schedulePrompt.Prompt}</p>
+        </div>
       </div>
     </div>
   )

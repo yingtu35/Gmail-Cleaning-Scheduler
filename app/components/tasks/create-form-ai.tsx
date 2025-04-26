@@ -1,14 +1,16 @@
 "use client"
 
 import Link from 'next/link';
+import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
 import useMultiStepForm from '@/app/hooks/useMultiStepForm';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   FormValues,
-  AIPromptValues,
+  AIFormValues,
 } from '@/app/lib/definitions';
+import { AIFormValuesSchema } from '@/app/lib/validation/form';
 import { cn } from '@/lib/utils';
 import {
   AlertDialog,
@@ -21,18 +23,24 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  Form,
+} from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
+import { INITIAL_AI_STATE } from '@/app/constants/aiPromptValues';
 
 import ScheduleFormAI from './scheduleForm-ai';
 import TaskFormAI from './taskForm-ai';
 import ReviewFormAI from './reviewForm-ai';
 import StepIndicator, { StepConfig } from './StepIndicator';
+import { createTask } from '@/app/lib/actions';
+
 
 interface FormControlGroupProps {
   isFirstStep: boolean;
   isLastStep: boolean;
   isResultGenerated: boolean;
-  onEditAIGeneratedForm: () => void;
+  onEditClicked: () => void;
   onBackClicked: () => void;
   onCancelClicked: () => void;
 }
@@ -40,7 +48,7 @@ const FormControlGroup = ({
   isFirstStep,
   isLastStep,
   isResultGenerated,
-  onEditAIGeneratedForm,
+  onEditClicked,
   onBackClicked,
   onCancelClicked,
   className,
@@ -80,6 +88,32 @@ const FormControlGroup = ({
     </Button>
   )
 
+  const editButton = (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="secondary"
+          type="button"
+          disabled={!isResultGenerated}
+        >
+          Edit
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>This will take you to the template edit form</AlertDialogTitle>
+          <AlertDialogDescription>
+            You can refine the generated task and schedule to your liking.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={onEditClicked}>Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>    
+  )
+
   return (
     <div className={cn("flex items-center space-x-4", className)}>
       <Link href="https://support.google.com/mail/answer/7190?hl=en" target="_blank" className="text-blue-600 hover:underline">Help</Link>
@@ -105,7 +139,7 @@ const FormControlGroup = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      {backButton}
+      { !isResultGenerated && (backButton) }
       {!isLastStep ? (
         <Button
           variant="default"
@@ -114,14 +148,7 @@ const FormControlGroup = ({
           Next
         </Button>
       ) : (
-        <Button
-          variant="default"
-          type="button"
-          onClick={onEditAIGeneratedForm}
-          disabled={!isResultGenerated}
-        >
-          Edit
-        </Button>
+        editButton
       )}
       <Button
         variant="default"
@@ -135,42 +162,39 @@ const FormControlGroup = ({
 }
 
 interface CreateFormAIProps {
-  onEditAIGeneratedForm: () => void;
-  formValues: FormValues;
-  setFormValues: React.Dispatch<React.SetStateAction<FormValues>>;
-  aiPromptValues: AIPromptValues;
-  setAIPromptValues: React.Dispatch<React.SetStateAction<AIPromptValues>>;
+  onEditAIGeneratedForm: (generatedFormValues: FormValues) => void;
   resetTemplate: () => void;
 }
 
 export default function CreateFormAI({ 
   onEditAIGeneratedForm,
-  formValues,
-  setFormValues,
-  aiPromptValues,
-  setAIPromptValues,
   resetTemplate
 }: CreateFormAIProps) {
   const router = useRouter();
-  const [isResultGenerated, setIsResultGenerated] = useState<boolean>(false);
-
-  function updatePromptFields(fields: Partial<AIPromptValues>) {
-    setAIPromptValues({ ...aiPromptValues, ...fields });
-  }
-
-  function updateFields(fields: Partial<FormValues>) {
-    setFormValues({ ...formValues, ...fields });
-  }
-
+  const form = useForm<AIFormValues>({
+    resolver: zodResolver(AIFormValuesSchema),
+    defaultValues: INITIAL_AI_STATE,
+    mode: 'onChange'
+  });
+  
+  const { handleSubmit, setValue, control, watch } = form;
+  
   const stepDefinitions = [
-    { label: 'Task', element: <TaskFormAI key="Task" {...aiPromptValues} updatePromptFields={updatePromptFields} /> },
-    { label: 'Schedule', element: <ScheduleFormAI key="Schedule" {...aiPromptValues} updatePromptFields={updatePromptFields} /> },
-    { label: 'Review', element: <ReviewFormAI key="Review" formValues={formValues} aiPromptValues={aiPromptValues} updateFields={updateFields} isResultGenerated={isResultGenerated} setIsResultGenerated={setIsResultGenerated} /> },
+    { label: 'Task', element: <TaskFormAI key="Task" title="Task Description" control={control} /> },
+    { label: 'Schedule', element: <ScheduleFormAI key="Schedule" title="Schedule Description" control={control} watch={watch} /> },
+    { label: 'Review', element: <ReviewFormAI key="Review" title="Prompt Review" setValue={setValue} watch={watch} /> },
   ]
 
   const stepConfigs: StepConfig[] = stepDefinitions.map(d => ({ label: d.label }));
   const { stepRefs, visibleSteps, currentStep, maxStep, isFirstStep, isLastStep, nextStep, prevStep, goToStep } =
     useMultiStepForm(stepDefinitions.map(d => d.element));
+    
+  const generatedFormValues = watch('formValues.value');
+  const isGenerated = watch('formValues.isGenerated');
+
+  const onError = (error: any) => {
+    console.error("Form submission error:", error);
+  }
 
   const onBackClicked = () => {
     if (isFirstStep) {
@@ -184,14 +208,19 @@ export default function CreateFormAI({
     router.push('/');
   }
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onEditClicked = () => {
+    onEditAIGeneratedForm(generatedFormValues);
+  }
+
+  const onSubmit = (values: AIFormValues) => {
     if (!isLastStep) return nextStep();
-    // TODO: Create Task
-    alert('Task Created');
-  };
+    const formValues = values.formValues.value;
+    createTask(formValues);
+  }
+
   return (
-      <form id="task-form-ai" onSubmit={onSubmit} className="flex flex-col h-screen">
+    <Form {...form}>
+      <form id="task-form-ai" onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col h-screen">
         <div className="sticky top-0 bg-white flex items-center justify-between p-4 z-10 shadow">
           <div className="flex-1">
             <StepIndicator
@@ -204,8 +233,8 @@ export default function CreateFormAI({
           <FormControlGroup
             isFirstStep={isFirstStep}
             isLastStep={isLastStep}
-            isResultGenerated={isResultGenerated}
-            onEditAIGeneratedForm={onEditAIGeneratedForm}
+            isResultGenerated={isGenerated}
+            onEditClicked={onEditClicked}
             onBackClicked={onBackClicked}
             onCancelClicked={onCancelClicked}
           />
@@ -223,5 +252,6 @@ export default function CreateFormAI({
           ))}
         </div>
       </form>
+    </Form>
   )
 }

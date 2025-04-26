@@ -1,5 +1,5 @@
 import { UseFormWatch } from "react-hook-form";
-import { useFormState } from "react-dom";
+import { useState } from "react";
 
 import { formatFields } from "@/app/utils/schedule";
 import { getSearchQueryExplanation } from "@/app/lib/actions";
@@ -22,7 +22,7 @@ function RenderKeyValue({ keyField, value }: { keyField: string, value: any }) {
   const formattedKey = lastKey.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
   return (
     <div>
-      <p className="font-light">{formattedKey}</p>
+      <p className="text-sm text-muted-foreground">{formattedKey}</p>
       <p className="break-words">{Array.isArray(value) ? value.join(", ") : (String(value) === "" ? "-" : String(value))}</p>
     </div>
   )
@@ -94,15 +94,19 @@ export function TaskDetail({ taskEntries }: { taskEntries: [string, any][] }) {
 
 function AIExplanation({
   result,
+  error,
   onGenerateButtonClicked,
+  isLoading,
 }: {
   result: string | null;
+  error: string | null;
   onGenerateButtonClicked: () => void;
+  isLoading: boolean;
 }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center">
-        <p className="text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           What is the AI explanation?
         </p>
         <Popover>
@@ -124,11 +128,13 @@ function AIExplanation({
           variant="default"
           type="button"
           onClick={onGenerateButtonClicked}
+          disabled={isLoading}
         >
-          Generate
+          {isLoading ? "Generating..." : "Generate"}
         </Button>
       )}
       {result && <p>{result}</p>}
+      {error && <p className="text-red-500">{error}</p>}
     </div>
   );
 }
@@ -139,13 +145,24 @@ export function ReviewForm({ watch }: ReviewFormProps) {
   const scheduleEntries = aggregatedEntries.slice(0, 3);
   const taskEntries = aggregatedEntries.slice(3);
 
-  // TODO: Stream the explanation to the UI
-  const [result, action] = useFormState(getSearchQueryExplanation, null);
   const fullSearchQueries = formatFields(formValues);
 
-  const onGenerateButtonClicked = () => {
-    action(fullSearchQueries);
-  }
+  const [result, setResult] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onGenerateButtonClicked = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await getSearchQueryExplanation(undefined, fullSearchQueries);
+      setResult(res);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -153,6 +170,8 @@ export function ReviewForm({ watch }: ReviewFormProps) {
         <SectionWrapper title="AI Explanation">
           <AIExplanation
             result={result}
+            error={error}
+            isLoading={isLoading}
             onGenerateButtonClicked={onGenerateButtonClicked}
           />
         </SectionWrapper>         
