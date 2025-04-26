@@ -22,7 +22,7 @@ function RenderKeyValue({ keyField, value }: { keyField: string, value: any }) {
   const formattedKey = lastKey.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
   return (
     <div>
-      <p className="font-light">{formattedKey}</p>
+      <p className="text-sm text-muted-foreground">{formattedKey}</p>
       <p className="break-words">{Array.isArray(value) ? value.join(", ") : (String(value) === "" ? "-" : String(value))}</p>
     </div>
   )
@@ -102,7 +102,7 @@ function AIExplanation({
   return (
     <div className="space-y-2">
       <div className="flex items-center">
-        <p className="text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           What is the AI explanation?
         </p>
         <Popover>

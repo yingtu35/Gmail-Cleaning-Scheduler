@@ -33,7 +33,6 @@ import ScheduleFormAI from './scheduleForm-ai';
 import TaskFormAI from './taskForm-ai';
 import ReviewFormAI from './reviewForm-ai';
 import StepIndicator, { StepConfig } from './StepIndicator';
-import { create } from 'domain';
 import { createTask } from '@/app/lib/actions';
 
 
@@ -89,6 +88,32 @@ const FormControlGroup = ({
     </Button>
   )
 
+  const editButton = (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="secondary"
+          type="button"
+          disabled={!isResultGenerated}
+        >
+          Edit
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>This will take you to the template edit form</AlertDialogTitle>
+          <AlertDialogDescription>
+            You can refine the generated task and schedule to your liking.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={onEditClicked}>Continue</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>    
+  )
+
   return (
     <div className={cn("flex items-center space-x-4", className)}>
       <Link href="https://support.google.com/mail/answer/7190?hl=en" target="_blank" className="text-blue-600 hover:underline">Help</Link>
@@ -114,7 +139,7 @@ const FormControlGroup = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      {backButton}
+      { !isResultGenerated && (backButton) }
       {!isLastStep ? (
         <Button
           variant="default"
@@ -123,14 +148,7 @@ const FormControlGroup = ({
           Next
         </Button>
       ) : (
-        <Button
-          variant="default"
-          type="button"
-          onClick={onEditClicked}
-          disabled={!isResultGenerated}
-        >
-          Edit
-        </Button>
+        editButton
       )}
       <Button
         variant="default"
@@ -164,7 +182,7 @@ export default function CreateFormAI({
   const stepDefinitions = [
     { label: 'Task', element: <TaskFormAI key="Task" title="Task Description" control={control} /> },
     { label: 'Schedule', element: <ScheduleFormAI key="Schedule" title="Schedule Description" control={control} watch={watch} /> },
-    { label: 'Review', element: <ReviewFormAI key="Review" setValue={setValue} watch={watch} /> },
+    { label: 'Review', element: <ReviewFormAI key="Review" title="Prompt Review" setValue={setValue} watch={watch} /> },
   ]
 
   const stepConfigs: StepConfig[] = stepDefinitions.map(d => ({ label: d.label }));

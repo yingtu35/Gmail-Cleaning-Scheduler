@@ -530,7 +530,7 @@ export const QUERY_AI_TEMPLATE: FormValues = {
   size: { enabled: false, size: { comparison: 'greater than', value: 0, unit: 'MB' } },
   age: { enabled: false, age: { comparison: 'older than', value: 0, unit: 'days' } },
   time: { enabled: false, time: { comparison: 'before', value: new Date() } },
-  emailIn: { enabled: false, emailIn: [] },
+  emailIn: { enabled: true, emailIn: ["inbox"] },
 };
 
 export type QueryName = 'QUERY_EMPTY_FORM' | 
