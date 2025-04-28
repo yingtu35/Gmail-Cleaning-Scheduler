@@ -1,11 +1,12 @@
 import { openai } from "./client";
-import { PROMPT_TYPES } from "@/app/constants/prompt-types";
-import { QUERY_TEMPLATE } from "../constants/formValues";
+import { SYSTEM_PROMPT } from "@/app/constants/prompts";
 import {
-  AIPromptType
+  AIPromptType,
+  UserDateTimePromptType
 } from '@/app/lib/definitions';
 import log from "../utils/log";
 
+// TODO: Improve the system prompt to be more specific
 export async function getEmailSearchesExplanation(query: string) {
   try {
     const response = await openai.chat.completions.create({
@@ -29,22 +30,18 @@ export async function getEmailSearchesExplanation(query: string) {
   }
 }
 
-export async function getScheduleByPrompt(prompt: AIPromptType) {
+export async function getScheduleByPrompt(userDateTimePrompt: UserDateTimePromptType, prompt: AIPromptType) {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4.1-mini",
       messages: [
         {
           role: "system",
-          content: "You are an assistant specializing in forming JSON object. You will be given a TypeScript type called FormValues representing the format you should return, then a example json object, then another json object containing the prompt. You must change the name and description field to summarize the json object you created. Other fields should be unchanged as the example json object if it's not mentioned in the prompt.",
+          content: SYSTEM_PROMPT,
         },
         {
           role: "user",
-          content: PROMPT_TYPES,
-        },
-        {
-          role: "user",
-          content: JSON.stringify(QUERY_TEMPLATE.QUERY_EMPTY_FORM)
+          content: JSON.stringify(userDateTimePrompt),
         },
         {
           role: "user",

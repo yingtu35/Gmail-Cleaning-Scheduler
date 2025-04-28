@@ -172,9 +172,15 @@ const CreateForm = ({
     if (!isLastStep) return nextStep();
     createTask(values);
   }
+
+  const onError = (errors: any) => {
+
+    console.error(errors);
+  }
+
   return (
     <Form {...form}>
-      <form id="task-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-screen">
+      <form id="task-form" onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col h-screen">
         {/* Form header */}
         <div className="sticky top-0 bg-white flex items-center justify-between p-4 z-10 shadow">
           <div className="flex-1">
