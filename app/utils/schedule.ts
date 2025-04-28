@@ -1,5 +1,6 @@
 import { UserInDB, FormValues, CommandInput, LambdaInput, TimeValue, AgeValue, SizeValue } from "@/app/lib/definitions"
 import moment from "moment-timezone";
+import { convertDateStringToDate, isStringDateFormat } from "./date";
 
 function formatArrayField(key: string, fieldValue: any[]): string {
   return fieldValue.map(value => `${key}:${value.trim()}`).join(' OR ');
@@ -149,4 +150,13 @@ export function createCommandInput(data: FormValues, user: UserInDB) {
     } as CommandInput;
   }
   return commandInput;
+}
+
+export function parseJsonToFormValues(json: string): FormValues {
+  return JSON.parse(json, (key, value) => {
+    if (typeof value === 'string' && isStringDateFormat(value)) {
+      return convertDateStringToDate(value);
+    }
+    return value;
+  });
 }

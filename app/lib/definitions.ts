@@ -77,3 +77,9 @@ export type SizeValue = {
   unit: "Bytes" | "KB" | "MB";
   value: number;
 }
+
+export type UserDateTimePromptType = {
+  date: string;
+  time: string;
+  timezone: string;
+}
