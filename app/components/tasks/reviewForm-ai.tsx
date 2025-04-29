@@ -6,11 +6,11 @@ import {
 } from '@/app/lib/definitions';
 import { generateScheduleByPrompt } from '@/app/lib/actions';
 import { Button } from '@/components/ui/button';
-import { ScheduleDetail } from '@/components/task/schedule-detail';
-import { TaskDetail } from '@/components/task/task-detail';
+import { ScheduleDetail } from '@/components/task/detail/schedule-detail';
+import { TaskDetail } from '@/components/task/detail/task-detail';
 
 import { FormWrapper } from './formWrapper';
-import { SectionWrapper } from './sectionWrapper';
+import { SectionWrapper } from '@/components/task/sectionWrapper';
 
 type ReviewFormAIProps = {
   title: string;

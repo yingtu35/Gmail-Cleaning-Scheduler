@@ -12,9 +12,9 @@ import {
 } from "@/components/ui/popover"
 
 import { FormWrapper } from "./formWrapper"
-import { SectionWrapper } from "./sectionWrapper";
-import { ScheduleDetail } from "@/components/task/schedule-detail";
-import { TaskDetail } from "@/components/task/task-detail";
+import { SectionWrapper } from "@/components/task/sectionWrapper";
+import { ScheduleDetail } from "@/components/task/detail/schedule-detail";
+import { TaskDetail } from "@/components/task/detail/task-detail";
 
 function AIExplanation({
   result,

@@ -44,7 +44,7 @@ import {
  import { FormValues } from "@/app/lib/definitions";
  import { cn } from "@/lib/utils";
 
- import { SectionWrapper } from "./sectionWrapper";
+ import { SectionWrapper } from "@/components/task/sectionWrapper";
  import { FormWrapper } from "./formWrapper"
 
 interface TaskFormProps {

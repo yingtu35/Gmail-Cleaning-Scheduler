@@ -12,7 +12,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 import { FormWrapper } from "./formWrapper"
-import { SectionWrapper } from "./sectionWrapper";
+import { SectionWrapper } from "@/components/task/sectionWrapper";
 
 type TaskFormAIProps = {
   title: string;

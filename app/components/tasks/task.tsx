@@ -7,8 +7,8 @@ import { FormValues, Task as TaskType } from "@/app/lib/definitions"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { deleteTask } from "@/app/lib/actions"
-import { ScheduleDetail } from "@/components/task/schedule-detail"
-import { TaskDetail } from "@/components/task/task-detail"
+import { ScheduleDetail } from "@/components/task/detail/schedule-detail"
+import { TaskDetail } from "@/components/task/detail/task-detail"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,8 +35,8 @@ import {
 } from "@/components/ui/tabs"
 
 
-import { SectionWrapper } from "./sectionWrapper"
-import { InfoDetail } from "@/components/task/info-detail"
+import { SectionWrapper } from "@/components/task/sectionWrapper"
+import { InfoDetail } from "@/components/task/detail/info-detail"
 import { PingWrapper } from "@/components/ui/ping-wrapper"
 import { ChevronDownIcon } from "lucide-react"
 
