@@ -11,7 +11,7 @@ export default async function Dashboard() {
   if (!user) return null;
 
   return (
-    <div className='flex flex-col grow m-4 gap-4'>
+    <div className='flex flex-col grow gap-4'>
       <Overview />
       <Suspense fallback={
         <div className="flex items-center justify-center w-full h-32">

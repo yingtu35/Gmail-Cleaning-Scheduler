@@ -83,7 +83,7 @@ export const columns: ColumnDef<Task>[] = [
     }
   },
   {
-    id: "isExpired",
+    id: "status",
     header: "Status",
     cell: ({ row }) => {
       const expiresAt = row.original.expiresAt;
