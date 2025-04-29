@@ -6,12 +6,13 @@ import {
   AIFormValues,
   SchedulePromptType,
 } from '@/app/lib/definitions';
+import { Button } from '@/components/ui/button';
 import { generateScheduleByPrompt } from '@/app/lib/actions';
+import { getUserDateTimePrompt } from '@/app/utils/date';
 
 import { FormWrapper } from './formWrapper';
 import { SectionWrapper } from './sectionWrapper';
 import { ScheduleDetail, TaskDetail } from './reviewForm';
-import { Button } from '@/components/ui/button';
 
 type ReviewFormAIProps = {
   title: string;
@@ -40,7 +41,8 @@ export default function ReviewFormAI({
   async function onGenerate() {
     setLoading(true);
     setError(null);
-    const result = await generateScheduleByPrompt(prompt);
+    const userDateTimePrompt = getUserDateTimePrompt();
+    const result = await generateScheduleByPrompt(userDateTimePrompt, prompt);
     if (typeof result === "string") {
       setError(result);
     } else {
