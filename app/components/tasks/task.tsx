@@ -140,7 +140,7 @@ export default function Task({ task }: { task: TaskType }) {
       <Tabs defaultValue="detail">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="detail">Detail</TabsTrigger>
-          <TabsTrigger value="stats">Stats</TabsTrigger>
+          <TabsTrigger value="stats" disabled className="cursor-not-allowed">Stats (Coming Soon)</TabsTrigger>
         </TabsList>
         <TabsContent value="detail" className="space-y-4">
           <SectionWrapper title="Schedule Detail">
