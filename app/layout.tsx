@@ -23,7 +23,7 @@ export default async function RootLayout({
       <body className={inter.className}>
         <main className="flex flex-row">
           {isAuthenticated && <AppSidebar user={user} className="h-screen sticky top-0" />}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto m-4">
             {children}
           </div>
         </main>
