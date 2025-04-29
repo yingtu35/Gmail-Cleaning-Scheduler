@@ -123,7 +123,7 @@ export default function Task({ task }: { task: TaskType }) {
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4 py-2">
           <h1 className="text-2xl font-bold">{name}</h1>
-          <PingWrapper status="alert">
+          <PingWrapper status="active">
             <Badge variant="outline">
               Active
             </Badge>
