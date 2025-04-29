@@ -1,10 +1,89 @@
 "use client"
 
-import { FormValues, Task as TaskType } from "@/app/lib/definitions"
-import { Button } from '@/app/components/button'
-import { ScheduleDetail, TaskDetail } from './reviewForm'
+import { useState } from "react"
 import Link from "next/link"
+
+import { FormValues, Task as TaskType } from "@/app/lib/definitions"
+import { Button } from "@/components/ui/button"
 import { deleteTask } from "@/app/lib/actions"
+import { ScheduleDetail } from "@/components/task/schedule-detail"
+import { TaskDetail } from "@/components/task/task-detail"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
+
+import { SectionWrapper } from "./sectionWrapper"
+import { InfoDetail } from "@/components/task/info-detail"
+import { ChevronDownIcon } from "lucide-react"
+
+interface StatusAndActionsGroupProps {
+  taskId: string
+  onDeleteTask: () => void
+}
+function StatusAndActionsGroup({
+  taskId,
+  onDeleteTask,
+}: StatusAndActionsGroupProps) {
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  return (
+    <div className="flex justify-end items-center">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline">
+            Actions
+            <ChevronDownIcon />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem>Pause</DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <Link href={`/tasks/${taskId}/edit`}>Edit</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>
+            <span className="text-red-500 hover:text-red-700">Delete</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete the task?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone and will delete all associated data.
+              <br />
+              If you are sure, please click the delete button below.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={onDeleteTask}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  )
+}
 
 export default function Task({ task }: { task: TaskType }) {
   if (!task) {
@@ -13,29 +92,42 @@ export default function Task({ task }: { task: TaskType }) {
   if (!task.id) {
     return <div>Task ID not found</div>
   }
+  const { createdAt, updatedAt } = task
   const formValues: FormValues = task.formValues
-  const aggregatedEntries = Object.entries(formValues)
+  const { name, description, ...restFormValues } = formValues
+  const aggregatedEntries = Object.entries(restFormValues)
   // extract the first 3 entries
   const scheduleEntries = aggregatedEntries.slice(0, 3)
   const taskEntries = aggregatedEntries.slice(3)
 
+  const informationEntries = Object.entries({
+    ["Description"]: description,
+    ["Created Date"]: new Date(createdAt ?? Date.now()).toLocaleString(),
+    ["Updated Date"]: new Date(updatedAt ?? Date.now()).toLocaleString(),
+  })
+
   const onDeleteTask = async () => {
-    if (confirm('Are you sure you want to delete this task?')) {
-      await deleteTask(task.id as string)
-    }
+    console.log("Deleting task with ID:", task.id)
+    // await deleteTask(task.id as string)
   }
   return (
     <div className="space-y-4">
-      <div className="flex justify-end items-center">
-        <Link href={`/tasks/${task.id}/edit`}>
-          <Button>
-            Edit
-          </Button>
-        </Link>
-        <Button onClick={onDeleteTask}>Delete</Button>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">{name}</h1>
+        <StatusAndActionsGroup
+          taskId={task.id}
+          onDeleteTask={onDeleteTask}
+        />
       </div>
-      <ScheduleDetail scheduleEntries={scheduleEntries} />
-      <TaskDetail taskEntries={taskEntries}/>
+      <SectionWrapper title="Information">
+        <InfoDetail infoEntries={informationEntries} />
+      </SectionWrapper>
+      <SectionWrapper title="Schedule Detail">
+        <ScheduleDetail scheduleEntries={scheduleEntries} />
+      </SectionWrapper>
+      <SectionWrapper title="Task Detail">
+        <TaskDetail taskEntries={taskEntries} />
+      </SectionWrapper>
     </div>
   )
 }
