@@ -2,16 +2,15 @@ import { useState } from 'react';
 import { UseFormSetValue, UseFormWatch } from 'react-hook-form';
 
 import {
-  FormValues,
   AIFormValues,
-  SchedulePromptType,
 } from '@/app/lib/definitions';
 import { generateScheduleByPrompt } from '@/app/lib/actions';
+import { Button } from '@/components/ui/button';
+import { ScheduleDetail } from '@/components/task/schedule-detail';
+import { TaskDetail } from '@/components/task/task-detail';
 
 import { FormWrapper } from './formWrapper';
 import { SectionWrapper } from './sectionWrapper';
-import { ScheduleDetail, TaskDetail } from './reviewForm';
-import { Button } from '@/components/ui/button';
 
 type ReviewFormAIProps = {
   title: string;
@@ -144,28 +143,5 @@ function PromptDetail({
         </div>
       </div>
     </div>
-  )
-}
-
-function RenderValuePrompt({ keyField, value }: { keyField: string, value: any }) {
-  return (
-    <div>
-      <p className="font-light">{keyField}</p>
-      <p className="break-words">{String(value) === "" ? "-" : String(value)}</p>
-    </div>
-  )
-}
-
-function RenderSchedulePrompt({ value }: { value: SchedulePromptType }) {
-  const { isOneTime, oneTimePrompt, recurringPrompt } = value;
-  return (
-    <>
-      <RenderValuePrompt keyField='Recurring Type' value={isOneTime ? "One Time" : "Recurring"} />
-      {isOneTime ? (
-        <RenderValuePrompt keyField='One-time Prompt' value={oneTimePrompt} />
-      ) : (
-        <RenderValuePrompt keyField='Recurring Prompt' value={recurringPrompt} />
-      )}
-    </>
   )
 }
