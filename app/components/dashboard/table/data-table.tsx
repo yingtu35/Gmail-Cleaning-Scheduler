@@ -129,12 +129,12 @@ export function DataTable<TData, TValue>({
           <Select
             onValueChange={(value) => {
               if (value === "All") {
-                table.getColumn("isExpired")?.setFilterValue(undefined)
+                table.getColumn("status")?.setFilterValue(undefined)
               } else {
-                table.getColumn("isExpired")?.setFilterValue(value)
+                table.getColumn("status")?.setFilterValue(value)
               }
             }}
-            defaultValue={table.getColumn("isExpired")?.getFilterValue() as string}
+            defaultValue={table.getColumn("status")?.getFilterValue() as string}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by Status" />
