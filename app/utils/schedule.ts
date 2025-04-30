@@ -1,9 +1,19 @@
 import { UserInDB, FormValues, CommandInput, LambdaInput, TimeValue, AgeValue, SizeValue } from "@/app/lib/definitions"
 import moment from "moment-timezone";
-import { convertDateStringToDate, isStringDateFormat } from "./date";
+import { 
+  convertDateStringToDate, 
+  isStringDateFormat, 
+  convertDateToString 
+} from "./date";
 
 function formatArrayField(key: string, fieldValue: any[]): string {
-  return fieldValue.map(value => `${key}:${value.trim()}`).join(' OR ');
+  const query = fieldValue.map(value => `${key}:${value.trim()}`).join(' ');
+  return `{${query}}`;
+}
+
+function formatExcludedField(key: string, fieldValue: any[]): string {
+  const query = fieldValue.map(value => `${key}${value.trim()}`).join(' ');
+  return `(${query})`;
 }
 
 function formatStringField(key: string, fieldValue: string): string {
@@ -46,7 +56,8 @@ function formatAgeField(fieldValue: AgeValue): string {
 }
 
 function formatTimeField(fieldValue: TimeValue): string {
-  return `${fieldValue.comparison}:${fieldValue.value}`;
+  const formattedDateString = convertDateToString(fieldValue.value);
+  return `${fieldValue.comparison}:${formattedDateString}`;
 }
 
 type Field<T> = { enabled: boolean; } & { [key: string]: T | boolean; };
@@ -59,18 +70,16 @@ export function formatFields(jsonObj: FormValues): string {
           const fieldValue = field[key];
           if (typeof fieldValue !== 'boolean') {
             const formattedString = formatter(fieldValue);
-            resultArray.push(`(${formattedString})`);
+            resultArray.push(`${formattedString}`);
           }
       }
   }
 
   processField('from', jsonObj.from, value => formatArrayField('from', value));
   processField('to', jsonObj.to, value => formatArrayField('to', value));
-  // TODO: title should be "subject"
   processField('title', jsonObj.title, value => formatArrayField('title', value));
   processField('emailIs', jsonObj.emailIs, value => formatArrayField('is', value));
-  // TODO: doesntHave should be "-"
-  processField('doesntHave', jsonObj.doesntHave, value => formatArrayField('doesntHave', value));
+  processField('doesntHave', jsonObj.doesntHave, value => formatExcludedField('-', value));
   processField('has', jsonObj.has, value => formatArrayField('has', value));
   processField('labels', jsonObj.labels, value => formatArrayField('label', value));
   processField('category', jsonObj.category, value => formatArrayField('category', value));

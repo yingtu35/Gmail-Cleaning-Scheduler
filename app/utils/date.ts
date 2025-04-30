@@ -58,3 +58,15 @@ export const convertDateStringToDate = (dateString: string): Date => {
 
   return new Date(year, month, day);
 }
+
+/**
+ * Function to convert a Date object to a string in YYYY-MM-DD format
+ * @param date - The Date object to be converted
+ * @returns - A string in YYYY-MM-DD format
+ */
+export const convertDateToString = (date: Date): string => {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
