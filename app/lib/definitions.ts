@@ -9,8 +9,17 @@ export type UserIconType = {
   htmlUrl: string;
 }
 
+export type UserGoogle = {
+  name: string;
+  email: string;
+  image: string;
+  accessToken: string;
+  expiresAt: Date;
+  refreshToken: string | undefined;
+}
+
 export type UserInDB = {
-  id?: string;
+  id: string;
   name: string;
   email: string;
   image: string;
@@ -38,6 +47,7 @@ export type LambdaInput = {
   refresh_token: string;
   expires_at: string;
   q: string;
+  task_name: string;
 }
 
 export type CommandInput = {

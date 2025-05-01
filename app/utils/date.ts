@@ -60,13 +60,29 @@ export const convertDateStringToDate = (dateString: string): Date => {
 }
 
 /**
- * Function to convert a Date object to a string in YYYY-MM-DD format
+ * Function to convert a Date object to a string
  * @param date - The Date object to be converted
- * @returns - A string in YYYY-MM-DD format
+ * @returns - A string in either YYYY-MM-DD format
  */
 export const convertDateToString = (date: Date): string => {
   const yyyy = date.getFullYear();
   const mm = String(date.getMonth() + 1).padStart(2, '0');
   const dd = String(date.getDate()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd}`;
+}
+
+/**
+ * Function to convert a Date object to a string that is compatible with AWS schedule naming
+ * @param date - The Date object to be converted
+ * @returns - A string in either YYYY-MM-DD or YYYY-MM-DD:HH:mm:ss.SSSZ format
+ */
+export const convertDateToAWSString = (date: Date): string => {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+  const ss = String(date.getSeconds()).padStart(2, '0');
+  const ms = String(date.getMilliseconds()).padStart(3, '0');
+  return `${yyyy}-${mm}-${dd}T${hh}-${min}-${ss}.${ms}Z`;
 }

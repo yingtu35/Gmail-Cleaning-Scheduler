@@ -11,7 +11,7 @@ import { eq, and, count } from "drizzle-orm";
 import { createSchedule, updateSchedule, deleteSchedule } from "@/app/aws/scheduler";
 import { subscribe } from "@/app/aws/sns";
 
-import { UserInDB, Task, FormValues, AIFormValues, AIPromptType, UserDateTimePromptType } from "@/app/lib/definitions";
+import { UserInDB, Task, FormValues, AIFormValues, AIPromptType, UserDateTimePromptType, UserGoogle } from "@/app/lib/definitions";
 import { convertToUTCDate, createCommandInput, parseJsonToFormValues } from "@/app/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/app/utils/database";
 
@@ -75,7 +75,7 @@ export async function getUserByEmail(email: string) {
   return user as UserInDB;
 }
 
-export async function updateUserOnSignIn(user: UserInDB) {
+export async function updateUserOnSignIn(user: UserGoogle) {
   await db.update(UserTable).set({
     name: user.name,
     image: user.image,
@@ -88,7 +88,7 @@ export async function updateUserOnSignIn(user: UserInDB) {
 }
 
 // create a new user in the database
-export async function createUserOnSignIn(user: UserInDB) {
+export async function createUserOnSignIn(user: UserGoogle) {
   await db.insert(UserTable).values(user)
   .onConflictDoUpdate({
     target: UserTable.email,
