@@ -147,6 +147,11 @@ function createScheduleTimeZone(timezone: string): string {
   return timezone.split(' ')[1];
 }
 
+function createOneTimeScheduleExpression(date: Date, time: string): string {
+  const dateString = convertDateToString(date);
+  return `at(${dateString}T${time}:00)`;
+}
+
 export function createCommandInput(data: FormValues, user: UserInDB) {
   let commandInput;
   let scheduleExpression = '';
@@ -158,7 +163,10 @@ export function createCommandInput(data: FormValues, user: UserInDB) {
   const q: string = formatFields(data);
   const input = JSON.stringify(createLambdaInput(q, user, data.name));
   if ('date' in data.occurrence.Schedule) {
-    scheduleExpression = `at(${data.occurrence.Schedule.date}T${data.occurrence.Schedule.time}:00)`;
+    scheduleExpression = createOneTimeScheduleExpression(
+      data.occurrence.Schedule.date,
+      data.occurrence.Schedule.time
+    );
     commandInput = {
       name,
       scheduleExpression,
