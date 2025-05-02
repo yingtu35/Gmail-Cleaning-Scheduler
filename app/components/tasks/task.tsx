@@ -25,7 +25,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {
   Tabs,
@@ -115,8 +114,7 @@ export default function Task({ task }: { task: TaskType }) {
   })
 
   const onDeleteTask = async () => {
-    console.log("Deleting task with ID:", task.id)
-    // await deleteTask(task.id as string)
+    await deleteTask(task.id as string)
   }
   return (
     <div className="space-y-4">

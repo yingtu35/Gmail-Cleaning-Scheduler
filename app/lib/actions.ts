@@ -12,7 +12,7 @@ import { createSchedule, updateSchedule, deleteSchedule } from "@/app/aws/schedu
 import { subscribe } from "@/app/aws/sns";
 
 import { UserInDB, Task, FormValues, AIFormValues, AIPromptType, UserDateTimePromptType, UserGoogle } from "@/app/lib/definitions";
-import { convertToUTCDate, createCommandInput, parseJsonToFormValues } from "@/app/utils/schedule";
+import { convertToUTCDate, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/app/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/app/utils/database";
 
 import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/app/openai/chat";
@@ -115,8 +115,11 @@ export async function getTaskById(taskId: string): Promise<Task | null> {
   }
   const task = await db.query.UserTasksTable.findFirst({
     where: and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)),
-  }) as Task;
-  return task;
+  });
+  if (!task) {
+    return null;
+  }
+  return task as Task;
 }
 
 export async function getTasks(): Promise<Task[]> {
@@ -147,16 +150,18 @@ export async function createTask(data: FormValues) {
   // TODO: parse the data using zod
   const user = await getUser();
   if (!isValidUser(user)) {
+    log.debug("user is not valid");
     return;
   }
 
   // check if user has reached the limit of tasks
   const numOfTasks = await getTasksCount(user);
   if (hasReachedTaskLimit(numOfTasks)) {
+    log.debug("user has reached the limit of tasks");
     return;
   }
   // create a schedule for the task
-  const commandInput = createCommandInput(data, user);
+  const commandInput = generateCreateScheduleCommand(data, user);
   const response = await createSchedule(commandInput);
   if (response.$metadata.httpStatusCode !== 200) {
     console.error("error creating schedule", response);
@@ -164,6 +169,7 @@ export async function createTask(data: FormValues) {
   }
   // create a new task in the database
   const newTask: Task = {
+    scheduleName: commandInput.name,
     expiresAt: data.occurrence.Occurrence === 'Recurring' ? convertToUTCDate(data.occurrence.Schedule.endDateAndTime, data.occurrence.TimeZone) : null,
     repeatCount: 0,
     formValues: data,
@@ -176,10 +182,10 @@ export async function createTask(data: FormValues) {
     log.error("error creating task");
     return;
   }
-  const returnedTask = result[0] as Task;
-  log.debug("created task", returnedTask);
+  const returnedTaskId = result[0].id;
+  log.debug("created task", returnedTaskId);
   revalidatePath("/");
-  redirect(`/tasks/${returnedTask.id}`);
+  redirect(`/tasks/${returnedTaskId}`);
 }
 
 export async function updateTask(data: FormValues, taskId: string) {
@@ -189,7 +195,12 @@ export async function updateTask(data: FormValues, taskId: string) {
   if (!isValidUser(user)) {
     return;
   }
-  const commandInput = createCommandInput(data, user);
+  // get the task from the database
+  const task = await getTaskById(taskId);
+  if (!task) {
+    return;
+  }
+  const commandInput = generateUpdateScheduleCommand(data, user, task.scheduleName);
   const response = await updateSchedule(commandInput);
   if (response.$metadata.httpStatusCode !== 200) {
     log.error("error updating schedule", response);
@@ -233,6 +244,7 @@ export async function deleteTask(taskId: string) {
     .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id)))
     .returning({
       id: UserTasksTable.id,
+      scheduleName: UserTasksTable.scheduleName,
       createdAt: UserTasksTable.createdAt,
       updatedAt: UserTasksTable.updatedAt,
       expiresAt: UserTasksTable.expiresAt,
@@ -245,10 +257,10 @@ export async function deleteTask(taskId: string) {
     return;
   }
   const deletedTask = result[0] as Task;
-  const taskName = deletedTask.formValues.name; 
+  const scheduleName = deletedTask.scheduleName; 
 
   // delete the schedule for the task
-  const response = await deleteSchedule(taskName);
+  const response = await deleteSchedule(scheduleName);
   if (response.$metadata.httpStatusCode !== 200) {
     log.error("error deleting schedule", response);
     // insert the task back into the database
