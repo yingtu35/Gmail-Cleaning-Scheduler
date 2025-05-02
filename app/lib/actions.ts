@@ -1,22 +1,21 @@
 'use server'
 
-import { auth, signIn, signOut } from "@/auth";
+import { eq, and, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from 'next/navigation';
 
 import { db } from "@/app/drizzle/db";
 import { UserTable, UserTasksTable } from "@/app/drizzle/schema";
-import { eq, and, count } from "drizzle-orm";
-
+import { auth, signIn, signOut } from "@/auth";
 import { createSchedule, updateSchedule, deleteSchedule } from "@/app/aws/scheduler";
 import { subscribe } from "@/app/aws/sns";
 
-import { UserInDB, Task, FormValues, AIFormValues, AIPromptType, UserDateTimePromptType, UserGoogle } from "@/app/lib/definitions";
+import { UserInDB, Task, FormValues, AIPromptType, UserDateTimePromptType, UserGoogle } from "@/app/lib/definitions";
 import { convertToUTCDate, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/app/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/app/utils/database";
 
 import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/app/openai/chat";
-import { QUERY_TEMPLATE } from "@/app/constants/formValues";
+
 import log from "../utils/log";
 
 export async function authenticate() {

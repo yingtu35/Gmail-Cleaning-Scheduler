@@ -1,5 +1,7 @@
-import { UserInDB, FormValues, CommandInput, LambdaInput, TimeValue, AgeValue, SizeValue } from "@/app/lib/definitions"
 import moment from "moment-timezone";
+
+import { UserInDB, FormValues, CommandInput, LambdaInput, TimeValue, AgeValue, SizeValue } from "@/app/lib/definitions"
+
 import { 
   convertDateStringToDate, 
   isStringDateFormat, 
@@ -197,7 +199,7 @@ export function generateCreateScheduleCommand(data: FormValues, user: UserInDB) 
 
 export function generateUpdateScheduleCommand(data: FormValues, user: UserInDB, scheduleName: string) {
   let commandInput;
-  
+
   const name = scheduleName;
   const description = data.description;
   const scheduleExpressionTimezone = createScheduleTimeZone(data.occurrence.TimeZone);
