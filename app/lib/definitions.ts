@@ -29,8 +29,14 @@ export type UserInDB = {
   createdAt?: Date;
 }
 
+/**
+ * Defines the type of a task in the database.
+ * 
+ * This type is used to represent a task that has been created by a user.
+ */
 export type Task = {
   id?: string;
+  scheduleName: string;
   createdAt?: Date;
   updatedAt?: Date;
   expiresAt: Date | null;

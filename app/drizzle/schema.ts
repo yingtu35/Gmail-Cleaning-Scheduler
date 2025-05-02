@@ -18,6 +18,7 @@ export const UserTable = pgTable('user', {
 
 export const UserTasksTable = pgTable('task', {
   id: uuid('id').primaryKey().defaultRandom(),
+  scheduleName: varchar('schedule_name', { length: 61 }).notNull().unique(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
   expiresAt: timestamp('expires_at'),
