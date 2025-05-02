@@ -1,9 +1,12 @@
-import { UserInDB, FormValues, CommandInput, LambdaInput, TimeValue, AgeValue, SizeValue } from "@/app/lib/definitions"
 import moment from "moment-timezone";
+
+import { UserInDB, FormValues, CommandInput, LambdaInput, TimeValue, AgeValue, SizeValue } from "@/app/lib/definitions"
+
 import { 
   convertDateStringToDate, 
   isStringDateFormat, 
-  convertDateToString 
+  convertDateToString, 
+  convertDateToAWSString
 } from "./date";
 
 function formatArrayField(key: string, fieldValue: any[]): string {
@@ -91,13 +94,14 @@ export function formatFields(jsonObj: FormValues): string {
   return resultArray.join(' AND ');
 }
 
-function createLambdaInput(q: string, user:UserInDB): LambdaInput {
+function createLambdaInput(q: string, user:UserInDB, taskName: string): LambdaInput {
   return {
     email: user.email,
     access_token: user.accessToken,
     refresh_token: user.refreshToken as string,
     expires_at: user.expiresAt.toISOString(),
-    q
+    q,
+    task_name: taskName
   };
 }
 
@@ -122,17 +126,49 @@ function formatName(name: string): string {
   return name.replace(/[^0-9a-zA-Z-_.]/g, '-');
 }
 
-export function createCommandInput(data: FormValues, user: UserInDB) {
+/**
+ * Generate a unique name for the schedule
+ * The length of the schedule name is guaranteed to be less than 64 characters
+ * userId has a length of 36 characters
+ * timestamp has a length of 24 characters
+ * the total length of the name is 36 + 24 + 1 = 61 characters
+ * @param userId 
+ * @returns Schedule name
+ */
+function createScheduleName(userId: string): string {
+  const timestamp = convertDateToAWSString(new Date());
+  return `${userId}-${timestamp}`;
+}
+
+/**
+ * Extract the timezone from the schedule expression
+ * @param timezone - The timezone string
+ * @returns The timezone in the format of 'America/New_York'
+ */
+function createScheduleTimeZone(timezone: string): string {
+  return timezone.split(' ')[1];
+}
+
+function createOneTimeScheduleExpression(date: Date, time: string): string {
+  const dateString = convertDateToString(date);
+  return `at(${dateString}T${time}:00)`;
+}
+
+export function generateCreateScheduleCommand(data: FormValues, user: UserInDB) {
   let commandInput;
-  const name = formatName(user.name) + '-' + formatName(data.name);
   let scheduleExpression = '';
+
+  const name = createScheduleName(user.id);
   const description = data.description;
-  const scheduleExpressionTimezone = data.occurrence.TimeZone;
+  const scheduleExpressionTimezone = createScheduleTimeZone(data.occurrence.TimeZone);
   const state = 'ENABLED';
   const q: string = formatFields(data);
-  const input = JSON.stringify(createLambdaInput(q, user));
+  const input = JSON.stringify(createLambdaInput(q, user, data.name));
   if ('date' in data.occurrence.Schedule) {
-    scheduleExpression = `at(${data.occurrence.Schedule.date}T${data.occurrence.Schedule.time}:00)`;
+    scheduleExpression = createOneTimeScheduleExpression(
+      data.occurrence.Schedule.date,
+      data.occurrence.Schedule.time
+    );
     commandInput = {
       name,
       scheduleExpression,
@@ -159,6 +195,49 @@ export function createCommandInput(data: FormValues, user: UserInDB) {
     } as CommandInput;
   }
   return commandInput;
+}
+
+export function generateUpdateScheduleCommand(data: FormValues, user: UserInDB, scheduleName: string) {
+  let commandInput;
+
+  const name = scheduleName;
+  const description = data.description;
+  const scheduleExpressionTimezone = createScheduleTimeZone(data.occurrence.TimeZone);
+  const state = 'ENABLED';
+  const q: string = formatFields(data);
+  const input = JSON.stringify(createLambdaInput(q, user, data.name));
+  if ('date' in data.occurrence.Schedule) {
+    const scheduleExpression = createOneTimeScheduleExpression(
+      data.occurrence.Schedule.date,
+      data.occurrence.Schedule.time
+    );
+    commandInput = {
+      name,
+      scheduleExpression,
+      description,
+      scheduleExpressionTimezone,
+      state,
+      input,
+    } as CommandInput;
+  } else {
+    const scheduleExpression = `rate(${data.occurrence.Schedule.rate.value} ${data.occurrence.Schedule.rate.unit})`;
+    // convert start/end dateTime objects to UTC
+    const { startDateAndTime, endDateAndTime } = data.occurrence.Schedule;
+    const startDate = convertToUTCDate(startDateAndTime, scheduleExpressionTimezone);
+    const endDate = convertToUTCDate(endDateAndTime, scheduleExpressionTimezone);
+    commandInput = {
+      name,
+      scheduleExpression,
+      description,
+      startDate,
+      endDate,
+      scheduleExpressionTimezone,
+      state,
+      input,
+    } as CommandInput;
+  }
+  return commandInput;
+
 }
 
 export function parseJsonToFormValues(json: string): FormValues {

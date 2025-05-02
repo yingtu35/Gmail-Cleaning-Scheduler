@@ -9,8 +9,17 @@ export type UserIconType = {
   htmlUrl: string;
 }
 
+export type UserGoogle = {
+  name: string;
+  email: string;
+  image: string;
+  accessToken: string;
+  expiresAt: Date;
+  refreshToken: string | undefined;
+}
+
 export type UserInDB = {
-  id?: string;
+  id: string;
   name: string;
   email: string;
   image: string;
@@ -20,8 +29,14 @@ export type UserInDB = {
   createdAt?: Date;
 }
 
+/**
+ * Defines the type of a task in the database.
+ * 
+ * This type is used to represent a task that has been created by a user.
+ */
 export type Task = {
   id?: string;
+  scheduleName: string;
   createdAt?: Date;
   updatedAt?: Date;
   expiresAt: Date | null;
@@ -38,6 +53,7 @@ export type LambdaInput = {
   refresh_token: string;
   expires_at: string;
   q: string;
+  task_name: string;
 }
 
 export type CommandInput = {

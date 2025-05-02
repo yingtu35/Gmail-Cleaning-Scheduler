@@ -1,6 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
-import { UserInDB } from "@/app/lib/definitions";
+import { UserGoogle } from "@/app/lib/definitions";
 import { epochToDate } from "@/app/utils/date";
 import { createUserOnSignIn, getUserIdByEmail, updateUserOnSignIn, subscribeEmailNotification } from "@/app/lib/actions";
 import log from "@/app/utils/log";
@@ -33,7 +33,7 @@ export const autoConfig = {
       if (!user.email || !user.name) {
         return false;
       }
-      const newUser: UserInDB = {
+      const newUser: UserGoogle = {
         name: user.name,
         email: user.email,
         image: user.image as string,

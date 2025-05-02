@@ -3,6 +3,7 @@ import { Task } from "../lib/definitions";
 export const mockTasks: Task[] = [
   {
     id: "task-001",
+    scheduleName: "Schedule 1",
     createdAt: new Date("2025-03-10T10:00:00Z"),
     updatedAt: new Date("2025-03-10T10:00:00Z"),
     expiresAt: new Date("2025-05-10T10:00:00Z"), // future
@@ -65,6 +66,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-002",
+    scheduleName: "Schedule 2",
     createdAt: new Date("2025-02-15T14:30:00Z"),
     updatedAt: new Date("2025-02-15T14:30:00Z"),
     expiresAt: new Date("2025-04-01T14:30:00Z"), // expired
@@ -144,6 +146,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-003",
+    scheduleName: "Schedule 3",
     createdAt: new Date("2025-03-01T09:15:00Z"),
     updatedAt: new Date("2025-03-05T11:20:00Z"),
     expiresAt: null,
@@ -227,6 +230,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-004",
+    scheduleName: "Schedule 4",
     createdAt: new Date("2025-01-20T16:45:00Z"),
     updatedAt: new Date("2025-01-20T16:45:00Z"),
     expiresAt: new Date("2025-04-20T16:45:00Z"), // future
@@ -306,6 +310,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-005",
+    scheduleName: "Schedule 5",
     createdAt: new Date("2025-03-25T08:30:00Z"),
     updatedAt: new Date("2025-03-25T08:30:00Z"),
     expiresAt: new Date("2025-04-10T08:30:00Z"), // expired
@@ -385,6 +390,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-006",
+    scheduleName: "Schedule 6",
     createdAt: new Date("2025-02-28T17:00:00Z"),
     updatedAt: new Date("2025-03-01T09:15:00Z"),
     expiresAt: new Date("2026-02-28T17:00:00Z"), // future
@@ -468,6 +474,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-007",
+    scheduleName: "Schedule 7",
     createdAt: new Date("2025-03-15T11:20:00Z"),
     updatedAt: new Date("2025-03-15T11:20:00Z"),
     expiresAt: new Date("2025-04-05T11:20:00Z"), // expired
@@ -547,6 +554,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-008",
+    scheduleName: "Schedule 8",
     createdAt: new Date("2025-01-05T13:40:00Z"),
     updatedAt: new Date("2025-01-10T15:25:00Z"),
     expiresAt: null,
@@ -630,6 +638,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-009",
+    scheduleName: "Schedule 9",
     createdAt: new Date("2025-02-20T10:10:00Z"),
     updatedAt: new Date("2025-02-22T14:30:00Z"),
     expiresAt: new Date("2025-05-20T10:10:00Z"), // future
@@ -709,6 +718,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-010",
+    scheduleName: "Schedule 10",
     createdAt: new Date("2025-03-30T09:00:00Z"),
     updatedAt: new Date("2025-03-30T09:00:00Z"),
     expiresAt: new Date("2025-04-30T09:00:00Z"), // future
@@ -792,6 +802,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-011",
+    scheduleName: "Schedule 11",
     createdAt: new Date("2025-02-05T15:45:00Z"),
     updatedAt: new Date("2025-02-10T09:15:00Z"),
     expiresAt: null,
@@ -875,6 +886,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-012",
+    scheduleName: "Schedule 12",
     createdAt: new Date("2025-03-12T11:30:00Z"),
     updatedAt: new Date("2025-03-12T11:30:00Z"),
     expiresAt: new Date("2025-06-12T11:30:00Z"), // future
@@ -954,6 +966,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-013",
+    scheduleName: "Schedule 13",
     createdAt: new Date("2025-03-20T14:15:00Z"),
     updatedAt: new Date("2025-03-22T09:30:00Z"),
     expiresAt: new Date("2025-04-10T14:15:00Z"), // expired
@@ -1033,6 +1046,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-014",
+    scheduleName: "Schedule 14",
     createdAt: new Date("2025-01-15T17:00:00Z"),
     updatedAt: new Date("2025-01-20T10:45:00Z"),
     expiresAt: new Date("2026-01-15T17:00:00Z"), // future
@@ -1116,6 +1130,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-015",
+    scheduleName: "Schedule 15",
     createdAt: new Date("2025-03-08T12:00:00Z"),
     updatedAt: new Date("2025-03-08T12:00:00Z"),
     expiresAt: new Date("2025-04-08T12:00:00Z"), // expired
@@ -1199,6 +1214,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-016",
+    scheduleName: "Schedule 16",
     createdAt: new Date("2025-02-25T08:20:00Z"),
     updatedAt: new Date("2025-02-25T08:20:00Z"),
     expiresAt: null,
@@ -1282,6 +1298,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-017",
+    scheduleName: "Schedule 17",
     createdAt: new Date("2025-03-28T16:35:00Z"),
     updatedAt: new Date("2025-03-28T16:35:00Z"),
     expiresAt: new Date("2025-05-28T16:35:00Z"), // future
@@ -1361,6 +1378,7 @@ export const mockTasks: Task[] = [
   },
   {
     id: "task-018",
+    scheduleName: "Schedule 18",
     createdAt: new Date("2025-03-01T10:00:00Z"),
     updatedAt: new Date("2025-03-05T14:20:00Z"),
     expiresAt: new Date("2025-04-01T10:00:00Z"), // expired
