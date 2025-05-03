@@ -60,7 +60,7 @@ function StatusAndActionsGroup({
         <DropdownMenuContent>
           <DropdownMenuItem>Pause</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link href={`/tasks/${taskId}/edit`}>Edit</Link>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>

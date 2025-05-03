@@ -105,13 +105,31 @@ function createLambdaInput(q: string, user:UserInDB, taskName: string): LambdaIn
   };
 }
 
+/**
+ * Get the timezone string in the format 'Area/Location' (e.g., 'America/Los_Angeles')
+ * Handles input formats:
+ *   1. 'Area/Location'
+ *   2. '(UTC-08:00) Area/Location'
+ * Always returns 'Area/Location' style.
+ * @param timezone - The timezone string
+ * @returns The timezone in the format of 'Area/Location'
+ */
+function getTzTimeZone(timezone: string): string {
+  const match = timezone.match(/^\(UTC[+-]\d{2}:\d{2}\)\s*(.*)$/);
+  if (match && match[1]) {
+    return match[1]; // Return the 'Area/Location' part
+  }
+  // If not, return the original timezone
+  return timezone;
+}
+
 export function convertToUTCDate(
   dateTime: { date: Date; time: string },
   timezone: string
 ): Date | null {
   // Construct ISO string from date and time, interpret in given timezone
   const iso = `${dateTime.date.toISOString().split('T')[0]}T${dateTime.time}`;
-  const parsed = moment.tz(iso, timezone);
+  const parsed = moment.tz(iso, getTzTimeZone(timezone));
   // Validate parsed date
   if (!parsed.isValid()) {
     console.error('Invalid date or timezone');
@@ -140,15 +158,6 @@ function createScheduleName(userId: string): string {
   return `${userId}-${timestamp}`;
 }
 
-/**
- * Extract the timezone from the schedule expression
- * @param timezone - The timezone string
- * @returns The timezone in the format of 'America/New_York'
- */
-function createScheduleTimeZone(timezone: string): string {
-  return timezone.split(' ')[1];
-}
-
 function createOneTimeScheduleExpression(date: Date, time: string): string {
   const dateString = convertDateToString(date);
   return `at(${dateString}T${time}:00)`;
@@ -160,7 +169,7 @@ export function generateCreateScheduleCommand(data: FormValues, user: UserInDB) 
 
   const name = createScheduleName(user.id);
   const description = data.description;
-  const scheduleExpressionTimezone = createScheduleTimeZone(data.occurrence.TimeZone);
+  const scheduleExpressionTimezone = getTzTimeZone(data.occurrence.TimeZone);
   const state = 'ENABLED';
   const q: string = formatFields(data);
   const input = JSON.stringify(createLambdaInput(q, user, data.name));
@@ -202,7 +211,7 @@ export function generateUpdateScheduleCommand(data: FormValues, user: UserInDB, 
 
   const name = scheduleName;
   const description = data.description;
-  const scheduleExpressionTimezone = createScheduleTimeZone(data.occurrence.TimeZone);
+  const scheduleExpressionTimezone = getTzTimeZone(data.occurrence.TimeZone);
   const state = 'ENABLED';
   const q: string = formatFields(data);
   const input = JSON.stringify(createLambdaInput(q, user, data.name));

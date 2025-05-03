@@ -170,9 +170,13 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
       updateTask(values, taskId);
   }
 
+  const onError = (error: any) => {
+    console.error("Form submission error:", error);
+  }
+
   return (
     <Form {...form}>
-      <form id="edit-task-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-screen">
+      <form id="edit-task-form" onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col h-screen">
         {/* Form header */}
         <div className="sticky top-0 bg-white flex items-center justify-between p-4 z-10 shadow">
           <div className="flex-1">

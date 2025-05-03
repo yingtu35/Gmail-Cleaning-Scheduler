@@ -17,6 +17,7 @@ import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/app/utils/datab
 import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/app/openai/chat";
 
 import log from "../utils/log";
+import { parseTask } from "../utils/task";
 
 export async function authenticate() {
   await signIn('google', { callbackUrl: '/' });
@@ -114,11 +115,11 @@ export async function getTaskById(taskId: string): Promise<Task | null> {
   }
   const task = await db.query.UserTasksTable.findFirst({
     where: and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)),
-  });
+  })
   if (!task) {
     return null;
   }
-  return task as Task;
+  return parseTask(task);
 }
 
 export async function getTasks(): Promise<Task[]> {
@@ -130,8 +131,9 @@ export async function getTasks(): Promise<Task[]> {
   const tasks = await db.query.UserTasksTable.findMany({
     where: eq(UserTasksTable.userId, user.id as string),
     orderBy: (task, { desc }) => desc(task.updatedAt),
-  }) as Task[];
-  return tasks;
+  })
+  const formattedTasks = tasks.map(parseTask);
+  return formattedTasks;
 }
 
 export async function getTasksCount(user: UserInDB): Promise<number> {
@@ -215,13 +217,12 @@ export async function updateTask(data: FormValues, taskId: string) {
       formValues: data,
     })
     .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
-
-    revalidatePath(`/tasks/${taskId}`);
-    redirect(`/tasks/${taskId}`);
   } catch (error) {
     log.error("error updating task", error);
     return;
   }
+  revalidatePath(`/tasks/${taskId}`);
+  redirect(`/tasks/${taskId}`);
 }
 
 export async function deleteTask(taskId: string) {
