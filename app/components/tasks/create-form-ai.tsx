@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
 import { INITIAL_AI_STATE } from '@/app/constants/aiPromptValues';
+import { FormControlBarWrapper } from '@/components/task/form/form-control-bar-wrapper';
 
 import ScheduleFormAI from './scheduleForm-ai';
 import TaskFormAI from './taskForm-ai';
@@ -115,7 +116,7 @@ const FormControlGroup = ({
   )
 
   return (
-    <div className={cn("flex items-center space-x-4", className)}>
+    <div className={cn("flex flex-wrap items-center space-x-4", className)}>
       <Link href="https://support.google.com/mail/answer/7190?hl=en" target="_blank" className="text-blue-600 hover:underline">Help</Link>
       <AlertDialog>
         <AlertDialogTrigger asChild>
@@ -221,7 +222,7 @@ export default function CreateFormAI({
   return (
     <Form {...form}>
       <form id="task-form-ai" onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col h-screen">
-        <div className="sticky top-0 bg-white flex items-center justify-between p-4 z-10 shadow">
+        <FormControlBarWrapper>
           <div className="flex-1">
             <StepIndicator
               steps={stepConfigs}
@@ -238,7 +239,7 @@ export default function CreateFormAI({
             onBackClicked={onBackClicked}
             onCancelClicked={onCancelClicked}
           />
-        </div>
+        </FormControlBarWrapper>
         <div className="flex-1 overflow-hidden min-h-0">
           {visibleSteps.map((stepElement, idx) => (
             <div

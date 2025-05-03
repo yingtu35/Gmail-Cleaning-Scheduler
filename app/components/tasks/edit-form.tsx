@@ -28,6 +28,7 @@ import {
   Form,
 } from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
+import { FormControlBarWrapper } from '@/components/task/form/form-control-bar-wrapper';
 
 import { ScheduleForm } from './scheduleForm';
 import { TaskForm } from './taskForm';
@@ -84,7 +85,7 @@ const FormControlGroup = ({
   )
 
   return (
-    <div className={cn("flex items-center space-x-4", className)}>
+    <div className={cn("flex flex-wrap items-center space-x-4", className)}>
       <Link href="https://support.google.com/mail/answer/7190?hl=en" target="_blank" className="text-blue-600 hover:underline">Help</Link>
       <AlertDialog>
         <AlertDialogTrigger asChild>
@@ -178,7 +179,7 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
     <Form {...form}>
       <form id="edit-task-form" onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col h-screen">
         {/* Form header */}
-        <div className="sticky top-0 bg-white flex items-center justify-between p-4 z-10 shadow">
+        <FormControlBarWrapper>
           <div className="flex-1">
             <StepIndicator
               steps={stepConfigs}
@@ -193,7 +194,7 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
             onBackClicked={onBackClicked}
             onCancelClicked={onCancelClicked}
           />
-        </div>
+        </FormControlBarWrapper>
         <div className="flex-1 overflow-hidden min-h-0">
           {visibleSteps.map((stepElement, idx) => (
             <div
