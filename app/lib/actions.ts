@@ -217,13 +217,12 @@ export async function updateTask(data: FormValues, taskId: string) {
       formValues: data,
     })
     .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
-
-    revalidatePath(`/tasks/${taskId}`);
-    redirect(`/tasks/${taskId}`);
   } catch (error) {
     log.error("error updating task", error);
     return;
   }
+  revalidatePath(`/tasks/${taskId}`);
+  redirect(`/tasks/${taskId}`);
 }
 
 export async function deleteTask(taskId: string) {
