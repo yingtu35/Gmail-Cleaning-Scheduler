@@ -26,7 +26,7 @@ import {
   Form,
 } from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
-
+import { toast } from 'sonner';
 
 import StepIndicator, { StepConfig } from './StepIndicator';
 import { ScheduleForm } from './scheduleForm';
@@ -170,11 +170,22 @@ const CreateForm = ({
 
   const onSubmit = (values: FormValues) => {
     if (!isLastStep) return nextStep();
-    createTask(values);
+    toast.promise(
+      createTask(values),
+      {
+        loading: `Creating task ${values.name}...`,
+        success: (taskId) => {
+          router.push(`/tasks/${taskId}`);
+          return `Task ${values.name} created successfully!`;
+        },
+        error: (error) => {
+          return error.message || "Error creating task. Please try again later.";
+        },
+      }
+    )
   }
 
   const onError = (errors: any) => {
-
     console.error(errors);
   }
 

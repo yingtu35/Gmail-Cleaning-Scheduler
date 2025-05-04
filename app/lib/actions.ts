@@ -148,25 +148,24 @@ export async function getTasksCount(user: UserInDB): Promise<number> {
 
 // create a new task for the user in the database
 export async function createTask(data: FormValues) {
-  // TODO: parse the data using zod
   const user = await getUser();
   if (!isValidUser(user)) {
     log.debug("user is not valid");
-    return;
+    throw new Error("User is not valid");
   }
 
   // check if user has reached the limit of tasks
   const numOfTasks = await getTasksCount(user);
   if (hasReachedTaskLimit(numOfTasks)) {
     log.debug("user has reached the limit of tasks");
-    return;
+    throw new Error("User has reached the limit of tasks");
   }
   // create a schedule for the task
   const commandInput = generateCreateScheduleCommand(data, user);
   const response = await createSchedule(commandInput);
   if (response.$metadata.httpStatusCode !== 200) {
     console.error("error creating schedule", response);
-    return;
+    throw new Error("Error creating schedule. Please try again later.");
   }
   // create a new task in the database
   const newTask: Task = {
@@ -181,12 +180,12 @@ export async function createTask(data: FormValues) {
   })
   if (!result) {
     log.error("error creating task");
-    return;
+    throw new Error("Error creating task. Please try again later.");
   }
   const returnedTaskId = result[0].id;
   log.debug("created task", returnedTaskId);
   revalidatePath("/");
-  redirect(`/tasks/${returnedTaskId}`);
+  return returnedTaskId;
 }
 
 export async function updateTask(data: FormValues, taskId: string) {
