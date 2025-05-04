@@ -189,22 +189,20 @@ export async function createTask(data: FormValues) {
 }
 
 export async function updateTask(data: FormValues, taskId: string) {
-  // TODO: parse the data using zod
-  // update the data in the database
   const user = await getUser();
   if (!isValidUser(user)) {
-    return;
+    throw new Error("User is not valid");
   }
   // get the task from the database
   const task = await getTaskById(taskId);
   if (!task) {
-    return;
+    throw new Error("Task not found");
   }
   const commandInput = generateUpdateScheduleCommand(data, user, task.scheduleName);
   const response = await updateSchedule(commandInput);
   if (response.$metadata.httpStatusCode !== 200) {
     log.error("error updating schedule", response);
-    return;
+    throw new Error("Error updating schedule. Please try again later.");
   }
   // update the task in the database
   try {
@@ -218,10 +216,10 @@ export async function updateTask(data: FormValues, taskId: string) {
     .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
   } catch (error) {
     log.error("error updating task", error);
-    return;
+    throw new Error("Error updating task. Please try again later.");
   }
   revalidatePath(`/tasks/${taskId}`);
-  redirect(`/tasks/${taskId}`);
+  return taskId;
 }
 
 export async function deleteTask(taskId: string) {

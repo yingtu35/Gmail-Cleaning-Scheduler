@@ -4,6 +4,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/lib/utils';
@@ -26,7 +27,6 @@ import {
   Form,
 } from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 
 import StepIndicator, { StepConfig } from './StepIndicator';
 import { ScheduleForm } from './scheduleForm';
