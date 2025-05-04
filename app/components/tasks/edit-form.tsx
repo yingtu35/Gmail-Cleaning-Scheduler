@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import useMultiStepForm from '@/app/hooks/useMultiStepForm';
 import { cn } from '@/lib/utils';
@@ -139,10 +140,6 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
     mode: 'onChange'
   });
   const { handleSubmit, control, watch } = form;
-  const [formValues, setFormValues] = useState<FormValues>(task);
-  function updateFields(fields: Partial<FormValues>) {
-    setFormValues({ ...formValues, ...fields });
-  }
 
   const stepDefinitions = [
       { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Step 1: Schedule Details" control={control} watch={watch} /> },
@@ -168,7 +165,19 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
 
   const onSubmit = (values: FormValues) => {
       if (!isLastStep) return nextStep();
-      updateTask(values, taskId);
+      toast.promise(
+        updateTask(values, taskId),
+        {
+          loading: `Updating task ${values.name}...`,
+          success: (taskId) => {
+            router.push(`/tasks/${taskId}`);
+            return `Task ${values.name} updated successfully!`;
+          },
+          error: (error) => {
+            return error.message || "Error updating task. Please try again later.";
+          },
+        }
+      )
   }
 
   const onError = (error: any) => {

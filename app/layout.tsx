@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppSidebar } from "@/components/app-sidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 import { getAuthenticatedUser } from "./lib/actions";
 
@@ -27,6 +28,7 @@ export default async function RootLayout({
             {children}
           </div>
         </main>
+        <Toaster />
       </body>
     </html>
   );

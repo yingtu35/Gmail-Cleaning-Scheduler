@@ -9,7 +9,7 @@ export default async function Page({
   }
 }) {
   const task: TaskType | null = await getTaskById(params.taskId);
-  if (!task) {
+  if (!task || !task.id) {
     return <div>Task not found</div>
   }
   return (
