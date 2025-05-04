@@ -225,16 +225,16 @@ export async function updateTask(data: FormValues, taskId: string) {
 export async function deleteTask(taskId: string) {
   const user = await getUser();
   if (!isValidUser(user)) {
-    return;
+    throw new Error("User is not valid");
   }
   // check if the task exists
   const task = await getTaskById(taskId);
   if (!task) {
-    return;
+    throw new Error("Task not found");
   }
   // check if the user is the owner of the task
   if (task.userId !== user.id) {
-    return;
+    throw new Error("You are not the owner of the task");
   }
   // TODO: should ensure task is both deleted from the database and the schedule
   const result = await db.delete(UserTasksTable)
@@ -251,7 +251,7 @@ export async function deleteTask(taskId: string) {
     })
   if (!result) {
     console.error("error deleting task");
-    return;
+    throw new Error("Error deleting task. Please try again later.");
   }
   const deletedTask = result[0] as Task;
   const scheduleName = deletedTask.scheduleName; 
@@ -262,10 +262,10 @@ export async function deleteTask(taskId: string) {
     log.error("error deleting schedule", response);
     // insert the task back into the database
     await db.insert(UserTasksTable).values(deletedTask);
-    return;
+    throw new Error("Error deleting schedule. Please try again later.");
   }
   revalidatePath("/");
-  redirect("/");
+  return;
 }
 
 export async function subscribeEmailNotification(email: string) {

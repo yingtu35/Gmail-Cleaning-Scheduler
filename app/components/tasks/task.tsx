@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 import { FormValues, Task as TaskType } from "@/app/lib/definitions"
 import { Button } from "@/components/ui/button"
@@ -93,14 +95,12 @@ function StatusAndActionsGroup({
 }
 
 export default function Task({ task }: { task: TaskType }) {
-  if (!task) {
-    return <div>Task not found</div>
-  }
-  if (!task.id) {
-    return <div>Task ID not found</div>
-  }
+  const router = useRouter()
+
   const { createdAt, updatedAt } = task
+  const taskId = task.id as string
   const formValues: FormValues = task.formValues
+
   const { name, description, ...restFormValues } = formValues
   const aggregatedEntries = Object.entries(restFormValues)
   // extract the first 3 entries
@@ -114,7 +114,19 @@ export default function Task({ task }: { task: TaskType }) {
   })
 
   const onDeleteTask = async () => {
-    await deleteTask(task.id as string)
+    toast.promise(
+      deleteTask(taskId),
+      {
+        loading: `Deleting task ${formValues.name}...`,
+        success: () => {
+          router.replace('/');
+          return `Task ${formValues.name} deleted successfully!`;
+        },
+        error: (error) => {
+          return error.message || "Error deleting task. Please try again later.";
+        },
+      }
+    )
   }
   return (
     <div className="space-y-4">
@@ -128,7 +140,7 @@ export default function Task({ task }: { task: TaskType }) {
           </PingWrapper>
         </div>
         <StatusAndActionsGroup
-          taskId={task.id}
+          taskId={taskId}
           onDeleteTask={onDeleteTask}
         />
       </div>
