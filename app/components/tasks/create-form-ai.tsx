@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 import useMultiStepForm from '@/app/hooks/useMultiStepForm';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -215,7 +216,19 @@ export default function CreateFormAI({
   const onSubmit = (values: AIFormValues) => {
     if (!isLastStep) return nextStep();
     const formValues = values.formValues.value;
-    createTask(formValues);
+    toast.promise(
+      createTask(formValues),
+      {
+        loading: `Creating task ${formValues.name}...`,
+        success: (taskId) => {
+          router.push(`/tasks/${taskId}`);
+          return `Task ${formValues.name} created successfully!`;
+        },
+        error: (error) => {
+          return error.message || "Error creating task. Please try again later.";
+        },
+      }
+    )
   }
 
   return (
