@@ -4,6 +4,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/lib/utils';
@@ -26,7 +27,6 @@ import {
   Form,
 } from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
-
 
 import StepIndicator, { StepConfig } from './StepIndicator';
 import { ScheduleForm } from './scheduleForm';
@@ -170,11 +170,22 @@ const CreateForm = ({
 
   const onSubmit = (values: FormValues) => {
     if (!isLastStep) return nextStep();
-    createTask(values);
+    toast.promise(
+      createTask(values),
+      {
+        loading: `Creating task ${values.name}...`,
+        success: (taskId) => {
+          router.push(`/tasks/${taskId}`);
+          return `Task ${values.name} created successfully!`;
+        },
+        error: (error) => {
+          return error.message || "Error creating task. Please try again later.";
+        },
+      }
+    )
   }
 
   const onError = (errors: any) => {
-
     console.error(errors);
   }
 

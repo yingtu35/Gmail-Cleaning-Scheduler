@@ -148,25 +148,24 @@ export async function getTasksCount(user: UserInDB): Promise<number> {
 
 // create a new task for the user in the database
 export async function createTask(data: FormValues) {
-  // TODO: parse the data using zod
   const user = await getUser();
   if (!isValidUser(user)) {
     log.debug("user is not valid");
-    return;
+    throw new Error("User is not valid");
   }
 
   // check if user has reached the limit of tasks
   const numOfTasks = await getTasksCount(user);
   if (hasReachedTaskLimit(numOfTasks)) {
     log.debug("user has reached the limit of tasks");
-    return;
+    throw new Error("User has reached the limit of tasks");
   }
   // create a schedule for the task
   const commandInput = generateCreateScheduleCommand(data, user);
   const response = await createSchedule(commandInput);
   if (response.$metadata.httpStatusCode !== 200) {
     console.error("error creating schedule", response);
-    return;
+    throw new Error("Error creating schedule. Please try again later.");
   }
   // create a new task in the database
   const newTask: Task = {
@@ -181,31 +180,29 @@ export async function createTask(data: FormValues) {
   })
   if (!result) {
     log.error("error creating task");
-    return;
+    throw new Error("Error creating task. Please try again later.");
   }
   const returnedTaskId = result[0].id;
   log.debug("created task", returnedTaskId);
   revalidatePath("/");
-  redirect(`/tasks/${returnedTaskId}`);
+  return returnedTaskId;
 }
 
 export async function updateTask(data: FormValues, taskId: string) {
-  // TODO: parse the data using zod
-  // update the data in the database
   const user = await getUser();
   if (!isValidUser(user)) {
-    return;
+    throw new Error("User is not valid");
   }
   // get the task from the database
   const task = await getTaskById(taskId);
   if (!task) {
-    return;
+    throw new Error("Task not found");
   }
   const commandInput = generateUpdateScheduleCommand(data, user, task.scheduleName);
   const response = await updateSchedule(commandInput);
   if (response.$metadata.httpStatusCode !== 200) {
     log.error("error updating schedule", response);
-    return;
+    throw new Error("Error updating schedule. Please try again later.");
   }
   // update the task in the database
   try {
@@ -219,25 +216,25 @@ export async function updateTask(data: FormValues, taskId: string) {
     .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
   } catch (error) {
     log.error("error updating task", error);
-    return;
+    throw new Error("Error updating task. Please try again later.");
   }
   revalidatePath(`/tasks/${taskId}`);
-  redirect(`/tasks/${taskId}`);
+  return taskId;
 }
 
 export async function deleteTask(taskId: string) {
   const user = await getUser();
   if (!isValidUser(user)) {
-    return;
+    throw new Error("User is not valid");
   }
   // check if the task exists
   const task = await getTaskById(taskId);
   if (!task) {
-    return;
+    throw new Error("Task not found");
   }
   // check if the user is the owner of the task
   if (task.userId !== user.id) {
-    return;
+    throw new Error("You are not the owner of the task");
   }
   // TODO: should ensure task is both deleted from the database and the schedule
   const result = await db.delete(UserTasksTable)
@@ -254,7 +251,7 @@ export async function deleteTask(taskId: string) {
     })
   if (!result) {
     console.error("error deleting task");
-    return;
+    throw new Error("Error deleting task. Please try again later.");
   }
   const deletedTask = result[0] as Task;
   const scheduleName = deletedTask.scheduleName; 
@@ -265,10 +262,10 @@ export async function deleteTask(taskId: string) {
     log.error("error deleting schedule", response);
     // insert the task back into the database
     await db.insert(UserTasksTable).values(deletedTask);
-    return;
+    throw new Error("Error deleting schedule. Please try again later.");
   }
   revalidatePath("/");
-  redirect("/");
+  return;
 }
 
 export async function subscribeEmailNotification(email: string) {
