@@ -19,11 +19,11 @@ export default function StepIndicator({ steps, currentStep, maxStep, goToStep }:
         {steps.map((step, idx) => {
           const isActive = idx === currentStep;
           const isUnlocked = idx <= maxStep;
+          const isConnected = idx < maxStep;
 
           return (
             <li 
               key={idx}
-
               className="flex items-center flex-1"
             >
               <div
@@ -31,13 +31,13 @@ export default function StepIndicator({ steps, currentStep, maxStep, goToStep }:
                 className={`flex items-center ${isUnlocked ? 'cursor-pointer' : 'cursor-not-allowed'}`}
               >
                 <Button
-                  variant={isActive ? 'default' : isUnlocked ? 'outline' : 'ghost'}
+                  variant={isActive ? 'default' : isUnlocked ? 'secondary' : 'ghost'}
                   size="icon"
                   type="button"
                   disabled={!isUnlocked}
                   onClick={() => isUnlocked && goToStep(idx)} 
                   aria-current={isActive ? 'step' : undefined}
-                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center border ${isUnlocked ? 'border-primary' : 'border-secondary'}`}
                 >
                   {idx + 1}
                 </Button>
@@ -46,7 +46,7 @@ export default function StepIndicator({ steps, currentStep, maxStep, goToStep }:
                 </span>
               </div>
               {idx < steps.length - 1 && (
-                <div className="flex-1 h-px bg-gray-300 mx-4" />  // Separator
+                <div className={`flex-1 h-px ${isConnected ? 'bg-primary' : 'bg-secondary'} mx-4`} />  // Separator
               )}
             </li>
           );

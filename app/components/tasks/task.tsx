@@ -129,7 +129,7 @@ export default function Task({ task }: { task: TaskType }) {
     )
   }
   return (
-    <div className="space-y-4">
+    <div className="p-4 space-y-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4 py-2">
           <h1 className="text-2xl font-bold">{name}</h1>
