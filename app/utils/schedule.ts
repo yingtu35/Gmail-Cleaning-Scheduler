@@ -9,20 +9,54 @@ import {
   convertDateToAWSString
 } from "./date";
 
+/**
+ * Format a string field for the query
+ * Trim the field value to remove leading and trailing whitespace
+ * If the field value contains whitespace, replace it with a hyphen (-)
+ * If the field value contains a colon (:), replace it with a hyphen (-)
+ * @param value - The field value to format
+ * @returns The formatted field value
+ * @example
+ * formatStringField('Hello World: Test') // returns 'Hello-World--Test'
+ * formatStringField('  Hello World  ') // returns 'Hello-World'
+ */
+function formatStringField(value: string): string {
+  const separatorRegex = /[\s:]+/g;
+  return value.trim().replace(separatorRegex, '-');
+}
+
+/**
+ * Format an array field for the query
+ * Map each value in the array to a string field using formatStringField
+ * Join the formatted values with a space
+ * Wrap the result in curly braces
+ * @param key - The field key
+ * @param fieldValue - The array field value to format
+ * @returns The formatted field value
+ * @example
+ * formatArrayField('from', ['Hello World', 'Test']) // returns '{from:Hello-World from:Test}'
+ */
 function formatArrayField(key: string, fieldValue: any[]): string {
-  const query = fieldValue.map(value => `${key}:${value.trim()}`).join(' ');
+  const query = fieldValue.map(value => `${key}:${formatStringField(value)}`).join(' ');
   return `{${query}}`;
 }
 
+/**
+ * Format an excluded field for the query
+ * Map each value in the array to a string field using formatStringField
+ * Join the formatted values with a space
+ * Wrap the result in parentheses
+ * @param key - The field key
+ * @param fieldValue - The array field value to format
+ * @returns The formatted field value
+ * @example
+ * formatExcludedField('-', ['Hello World', 'Test']) // returns '(-Hello-World -Test)'
+ */
 function formatExcludedField(key: string, fieldValue: any[]): string {
-  const query = fieldValue.map(value => `${key}${value.trim()}`).join(' ');
+  const query = fieldValue.map(value => `${key}${formatStringField(value)}`).join(' ');
   return `(${query})`;
 }
 
-function formatStringField(key: string, fieldValue: string): string {
-  const values = fieldValue.split(',');
-  return values.map(value => `${key}:${value.trim()}`).join(' OR ');
-}
 
 function formatSizeField(fieldValue: SizeValue): string {
   const comparison = fieldValue.comparison === 'greater than' ? 'larger' : 'smaller';
