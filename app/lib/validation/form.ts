@@ -130,6 +130,31 @@ export const formValuesSchema = z.object({
   age:         AgeSchema,
   time:        TimeSchemaField,
   emailIn:     EmailInSchema,
+}).superRefine((data, ctx) => {
+  const conditions = [
+    data.from,
+    data.to,
+    data.title,
+    data.emailIs,
+    data.doesntHave,
+    data.has,
+    data.labels,
+    data.category,
+    data.size,
+    data.age,
+    data.time,
+    data.emailIn,
+  ];
+
+  const isAtLeastOneEnabled = conditions.some(condition => condition && condition.enabled);
+
+  if (!isAtLeastOneEnabled) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["_taskConditions"], // Use a virtual path for the error
+      message: "At least one filter condition (e.g., From, To, Size, etc.) must be enabled",
+    });
+  }
 });
 
 const ScheduleOneTimeSchema = z.object({
