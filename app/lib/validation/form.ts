@@ -85,14 +85,86 @@ const OccurrenceSchema = z.discriminatedUnion('Occurrence', [
 ]);
 
 // field schemas
-const FromSchema        = z.object({ enabled: z.boolean(), from: z.string().array() });
-const ToSchema          = z.object({ enabled: z.boolean(), to: z.string().array() });
-const TitleSchema       = z.object({ enabled: z.boolean(), title: z.string().array() });
-const EmailIsSchema     = z.object({ enabled: z.boolean(), emailIs: EmailIsEnum.array() });
-const DoesntHaveSchema  = z.object({ enabled: z.boolean(), doesntHave: z.string().array() });
-const HasSchema         = z.object({ enabled: z.boolean(), has: HasEnum.array() });
-const LabelsSchema      = z.object({ enabled: z.boolean(), labels: z.string().array() });
-const CategorySchema    = z.object({ enabled: z.boolean(), category: CategoryEnum.array() });
+const FromSchema        = z.object({ enabled: z.boolean(), from: z.string().array() })
+  .superRefine((data, ctx) => {
+    if (data.enabled && data.from.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['from'],
+        message: "Please specify at least one email address.",
+      });
+    }
+  });
+const ToSchema          = z.object({ enabled: z.boolean(), to: z.string().array() })
+  .superRefine((data, ctx) => {
+    if (data.enabled && data.to.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['to'],
+        message: "Please specify at least one email address.",
+      });
+    }
+  });
+const TitleSchema       = z.object({ enabled: z.boolean(), title: z.string().array() })
+  .superRefine((data, ctx) => {
+    if (data.enabled && data.title.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['title'],
+        message: "Please specify at least one title.",
+      });
+    }
+  });
+const EmailIsSchema     = z.object({ enabled: z.boolean(), emailIs: EmailIsEnum.array() })
+  .superRefine((data, ctx) => {
+    if (data.enabled && data.emailIs.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['emailIs'],
+        message: "Please select at least one status.",
+      });
+    }
+  });
+const DoesntHaveSchema  = z.object({ enabled: z.boolean(), doesntHave: z.string().array() })
+  .superRefine((data, ctx) => {
+    if (data.enabled && data.doesntHave.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['doesntHave'],
+        message: "Please specify at least one term.",
+      });
+    }
+  });
+const HasSchema         = z.object({ enabled: z.boolean(), has: HasEnum.array() })
+  .superRefine((data, ctx) => {
+    if (data.enabled && data.has.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['has'],
+        message: "Please select at least one content type.",
+      });
+    }
+  });
+const LabelsSchema      = z.object({ enabled: z.boolean(), labels: z.string().array() })
+  .superRefine((data, ctx) => {
+    if (data.enabled && data.labels.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['labels'],
+        message: "Please specify at least one label.",
+      });
+    }
+  });
+const CategorySchema    = z.object({ enabled: z.boolean(), category: CategoryEnum.array() })
+  .superRefine((data, ctx) => {
+    if (data.enabled && data.category.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['category'],
+        message: "Please select at least one category.",
+      });
+    }
+  });
 const SizeSchema        = z.object({
   enabled: z.boolean(),
   size: z.object({ comparison: SizeComparison, value: z.coerce.number(), unit: SizeUnit }),
@@ -105,7 +177,16 @@ const TimeSchemaField   = z.object({
   enabled: z.boolean(),
   time: z.object({ comparison: TimeComparison, value: z.date() }),
 });
-const EmailInSchema     = z.object({ enabled: z.boolean(), emailIn: EmailInEnum.array() });
+const EmailInSchema     = z.object({ enabled: z.boolean(), emailIn: EmailInEnum.array() })
+  .superRefine((data, ctx) => {
+    if (data.enabled && data.emailIn.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['emailIn'],
+        message: "When 'Email In' filter is enabled, please select at least one location.",
+      });
+    }
+  });
 
 // main form schema
 export const formValuesSchema = z.object({
