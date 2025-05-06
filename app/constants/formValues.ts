@@ -1,7 +1,6 @@
 import {
   FormValues,
 } from '@/app/lib/definitions';
-import { start } from 'repl';
 
 export const DEFAULT_TIME_ZONE = '(UTC-08:00) America/Los_Angeles';
 
@@ -65,6 +64,11 @@ export const EMAIL_IN_OPTIONS = EMAIL_IN_ENUM.map((emailIn) => ({
   label: emailIn.charAt(0).toUpperCase() + emailIn.slice(1),
   value: emailIn,
 }))
+
+export const FIELDS_TO_VALIDATE: (keyof FormValues)[][] = [
+  ['name', 'description', 'occurrence'],
+  ['from', 'to', 'title', 'emailIs', 'doesntHave', 'has', 'labels', 'category', 'size', 'age', 'time', 'emailIn'], // _taskConditions is implicitly validated when these are triggered due to superRefine
+]
 
 const QUERY_EMPTY: FormValues = {
   name: '',
@@ -133,8 +137,8 @@ const QUERY_EMPTY: FormValues = {
     }
   },
   emailIn: {
-    enabled: true,
-    emailIn: ["inbox"],
+    enabled: false,
+    emailIn: [],
   },
 }
 
