@@ -1,6 +1,6 @@
 'use client'
 
-import { Control, UseFormWatch } from "react-hook-form";
+import { Control, UseFormWatch, FieldErrors, FieldError } from "react-hook-form";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 
@@ -51,12 +51,14 @@ interface TaskFormProps {
   title: string;
   control: Control<FormValues>;
   watch: UseFormWatch<FormValues>;
+  errors: FieldErrors<FormValues> & { _taskConditions?: FieldError };
 }
 
 export function TaskForm({
   title,
   control,
   watch,
+  errors,
 }: TaskFormProps) {
   const watchFromEnabled = watch("from.enabled");
   const watchToEnabled = watch("to.enabled");
@@ -73,6 +75,11 @@ export function TaskForm({
 
   return (
     <FormWrapper title={title}>
+      {errors._taskConditions && (
+        <div className="mb-4 p-4 border border-red-500 bg-red-50 text-red-700 rounded">
+          <p>{errors._taskConditions.message}</p>
+        </div>
+      )}
       <SectionWrapper title="Participant Filters">
         <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="flex space-x-4">

@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
 import { FormControlBarWrapper } from '@/components/task/form/form-control-bar-wrapper';
+import { FIELDS_TO_VALIDATE } from '@/app/constants/formValues';
 
 import { ScheduleForm } from './scheduleForm';
 import { TaskForm } from './taskForm';
@@ -40,6 +41,7 @@ interface FormControlGroupProps {
   isFirstStep: boolean;
   isLastStep: boolean;
   onBackClicked: () => void;
+  onNextClicked: () => void;
   onCancelClicked: () => void;
 }
 
@@ -47,6 +49,7 @@ const FormControlGroup = ({
   isFirstStep,
   isLastStep,
   onBackClicked,
+  onNextClicked,
   onCancelClicked,
   className,
 }: FormControlGroupProps & {
@@ -139,11 +142,11 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
     defaultValues: task,
     mode: 'onChange'
   });
-  const { handleSubmit, control, watch } = form;
+  const { handleSubmit, control, watch, formState: { errors }, trigger } = form;
 
   const stepDefinitions = [
       { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Step 1: Schedule Details" control={control} watch={watch} /> },
-      { label: 'Task', element: <TaskForm key="Task" title="Step 2: Task Details" control={control} watch={watch} /> },
+      { label: 'Task', element: <TaskForm key="Task" title="Step 2: Task Details" control={control} watch={watch} errors={errors} /> },
       { label: 'Review', element: <ReviewForm key="Review" watch={watch} /> },
     ];
 
@@ -163,21 +166,39 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
     router.back();
   }
 
+  const onNextClicked = async () => {
+    if (isLastStep) return;
+    const fieldsToValidate = FIELDS_TO_VALIDATE[currentStep];
+
+    if (fieldsToValidate.length > 0) {
+      // Trigger validation for the current step's fields
+      const isValid = await trigger(fieldsToValidate, { shouldFocus: true });
+      if (!isValid) {
+        return;
+      }
+    }
+    nextStep();
+  }
+
   const onSubmit = (values: FormValues) => {
-      if (!isLastStep) return nextStep();
-      toast.promise(
-        updateTask(values, taskId),
-        {
-          loading: `Updating task ${values.name}...`,
-          success: (taskId) => {
-            router.push(`/tasks/${taskId}`);
-            return `Task ${values.name} updated successfully!`;
-          },
-          error: (error) => {
-            return error.message || "Error updating task. Please try again later.";
-          },
-        }
-      )
+    if (!isLastStep) {
+      console.warn("onSubmit called before last step, this should be handled by onNextClicked");
+      return;
+    }
+
+    toast.promise(
+      updateTask(values, taskId),
+      {
+        loading: `Updating task ${values.name}...`,
+        success: (taskId) => {
+          router.push(`/tasks/${taskId}`);
+          return `Task ${values.name} updated successfully!`;
+        },
+        error: (error) => {
+          return error.message || "Error updating task. Please try again later.";
+        },
+      }
+    )
   }
 
   const onError = (error: any) => {
@@ -201,6 +222,7 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
             isFirstStep={isFirstStep}
             isLastStep={isLastStep}
             onBackClicked={onBackClicked}
+            onNextClicked={onNextClicked}
             onCancelClicked={onCancelClicked}
           />
         </FormControlBarWrapper>
