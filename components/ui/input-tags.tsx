@@ -22,21 +22,20 @@ export const InputTags = forwardRef<HTMLInputElement, InputTagsProps>(
       }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (["Enter", "Tab", ","].includes(e.key)) {
+        e.preventDefault();
+        addPendingDataPoint();
+      }
+    };
+
     return (
       <>
         <div className="flex">
           <Input
             value={pendingDataPoint}
             onChange={(e) => setPendingDataPoint(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                addPendingDataPoint();
-              } else if (e.key === "," || e.key === " ") {
-                e.preventDefault();
-                addPendingDataPoint();
-              }
-            }}
+            onKeyDown={handleKeyDown}
             className="rounded-r-none"
             {...props}
             ref={ref}
@@ -51,7 +50,7 @@ export const InputTags = forwardRef<HTMLInputElement, InputTagsProps>(
             Add
           </Button>
         </div>
-        <div className="border rounded-md min-h-[3rem] overflow-y-auto p-2 flex gap-2 flex-wrap items-center">
+        <div className={`${value.length === 0 ? "bg-muted" : ""} border rounded-md min-h-[3rem] overflow-y-auto p-2 flex gap-2 flex-wrap items-center`}>
           {value.length === 0 && (
             <span className="text-sm text-muted-foreground">
               Empty
