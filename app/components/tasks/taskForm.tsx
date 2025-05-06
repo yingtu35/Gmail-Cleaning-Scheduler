@@ -138,7 +138,7 @@ export function TaskForm({
                     />
                   </FormControl>
                   <FormMessage />
-                  <FormDescription>Enter the email address of the recipient</FormDescription>
+                  <FormDescription>Enter the email addresses of the recipient</FormDescription>
                 </FormItem>
               )}
             />
@@ -173,7 +173,7 @@ export function TaskForm({
                     />
                   </FormControl>
                   <FormMessage />
-                  <FormDescription>Enter the title of the email</FormDescription>
+                  <FormDescription>Enter titles of the email</FormDescription>
                 </FormItem>
               )}
             />
@@ -236,7 +236,7 @@ export function TaskForm({
                     />
                   </FormControl>
                   <FormMessage />
-                  <FormDescription>Enter text the email should not contain</FormDescription>
+                  <FormDescription>Emails that contain specified text will not be included</FormDescription>
                 </FormItem>
               )}
             />
@@ -304,7 +304,7 @@ export function TaskForm({
                     />
                   </FormControl>
                   <FormMessage />
-                  <FormDescription>Enter labels separated by commas</FormDescription>
+                  <FormDescription>Enter labels that emails are tagged with</FormDescription>
                 </FormItem>
               )}
             />
@@ -417,7 +417,7 @@ export function TaskForm({
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Specify a specific time to filter emails
+                      A specific time to filter emails
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -594,7 +594,7 @@ export function TaskForm({
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Specify how old the emails are
+                      How old the emails should be
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
