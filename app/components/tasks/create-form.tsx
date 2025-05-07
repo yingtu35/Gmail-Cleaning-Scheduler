@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
 import { FormControlBarWrapper } from '@/components/task/form/form-control-bar-wrapper';
+import { FIELDS_TO_VALIDATE } from '@/app/constants/formValues';
 
 import StepIndicator, { StepConfig } from './StepIndicator';
 import { ScheduleForm } from './scheduleForm';
@@ -38,6 +39,7 @@ interface FormControlGroupProps {
   isFirstStep: boolean;
   isLastStep: boolean;
   onBackClicked: () => void;
+  onNextClicked: () => void;
   onCancelClicked: () => void;
 }
 
@@ -45,6 +47,7 @@ const FormControlGroup = ({
   isFirstStep,
   isLastStep,
   onBackClicked,
+  onNextClicked,
   onCancelClicked,
   className,
 }: FormControlGroupProps & {
@@ -111,9 +114,10 @@ const FormControlGroup = ({
       {backButton}
       <Button
         variant="default"
-        type="submit"
+        type="button"
         disabled={isLastStep}
         className={cn(isLastStep ? "cursor-not-allowed" : "cursor-pointer")}
+        onClick={onNextClicked}
       >
         Next
       </Button>
@@ -145,12 +149,12 @@ const CreateForm = ({
     defaultValues: formValues,
     mode: 'onChange'
   });
-  const { handleSubmit, control, watch } = form;
+  const { handleSubmit, control, watch, formState: { errors }, trigger } = form;
   
   // define steps with labels and components
   const stepDefinitions = [
     { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Step 1: Schedule Details" control={control} watch={watch} /> },
-    { label: 'Task', element: <TaskForm key="Task" title="Step 2: Task Details" control={control} watch={watch} /> },
+    { label: 'Task', element: <TaskForm key="Task" title="Step 2: Task Details" control={control} watch={watch} errors={errors} /> },
     { label: 'Review', element: <ReviewForm key="Review" watch={watch} /> },
   ];
   const stepConfigs: StepConfig[] = stepDefinitions.map(d => ({ label: d.label }));
@@ -169,18 +173,39 @@ const CreateForm = ({
     router.push('/');
   }
 
-  const onSubmit = (values: FormValues) => {
-    if (!isLastStep) return nextStep();
+  const onNextClicked = async () => {
+    if (isLastStep || currentStep > FIELDS_TO_VALIDATE.length - 1) return;
+    const fieldsToValidate = FIELDS_TO_VALIDATE[currentStep];
+    let isValid = true;
+    if (fieldsToValidate.length > 0) {
+      // Trigger validation for the current step's fields
+      isValid = await trigger(fieldsToValidate, { shouldFocus: true });
+    } else {
+      isValid = await trigger();
+    }
+
+    if (!isValid) {
+      return;
+    }
+    nextStep();
+  }
+
+  const onSubmit = async (values: FormValues) => {
+    if (!isLastStep) {
+      console.warn("onSubmit called before last step, this should be handled by onNextClicked");
+      return;
+    }
+
     toast.promise(
       createTask(values),
       {
         loading: `Creating task ${values.name}...`,
         success: (taskId) => {
           router.push(`/tasks/${taskId}`);
-          return `Task ${values.name} created successfully!`;
+          return `Task ${values.name} created successfully!`; 
         },
         error: (error) => {
-          return error.message || "Error creating task. Please try again later.";
+          return error.message || "Error creating task. Please try again later."; 
         },
       }
     )
@@ -207,6 +232,7 @@ const CreateForm = ({
             isFirstStep={isFirstStep}
             isLastStep={isLastStep}
             onBackClicked={onBackClicked}
+            onNextClicked={onNextClicked}
             onCancelClicked={onCancelClicked}
           />
         </FormControlBarWrapper>
