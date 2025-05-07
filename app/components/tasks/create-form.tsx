@@ -174,15 +174,18 @@ const CreateForm = ({
   }
 
   const onNextClicked = async () => {
-    if (isLastStep) return;
+    if (isLastStep || currentStep > FIELDS_TO_VALIDATE.length - 1) return;
     const fieldsToValidate = FIELDS_TO_VALIDATE[currentStep];
-
+    let isValid = true;
     if (fieldsToValidate.length > 0) {
       // Trigger validation for the current step's fields
-      const isValid = await trigger(fieldsToValidate, { shouldFocus: true });
-      if (!isValid) {
-        return;
-      }
+      isValid = await trigger(fieldsToValidate, { shouldFocus: true });
+    } else {
+      isValid = await trigger();
+    }
+
+    if (!isValid) {
+      return;
     }
     nextStep();
   }
