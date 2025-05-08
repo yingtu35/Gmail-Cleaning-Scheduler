@@ -67,7 +67,7 @@ export const EMAIL_IN_OPTIONS = EMAIL_IN_ENUM.map((emailIn) => ({
 
 export const FIELDS_TO_VALIDATE: (keyof FormValues)[][] = [
   ['name', 'description', 'occurrence'],
-  ['from', 'to', 'title', 'emailIs', 'doesntHave', 'has', 'labels', 'category', 'size', 'age', 'time', 'emailIn'], // _taskConditions is implicitly validated when these are triggered due to superRefine
+  [], // check all fields
 ]
 
 const QUERY_EMPTY: FormValues = {

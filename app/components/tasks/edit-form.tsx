@@ -116,9 +116,10 @@ const FormControlGroup = ({
       {backButton}
       <Button
         variant="default"
-        type="submit"
+        type="button"
         disabled={isLastStep}
         className={cn(isLastStep ? "cursor-not-allowed" : "cursor-pointer")}
+        onClick={onNextClicked}
       >
         Next
       </Button>
@@ -167,15 +168,18 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
   }
 
   const onNextClicked = async () => {
-    if (isLastStep) return;
+    if (isLastStep || currentStep > FIELDS_TO_VALIDATE.length - 1) return;
     const fieldsToValidate = FIELDS_TO_VALIDATE[currentStep];
-
+    let isValid = true;
     if (fieldsToValidate.length > 0) {
       // Trigger validation for the current step's fields
-      const isValid = await trigger(fieldsToValidate, { shouldFocus: true });
-      if (!isValid) {
-        return;
-      }
+      isValid = await trigger(fieldsToValidate, { shouldFocus: true });
+    } else {
+      isValid = await trigger();
+    }
+
+    if (!isValid) {
+      return;
     }
     nextStep();
   }
