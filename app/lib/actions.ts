@@ -148,124 +148,232 @@ export async function getTasksCount(user: UserInDB): Promise<number> {
 
 // create a new task for the user in the database
 export async function createTask(data: FormValues) {
-  const user = await getUser();
-  if (!isValidUser(user)) {
-    log.debug("user is not valid");
-    throw new Error("User is not valid");
-  }
-
-  // check if user has reached the limit of tasks
-  const numOfTasks = await getTasksCount(user);
-  if (hasReachedTaskLimit(numOfTasks)) {
-    log.debug("user has reached the limit of tasks");
-    throw new Error("User has reached the limit of tasks");
-  }
-  // create a schedule for the task
-  const commandInput = generateCreateScheduleCommand(data, user);
-  const response = await createSchedule(commandInput);
-  if (response.$metadata.httpStatusCode !== 200) {
-    console.error("error creating schedule", response);
-    throw new Error("Error creating schedule. Please try again later.");
-  }
-  // create a new task in the database
-  const newTask: Task = {
-    scheduleName: commandInput.name,
-    expiresAt: data.occurrence.Occurrence === 'Recurring' ? convertToUTCDate(data.occurrence.Schedule.endDateAndTime, data.occurrence.TimeZone) : null,
-    repeatCount: 0,
-    formValues: data,
-    userId: user.id as string,
-  }
-  const result = await db.insert(UserTasksTable).values(newTask).returning({
-    id: UserTasksTable.id,
-  })
-  if (!result) {
-    log.error("error creating task");
-    throw new Error("Error creating task. Please try again later.");
-  }
-  const returnedTaskId = result[0].id;
-  log.debug("created task", returnedTaskId);
-  revalidatePath("/");
-  return returnedTaskId;
-}
-
-export async function updateTask(data: FormValues, taskId: string) {
-  const user = await getUser();
-  if (!isValidUser(user)) {
-    throw new Error("User is not valid");
-  }
-  // get the task from the database
-  const task = await getTaskById(taskId);
-  if (!task) {
-    throw new Error("Task not found");
-  }
-  const commandInput = generateUpdateScheduleCommand(data, user, task.scheduleName);
-  const response = await updateSchedule(commandInput);
-  if (response.$metadata.httpStatusCode !== 200) {
-    log.error("error updating schedule", response);
-    throw new Error("Error updating schedule. Please try again later.");
-  }
-  // update the task in the database
   try {
-    await db.update(UserTasksTable)
-    .set({
-      updatedAt: new Date(),
+    const user = await getUser();
+    if (!isValidUser(user)) {
+      log.debug("User is not valid for createTask");
+      // Directly throw the error message you want on the toast
+      throw new Error("Authentication error. Please sign in again.");
+    }
+
+    // check if user has reached the limit of tasks
+    const numOfTasks = await getTasksCount(user);
+    if (hasReachedTaskLimit(numOfTasks)) {
+      log.debug("User has reached the task limit");
+      // Directly throw the error message you want on the toast
+      throw new Error("You've reached the maximum number of tasks allowed.");
+    }
+    // create a schedule for the task
+    const commandInput = generateCreateScheduleCommand(data, user);
+    log.debug("Generated createSchedule command input:", { commandInput }); // Log object for better structure
+
+    const response = await createSchedule(commandInput);
+    if (response.$metadata.httpStatusCode !== 200) {
+      // Log the detailed AWS error response
+      log.error("Error creating AWS schedule", { 
+        statusCode: response.$metadata.httpStatusCode, 
+        requestId: response.$metadata.requestId,
+        errorDetails: response // Include the full response for more context if needed
+      });
+      // Directly throw the error message you want on the toast
+      throw new Error("Failed to set up the task schedule. Please try again later or contact support.");
+    }
+    // create a new task in the database
+    const newTask: Task = {
+      scheduleName: commandInput.name,
       expiresAt: data.occurrence.Occurrence === 'Recurring' ? convertToUTCDate(data.occurrence.Schedule.endDateAndTime, data.occurrence.TimeZone) : null,
       repeatCount: 0,
       formValues: data,
+      userId: user.id as string,
+    }
+    const result = await db.insert(UserTasksTable).values(newTask).returning({
+      id: UserTasksTable.id,
     })
-    .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
-  } catch (error) {
-    log.error("error updating task", error);
-    throw new Error("Error updating task. Please try again later.");
+    if (!result || result.length === 0) {
+      log.error("Error creating task in DB after schedule creation", { taskName: newTask.scheduleName });
+      // Directly throw the error message you want on the toast
+      throw new Error("Failed to save task details. Please try again later or contact support.");
+    }
+    const returnedTaskId = result[0].id;
+    log.debug("Created task successfully in DB", { taskId: returnedTaskId });
+    revalidatePath("/");
+    return returnedTaskId;
+  } catch (error: any) {
+    // Log the original error, regardless of what it is
+    log.error("Exception caught in createTask", {
+      originalMessage: error.message,
+      stack: error.stack,
+      // If it's an error we've constructed and thrown, its message is already user-friendly.
+      // If it's an unexpected error, its original message will be logged here.
+    });
+
+    // Define a list of known user-friendly messages that we might have thrown
+    const knownUserFriendlyMessages = [
+        "Authentication error. Please sign in again.",
+        "You've reached the maximum number of tasks allowed.",
+    ];
+
+    // If the error's message is one of our known user-friendly messages, re-throw it.
+    // This ensures it propagates to the client toast.
+    if (knownUserFriendlyMessages.includes(error.message)) {
+        throw error; 
+    }
+    
+    // For truly unexpected errors (e.g., from deep SDK calls not caught above, or runtime errors),
+    // throw a generic user-friendly message. The detailed error is already logged above.
+    error.cause = { nextNoDigest: true, originalCause: error.cause };
+    throw new Error("An unexpected error occurred while creating your task. Our team has been notified. Please try again later.");
   }
-  revalidatePath(`/tasks/${taskId}`);
-  return taskId;
+}
+
+export async function updateTask(data: FormValues, taskId: string) {
+  try {
+    const user = await getUser();
+    if (!isValidUser(user)) {
+      log.debug("User is not valid for updateTask");
+      throw new Error("Authentication error. Please sign in again.");
+    }
+    // get the task from the database
+    const task = await getTaskById(taskId);
+    if (!task) {
+      log.warn("Task not found for updateTask", { taskId });
+      throw new Error("Task not found. It might have been deleted.");
+    }
+    const commandInput = generateUpdateScheduleCommand(data, user, task.scheduleName);
+    const response = await updateSchedule(commandInput);
+    if (response.$metadata.httpStatusCode !== 200) {
+      log.error("Error updating AWS schedule for updateTask", {
+        statusCode: response.$metadata.httpStatusCode,
+        requestId: response.$metadata.requestId,
+        errorDetails: response,
+        taskId,
+      });
+      throw new Error("Failed to update the task schedule. Please try again later or contact support.");
+    }
+    // update the task in the database
+    await db.update(UserTasksTable)
+      .set({
+        updatedAt: new Date(),
+        expiresAt: data.occurrence.Occurrence === 'Recurring' ? convertToUTCDate(data.occurrence.Schedule.endDateAndTime, data.occurrence.TimeZone) : null,
+        repeatCount: 0,
+        formValues: data,
+      })
+      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
+    
+    log.debug("Updated task successfully in DB", { taskId });
+    revalidatePath(`/tasks/${taskId}`);
+    return taskId;
+  } catch (error: any) {
+    log.error("Exception caught in updateTask", {
+      originalMessage: error.message,
+      stack: error.stack,
+      taskId,
+    });
+
+    const knownUserFriendlyMessages = [
+      "Authentication error. Please sign in again.",
+      "Task not found. It might have been deleted.",
+    ];
+
+    if (knownUserFriendlyMessages.includes(error.message)) {
+      throw error;
+    }
+
+    error.cause = { nextNoDigest: true, originalCause: error.cause };
+    throw new Error("An unexpected error occurred while updating your task. Our team has been notified. Please try again later.");
+  }
 }
 
 export async function deleteTask(taskId: string) {
-  const user = await getUser();
-  if (!isValidUser(user)) {
-    throw new Error("User is not valid");
-  }
-  // check if the task exists
-  const task = await getTaskById(taskId);
-  if (!task) {
-    throw new Error("Task not found");
-  }
-  // check if the user is the owner of the task
-  if (task.userId !== user.id) {
-    throw new Error("You are not the owner of the task");
-  }
-  // TODO: should ensure task is both deleted from the database and the schedule
-  const result = await db.delete(UserTasksTable)
-    .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id)))
-    .returning({
-      id: UserTasksTable.id,
-      scheduleName: UserTasksTable.scheduleName,
-      createdAt: UserTasksTable.createdAt,
-      updatedAt: UserTasksTable.updatedAt,
-      expiresAt: UserTasksTable.expiresAt,
-      repeatCount: UserTasksTable.repeatCount,
-      formValues: UserTasksTable.formValues,
-      userId: UserTasksTable.userId,
-    })
-  if (!result) {
-    console.error("error deleting task");
-    throw new Error("Error deleting task. Please try again later.");
-  }
-  const deletedTask = result[0] as Task;
-  const scheduleName = deletedTask.scheduleName; 
+  try {
+    const user = await getUser();
+    if (!isValidUser(user)) {
+      log.debug("User is not valid for deleteTask");
+      throw new Error("Authentication error. Please sign in again.");
+    }
+    // check if the task exists
+    const task = await getTaskById(taskId);
+    if (!task) {
+      log.warn("Task not found for deleteTask", { taskId });
+      throw new Error("Task not found. It might have been already deleted.");
+    }
+    // check if the user is the owner of the task
+    if (task.userId !== user.id) {
+      log.warn("User is not the owner of the task for deleteTask", { taskId, userId: user.id });
+      throw new Error("You are not authorized to delete this task.");
+    }
 
-  // delete the schedule for the task
-  const response = await deleteSchedule(scheduleName);
-  if (response.$metadata.httpStatusCode !== 200) {
-    log.error("error deleting schedule", response);
-    // insert the task back into the database
-    await db.insert(UserTasksTable).values(deletedTask);
-    throw new Error("Error deleting schedule. Please try again later.");
+    const deletedTaskFromDB = await db.delete(UserTasksTable)
+      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
+      .returning({
+        id: UserTasksTable.id,
+        scheduleName: UserTasksTable.scheduleName,
+        createdAt: UserTasksTable.createdAt,
+        updatedAt: UserTasksTable.updatedAt,
+        expiresAt: UserTasksTable.expiresAt,
+        repeatCount: UserTasksTable.repeatCount,
+        formValues: UserTasksTable.formValues,
+        userId: UserTasksTable.userId,
+      });
+
+    if (!deletedTaskFromDB || deletedTaskFromDB.length === 0) {
+      log.error("Error deleting task from DB for deleteTask", { taskId });
+      throw new Error("Failed to delete task details from the database. Please try again.");
+    }
+
+    const deletedTask = deletedTaskFromDB[0] as Task;
+    const scheduleName = deletedTask.scheduleName;
+
+    // delete the schedule for the task
+    const response = await deleteSchedule(scheduleName);
+    if (response.$metadata.httpStatusCode !== 200) {
+      log.error("Error deleting AWS schedule for deleteTask", {
+        statusCode: response.$metadata.httpStatusCode,
+        requestId: response.$metadata.requestId,
+        errorDetails: response,
+        scheduleName,
+        taskId,
+      });
+      // Attempt to restore the task in the database since schedule deletion failed
+      try {
+        await db.insert(UserTasksTable).values(deletedTask);
+        log.info("Restored task in DB after failed schedule deletion", { taskId, scheduleName });
+      } catch (restoreError: any) {
+        log.error("Failed to restore task in DB after schedule deletion error", {
+          taskId,
+          scheduleName,
+          restoreErrorMessage: restoreError.message,
+          restoreErrorStack: restoreError.stack,
+        });
+        // Even if restore fails, the primary error is still about schedule deletion.
+        // The log above captures the restore failure for debugging.
+      }
+      throw new Error("Failed to delete the task schedule. The task may still exist. Please try again later or contact support.");
+    }
+
+    log.debug("Deleted task successfully", { taskId, scheduleName });
+    revalidatePath("/");
+    return;
+  } catch (error: any) {
+    log.error("Exception caught in deleteTask", {
+      originalMessage: error.message,
+      stack: error.stack,
+      taskId,
+    });
+
+    const knownUserFriendlyMessages = [
+      "Authentication error. Please sign in again.",
+      "Task not found. It might have been already deleted.",
+      "You are not authorized to delete this task.",
+    ];
+
+    if (knownUserFriendlyMessages.includes(error.message)) {
+      throw error;
+    }
+
+    error.cause = { nextNoDigest: true, originalCause: error.cause };
+    throw new Error("An unexpected error occurred while deleting your task. Our team has been notified. Please try again later.");
   }
-  revalidatePath("/");
-  return;
 }
 
 export async function subscribeEmailNotification(email: string) {
