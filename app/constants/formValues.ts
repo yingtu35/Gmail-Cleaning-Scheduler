@@ -4,17 +4,18 @@ import {
 
 export const DEFAULT_TIME_ZONE = '(UTC-08:00) America/Los_Angeles';
 
+const DATE_NOW = new Date();
 const DATE_ONE_DAY_FROM_NOW = new Date(Date.now() + 24 * 60 * 60 * 1000);
 const DATE_THREE_MONTHS_FROM_NOW = new Date(Date.now() + 3 * 30 * 24 * 60 * 60 * 1000);
 const DATE_THREE_MONTHS_BEFORE_NOW = new Date(Date.now() - 3 * 30 * 24 * 60 * 60 * 1000);
-const DATE_FIRST_DAY_OF_YEAR = new Date(new Date().getFullYear(), 0, 1);
+const DATE_FIRST_DAY_OF_YEAR = new Date(DATE_NOW.getFullYear(), 0, 1);
 export const DATE_THREE_YEARS_FROM_NOW = new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000);
 
-const DEFAULT_TIME = '00:00';
+const CURRENT_TIME = DATE_NOW.toTimeString().slice(0, 5);
 
 const DEFAULT_ONE_TIME_SCHEDULE = {
   date: DATE_ONE_DAY_FROM_NOW,
-  time: DEFAULT_TIME,
+  time: CURRENT_TIME,
 }
 
 const DEFAULT_RECURRING_SCHEDULE = {
@@ -24,11 +25,11 @@ const DEFAULT_RECURRING_SCHEDULE = {
   },
   startDateAndTime: {
     date: DATE_ONE_DAY_FROM_NOW,
-    time: DEFAULT_TIME,
+    time: CURRENT_TIME,
   },
   endDateAndTime: {
     date: DATE_THREE_MONTHS_FROM_NOW,
-    time: DEFAULT_TIME,
+    time: CURRENT_TIME,
   }
 }
 
@@ -78,7 +79,7 @@ const QUERY_EMPTY: FormValues = {
     TimeZone: DEFAULT_TIME_ZONE,
     Schedule: {
       date: DATE_ONE_DAY_FROM_NOW,
-      time: DEFAULT_TIME,
+      time: CURRENT_TIME,
     },
   },
   from: {
@@ -154,12 +155,12 @@ const QUERY_OLD_UNREAD: FormValues = {
         unit: 'days'
       },
       startDateAndTime: {
-        date: new Date(),
-        time: DEFAULT_TIME,
+        date: DATE_ONE_DAY_FROM_NOW,
+        time: CURRENT_TIME,
       },
       endDateAndTime: {
         date: DATE_THREE_MONTHS_FROM_NOW, 
-        time: DEFAULT_TIME,
+        time: CURRENT_TIME,
       },
     }
   },
@@ -232,7 +233,7 @@ const QUERY_LARGE_READ: FormValues = {
     TimeZone: DEFAULT_TIME_ZONE,
     Schedule: {
       date: DATE_ONE_DAY_FROM_NOW,
-      time: DEFAULT_TIME,
+      time: CURRENT_TIME,
     },
   },
   from: {
@@ -304,7 +305,7 @@ const QUERY_LAST_YEAR: FormValues = {
     TimeZone: DEFAULT_TIME_ZONE,
     Schedule: {
       date: DATE_ONE_DAY_FROM_NOW,
-      time: DEFAULT_TIME,
+      time: CURRENT_TIME,
     },
   },
   from: {
@@ -377,7 +378,7 @@ const QUERY_DRAFTS: FormValues = {
     TimeZone: DEFAULT_TIME_ZONE,
     Schedule: {
       date: DATE_ONE_DAY_FROM_NOW,
-      time: DEFAULT_TIME,
+      time: CURRENT_TIME,
     },
   },
   from: {
@@ -450,7 +451,7 @@ const QUERY_NOT_PRIMARY: FormValues = {
     TimeZone: DEFAULT_TIME_ZONE,
     Schedule: {
       date: DATE_ONE_DAY_FROM_NOW,
-      time: DEFAULT_TIME,
+      time: CURRENT_TIME,
     },
   },
   from: {
@@ -521,7 +522,7 @@ export const QUERY_AI_TEMPLATE: FormValues = {
   occurrence: {
     Occurrence: 'One-time',
     TimeZone: DEFAULT_TIME_ZONE,
-    Schedule: { date: new Date(), time: DEFAULT_TIME },
+    Schedule: { date: DATE_ONE_DAY_FROM_NOW, time: CURRENT_TIME },
   },
   from: { enabled: false, from: [] },
   to: { enabled: false, to: [] },
