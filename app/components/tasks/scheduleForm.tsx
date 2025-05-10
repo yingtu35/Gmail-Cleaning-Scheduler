@@ -230,7 +230,7 @@ export function ScheduleForm({
                     selected={field.value}
                     onSelect={field.onChange}
                     disabled={(date) =>
-                      date < new Date()
+                      date < new Date() || date > DATE_THREE_YEARS_FROM_NOW
                     }
                     initialFocus
                   />
@@ -373,7 +373,7 @@ export function ScheduleForm({
                         selected={field.value}
                         onSelect={field.onChange}
                         disabled={(date) =>
-                          date < new Date()
+                          date < new Date() || date > DATE_THREE_YEARS_FROM_NOW
                         }
                         initialFocus
                       />
