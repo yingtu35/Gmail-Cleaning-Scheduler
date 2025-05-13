@@ -1,5 +1,5 @@
 import React from 'react'
-import { SignIn } from "@/app/components/auth-components";
+import { SignIn } from "./auth-components";
 
 export default function LandingSignIn() {
   return (
