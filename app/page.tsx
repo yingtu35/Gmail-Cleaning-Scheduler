@@ -1,5 +1,5 @@
-import Landing from "./components/landing";
-import Dashboard from "./components/dashboard";
+import Landing from "@/components/landing";
+import Dashboard from "@/components/dashboard";
 import { getAuthenticatedUser } from "@/app/lib/actions";
 
 export default async function App() {
