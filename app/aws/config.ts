@@ -38,7 +38,6 @@ if (process.env.NODE_ENV === 'production') {
   // In non-production environments (e.g., local development),
   // we don't explicitly set 'credentials'. The AWS SDK will then use its
   // default credential provider chain (e.g., ~/.aws/credentials, instance profiles, etc.).
-  // Optional: Log that default credential chain is being used
   console.log("AWS SDK: Not in production. Using default credential provider chain.");
 }
 
