@@ -4,7 +4,7 @@ import "./globals.css";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Toaster } from "@/components/ui/sonner";
 
-import { getAuthenticatedUser } from "./lib/actions";
+import { getAuthenticatedUser } from "../libs/actions";
 
 const inter = Inter({ subsets: ["latin"] });
 

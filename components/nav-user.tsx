@@ -25,7 +25,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-import { logOut } from '@/app/lib/actions';
+import { logOut } from '@/libs/actions';
 
 export const NavUser = ({
   user,

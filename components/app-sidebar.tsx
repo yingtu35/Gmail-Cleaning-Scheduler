@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes, ReactNode } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import logo from '@/public/logo.svg';
@@ -16,7 +16,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { SideBarLogo } from '@/app/constants/home';
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from '@/components/nav-secondary';
 import { NavUser } from '@/components/nav-user';
@@ -46,6 +45,12 @@ const navSecondary = [
     rel: 'noopener noreferrer',
   }
 ]
+
+const SideBarLogo = Object.freeze({
+  alt: "Gmail Cleaner",
+  width: 300,
+  height: 300,
+});
 
 export async function AppSidebar({
   user,

@@ -1,4 +1,4 @@
-import { SectionWrapperSkeleton } from "@/components/task/sectionWrapper";
+import { SectionWrapperSkeleton } from "@/components/task/form/wrapper/sectionWrapper";
 import { DetailSkeleton } from "@/components/task/detail/detail-skeleton";
 
 export default function Loading() {

@@ -1,0 +1,553 @@
+import {
+  FormValues,
+} from '@/types/task';
+import {
+  EMAIL_IS_ENUM,
+  HAS_ENUM,
+  CATEGORY_ENUM,
+  EMAIL_IN_ENUM,
+} from '@/validations/form';
+
+const DEFAULT_TIME_ZONE = '(UTC-08:00) America/Los_Angeles';
+
+const DATE_NOW = new Date();
+const DATE_ONE_DAY_FROM_NOW = new Date(Date.now() + 24 * 60 * 60 * 1000);
+const DATE_THREE_MONTHS_FROM_NOW = new Date(Date.now() + 3 * 30 * 24 * 60 * 60 * 1000);
+const DATE_THREE_MONTHS_BEFORE_NOW = new Date(Date.now() - 3 * 30 * 24 * 60 * 60 * 1000);
+const DATE_FIRST_DAY_OF_YEAR = new Date(DATE_NOW.getFullYear(), 0, 1);
+export const DATE_THREE_YEARS_FROM_NOW = new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000);
+
+const CURRENT_TIME = DATE_NOW.toTimeString().slice(0, 5);
+
+const DEFAULT_ONE_TIME_SCHEDULE = {
+  date: DATE_ONE_DAY_FROM_NOW,
+  time: CURRENT_TIME,
+}
+
+const DEFAULT_RECURRING_SCHEDULE = {
+  rate: {
+    value: 90,
+    unit: 'days'
+  },
+  startDateAndTime: {
+    date: DATE_ONE_DAY_FROM_NOW,
+    time: CURRENT_TIME,
+  },
+  endDateAndTime: {
+    date: DATE_THREE_MONTHS_FROM_NOW,
+    time: CURRENT_TIME,
+  }
+}
+
+export const EMAIL_IS_OPTIONS = EMAIL_IS_ENUM.map((emailIs) => ({
+  label: emailIs.charAt(0).toUpperCase() + emailIs.slice(1),
+  value: emailIs,
+}))
+
+export const HAS_OPTIONS = HAS_ENUM.map((has) => ({
+  label: has.charAt(0).toUpperCase() + has.slice(1),
+  value: has,
+}))
+export const CATEGORY_OPTIONS = CATEGORY_ENUM.map((category) => ({
+  label: category.charAt(0).toUpperCase() + category.slice(1),
+  value: category,
+}))
+export const EMAIL_IN_OPTIONS = EMAIL_IN_ENUM.map((emailIn) => ({
+  label: emailIn.charAt(0).toUpperCase() + emailIn.slice(1),
+  value: emailIn,
+}))
+
+export const FIELDS_TO_VALIDATE: (keyof FormValues)[][] = [
+  ['name', 'description', 'occurrence'],
+  [], // check all fields
+]
+
+const QUERY_EMPTY: FormValues = {
+  name: '',
+  description: '',
+  occurrence: {
+    Occurrence: 'One-time',
+    TimeZone: DEFAULT_TIME_ZONE,
+    Schedule: {
+      date: DATE_ONE_DAY_FROM_NOW,
+      time: CURRENT_TIME,
+    },
+  },
+  from: {
+    enabled: false,
+    from: [],
+  },
+  to: {
+    enabled: false,
+    to: [],
+  },
+  title: {
+    enabled: false,
+    title: [],
+  },
+  emailIs: {
+    enabled: false,
+    emailIs: ["unread"],
+  },
+  doesntHave: {
+    enabled: false,
+    doesntHave: [],
+  },
+  has: {
+    enabled: false,
+    has: [],
+  },
+  labels: {
+    enabled: false,
+    labels: [],
+  },
+  category: {
+    enabled: false,
+    category: [],
+  },
+  size: {
+    enabled: false,
+    size: {
+      comparison: 'greater than',
+      value: 1,
+      unit: 'MB'
+    }
+  },
+  age: {
+    enabled: false,
+    age: {
+      comparison: 'older than',
+      value: 3,
+      unit: 'months'
+    }
+  },
+  time: {
+    enabled: false,
+    time: {
+      comparison: 'before',
+      value: DATE_THREE_MONTHS_BEFORE_NOW
+    }
+  },
+  emailIn: {
+    enabled: false,
+    emailIn: [],
+  },
+}
+
+const QUERY_OLD_UNREAD: FormValues = {
+  name: '',
+  description: '',
+  occurrence: {
+    Occurrence: "Recurring",
+    TimeZone: DEFAULT_TIME_ZONE,
+    Schedule: {
+      rate: {
+        value: 90,
+        unit: 'days'
+      },
+      startDateAndTime: {
+        date: DATE_ONE_DAY_FROM_NOW,
+        time: CURRENT_TIME,
+      },
+      endDateAndTime: {
+        date: DATE_THREE_MONTHS_FROM_NOW, 
+        time: CURRENT_TIME,
+      },
+    }
+  },
+  from: {
+    enabled: false,
+    from: [],
+  },
+  to: {
+    enabled: false,
+    to: [],
+  },
+  title: {
+    enabled: false,
+    title: [],
+  },
+  emailIs: {
+    enabled: true,
+    emailIs: ["unread"],
+  },
+  doesntHave: {
+    enabled: false,
+    doesntHave: [],
+  },
+  has: {
+    enabled: false,
+    has: [],
+  },
+  labels: {
+    enabled: false,
+    labels: [],
+  },
+  category: {
+    enabled: false,
+    category: [],
+  },
+  size: {
+    enabled: false,
+    size: {
+      comparison: 'greater than',
+      value: 1,
+      unit: 'MB'
+    }
+  },
+  age: {
+    enabled: true,
+    age: {
+      comparison: 'older than',
+      value: 3,
+      unit: 'months'
+    }
+  },
+  time: {
+    enabled: false,
+    time: {
+      comparison: 'before',
+      value: DATE_THREE_MONTHS_BEFORE_NOW
+    }
+  },
+  emailIn: {
+    enabled: true,
+    emailIn: ["inbox"],
+  },
+}
+
+const QUERY_LARGE_READ: FormValues = {
+  name: '',
+  description: '',
+  occurrence: {
+    Occurrence: 'One-time',
+    TimeZone: DEFAULT_TIME_ZONE,
+    Schedule: {
+      date: DATE_ONE_DAY_FROM_NOW,
+      time: CURRENT_TIME,
+    },
+  },
+  from: {
+    enabled: false,
+    from: [],
+  },
+  to: {
+    enabled: false,
+    to: [],
+  },
+  title: {
+    enabled: false,
+    title: [],
+  },
+  emailIs: {
+    enabled: true,
+    emailIs: ["read"],
+  },
+  doesntHave: {
+    enabled: false,
+    doesntHave: [],
+  },
+  has: {
+    enabled: false,
+    has: [],
+  },
+  labels: {
+    enabled: false,
+    labels: [],
+  },
+  category: {
+    enabled: false,
+    category: [],
+  },
+  size: {
+    enabled: true,
+    size: {
+      comparison: 'greater than',
+      value: 1,
+      unit: 'MB'
+    }
+  },
+  age: {
+    enabled: false,
+    age: {
+      comparison: 'older than',
+      value: 3,
+      unit: 'months'
+    }
+  },
+  time: {
+    enabled: false,
+    time: {
+      comparison: 'before',
+      value: DATE_THREE_MONTHS_BEFORE_NOW
+    }
+  },
+  emailIn: {
+    enabled: true,
+    emailIn: ["inbox"],
+  },
+}
+
+const QUERY_LAST_YEAR: FormValues = {
+  name: '',
+  description: '',
+  occurrence: {
+    Occurrence: 'One-time',
+    TimeZone: DEFAULT_TIME_ZONE,
+    Schedule: {
+      date: DATE_ONE_DAY_FROM_NOW,
+      time: CURRENT_TIME,
+    },
+  },
+  from: {
+    enabled: false,
+    from: [],
+  },
+  to: {
+    enabled: false,
+    to: [],
+  },
+  title: {
+    enabled: false,
+    title: [],
+  },
+  emailIs: {
+    enabled: false,
+    emailIs: ["unread"],
+  },
+  doesntHave: {
+    enabled: false,
+    doesntHave: [],
+  },
+  has: {
+    enabled: false,
+    has: [],
+  },
+  labels: {
+    enabled: false,
+    labels: [],
+  },
+  category: {
+    enabled: false,
+    category: [],
+  },
+  size: {
+    enabled: false,
+    size: {
+      comparison: 'greater than',
+      value: 1,
+      unit: 'MB'
+    }
+  },
+  age: {
+    enabled: false,
+    age: {
+      comparison: 'older than',
+      value: 3,
+      unit: 'months'
+    }
+  },
+  time: {
+    enabled: true,
+    time: {
+      comparison: 'before',
+      // value should be the first day of the year
+      value: DATE_FIRST_DAY_OF_YEAR
+    }
+  },
+  emailIn: {
+    enabled: true,
+    emailIn: ["inbox"],
+  },
+}
+
+const QUERY_DRAFTS: FormValues = {
+  name: '',
+  description: '',
+  occurrence: {
+    Occurrence: 'One-time',
+    TimeZone: DEFAULT_TIME_ZONE,
+    Schedule: {
+      date: DATE_ONE_DAY_FROM_NOW,
+      time: CURRENT_TIME,
+    },
+  },
+  from: {
+    enabled: false,
+    from: [],
+  },
+  to: {
+    enabled: false,
+    to: [],
+  },
+  title: {
+    enabled: false,
+    title: [],
+  },
+  emailIs: {
+    enabled: false,
+    emailIs: [],
+  },
+  doesntHave: {
+    enabled: false,
+    doesntHave: [],
+  },
+  has: {
+    enabled: false,
+    has: [],
+  },
+  labels: {
+    enabled: false,
+    labels: [],
+  },
+  category: {
+    enabled: false,
+    category: [],
+  },
+  size: {
+    enabled: false,
+    size: {
+      comparison: 'greater than',
+      value: 1,
+      unit: 'MB'
+    }
+  },
+  age: {
+    enabled: false,
+    age: {
+      comparison: 'older than',
+      value: 3,
+      unit: 'months'
+    }
+  },
+  time: {
+    enabled: false,
+    time: {
+      comparison: 'before',
+      // value should be the first day of the year
+      value: DATE_FIRST_DAY_OF_YEAR
+    }
+  },
+  emailIn: {
+    enabled: true,
+    emailIn: ["draft"],
+  },
+}
+
+const QUERY_NOT_PRIMARY: FormValues = {
+  name: '',
+  description: '',
+  occurrence: {
+    Occurrence: 'One-time',
+    TimeZone: DEFAULT_TIME_ZONE,
+    Schedule: {
+      date: DATE_ONE_DAY_FROM_NOW,
+      time: CURRENT_TIME,
+    },
+  },
+  from: {
+    enabled: false,
+    from: [],
+  },
+  to: {
+    enabled: false,
+    to: [],
+  },
+  title: {
+    enabled: false,
+    title: [],
+  },
+  emailIs: {
+    enabled: false,
+    emailIs: [],
+  },
+  doesntHave: {
+    enabled: false,
+    doesntHave: [],
+  },
+  has: {
+    enabled: false,
+    has: [],
+  },
+  labels: {
+    enabled: false,
+    labels: [],
+  },
+  category: {
+    enabled: true,
+    category: ["social", "updates", "forums", "promotions", "reservations", "purchases"],
+  },
+  size: {
+    enabled: false,
+    size: {
+      comparison: 'greater than',
+      value: 1,
+      unit: 'MB'
+    }
+  },
+  age: {
+    enabled: false,
+    age: {
+      comparison: 'older than',
+      value: 3,
+      unit: 'months'
+    }
+  },
+  time: {
+    enabled: false,
+    time: {
+      comparison: 'before',
+      // value should be the first day of the year
+      value: DATE_FIRST_DAY_OF_YEAR
+    }
+  },
+  emailIn: {
+    enabled: false,
+    emailIn: [],
+  },
+}
+// Simple template satisfying formValuesSchema
+const QUERY_AI_TEMPLATE: FormValues = {
+  name: 'a',
+  description: '',
+  occurrence: {
+    Occurrence: 'One-time',
+    TimeZone: DEFAULT_TIME_ZONE,
+    Schedule: { date: DATE_ONE_DAY_FROM_NOW, time: CURRENT_TIME },
+  },
+  from: { enabled: false, from: [] },
+  to: { enabled: false, to: [] },
+  title: { enabled: false, title: [] },
+  emailIs: { enabled: false, emailIs: [] },
+  doesntHave: { enabled: false, doesntHave: [] },
+  has: { enabled: false, has: [] },
+  labels: { enabled: false, labels: [] },
+  category: { enabled: false, category: [] },
+  size: { enabled: false, size: { comparison: 'greater than', value: 0, unit: 'MB' } },
+  age: { enabled: false, age: { comparison: 'older than', value: 0, unit: 'days' } },
+  time: { enabled: false, time: { comparison: 'before', value: new Date() } },
+  emailIn: { enabled: true, emailIn: ["inbox"] },
+};
+
+type QueryName = 'QUERY_EMPTY_FORM' | 
+'QUERY_OLD_UNREAD_FORM' | 
+'QUERY_LARGE_READ_FORM' | 
+'QUERY_LAST_YEAR_FORM' | 
+'QUERY_DRAFTS_FORM' | 
+'QUERY_NOT_PRIMARY_FORM' |
+'QUERY_AI_TEMPLATE';
+
+export const QUERY_TEMPLATE: Record<QueryName, FormValues> = {
+  QUERY_EMPTY_FORM: QUERY_EMPTY,
+  QUERY_OLD_UNREAD_FORM: QUERY_OLD_UNREAD,
+  QUERY_LARGE_READ_FORM: QUERY_LARGE_READ,
+  QUERY_LAST_YEAR_FORM: QUERY_LAST_YEAR,
+  QUERY_DRAFTS_FORM: QUERY_DRAFTS,
+  QUERY_NOT_PRIMARY_FORM: QUERY_NOT_PRIMARY,
+  QUERY_AI_TEMPLATE: QUERY_AI_TEMPLATE,
+}
+
+export const DEFAULT_SCHEDULE = {
+  oneTime: DEFAULT_ONE_TIME_SCHEDULE,
+  recurring: DEFAULT_RECURRING_SCHEDULE,
+}
