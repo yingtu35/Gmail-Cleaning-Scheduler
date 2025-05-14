@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { cn } from "@/libs/utils"
+import { cn } from "@/utils/cn"
 
 const SidebarMain = React.forwardRef<
   HTMLDivElement,

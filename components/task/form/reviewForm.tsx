@@ -1,7 +1,7 @@
 import { UseFormWatch } from "react-hook-form";
 import { useState } from "react";
 
-import { formatFields } from "@/app/utils/schedule";
+import { formatFields } from "@/utils/schedule";
 import { getSearchQueryExplanation } from "@/libs/actions";
 import { FormValues } from "@/types/task"
 import { Button } from "@/components/ui/button";

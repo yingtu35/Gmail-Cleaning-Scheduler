@@ -1,4 +1,4 @@
-import { Task } from "../lib/definitions";
+import { Task } from "@/types/task";
 import { parseJsonToFormValues } from "./schedule";
 
 type TaskFromDB = {

@@ -10,7 +10,7 @@ import { CreateScheduleCommand,
 } from "@aws-sdk/client-scheduler";
 import { schedulerClient as client } from "./client";
 import { CommandInput } from "@/types/aws";
-import log from "@/app/utils/log";
+import log from "@/utils/log";
 
 export const createSchedule = async (commandInput: CommandInput) => {
   const input: CreateScheduleCommandInput = { // CreateScheduleInput

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { cn } from '@/libs/utils';
+import { cn } from '@/utils/cn';
 import {
   FormValues,
 } from '@/types/task';

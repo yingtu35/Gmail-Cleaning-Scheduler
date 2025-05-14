@@ -1,5 +1,5 @@
-import { UserDateTimePromptType } from "../lib/definitions";
-import { timezonesMap } from "../constants/timezones";
+import { UserDateTimePromptType } from "@/types/user";
+import { timezonesMap } from "@/app/constants/timezones";
 
 export const epochToDate = (epoch: number | undefined) => {
   if (!epoch) {

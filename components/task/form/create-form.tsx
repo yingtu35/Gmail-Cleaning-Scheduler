@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { cn } from '@/libs/utils';
+import { cn } from '@/utils/cn';
 import { createTask } from '@/libs/actions';
 import { formValuesSchema }  from '@/validations/form'
 import type { FormValues } from '@/types/task'

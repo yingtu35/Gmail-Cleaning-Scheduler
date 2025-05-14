@@ -3,7 +3,7 @@ import { SYSTEM_PROMPT } from "@/app/constants/prompts";
 import { AIPromptType } from '@/types/task';
 import { UserDateTimePromptType } from "@/types/user";
 
-import log from "@/app/utils/log";
+import log from "@/utils/log";
 
 // TODO: Improve the system prompt to be more specific
 export async function getEmailSearchesExplanation(query: string) {

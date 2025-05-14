@@ -9,7 +9,7 @@ import { generateScheduleByPrompt } from '@/libs/actions';
 
 import { ScheduleDetail } from '@/components/task/detail/schedule-detail';
 import { TaskDetail } from '@/components/task/detail/task-detail';
-import { getUserDateTimePrompt } from '@/app/utils/date';
+import { getUserDateTimePrompt } from '@/utils/date';
 
 import { FormWrapper } from './wrapper/formWrapper';
 import { SectionWrapper } from './wrapper/sectionWrapper';

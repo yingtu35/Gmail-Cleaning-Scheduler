@@ -4,7 +4,7 @@ import {
   SubscribeCommandInput,
   SubscribeCommandOutput,
  } from '@aws-sdk/client-sns';
- import log from '@/app/utils/log';
+ import log from '@/utils/log';
 
  export const subscribe = async (email: string) => {
   const filterPolicy = {

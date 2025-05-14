@@ -50,7 +50,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-import { hasReachedTaskLimit } from '@/app/utils/database';
+import { hasReachedTaskLimit } from '@/utils/database';
 
 const DEFAULT_PAGE_SIZE = 5
 

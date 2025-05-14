@@ -12,7 +12,7 @@ import {
 } from '@/types/task';
 import { AIFormValuesSchema } from '@/validations/form';
 import { createTask } from '@/libs/actions';
-import { cn } from '@/libs/utils';
+import { cn } from '@/utils/cn';
 import {
   AlertDialog,
   AlertDialogAction,
