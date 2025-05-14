@@ -3,8 +3,8 @@
 import { eq, and, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-import { db } from "@/app/drizzle/db";
-import { UserTable, UserTasksTable } from "@/app/drizzle/schema";
+import { db } from "@/models/db";
+import { UserTable, UserTasksTable } from "@/models/schema";
 import { auth, signIn, signOut } from "@/auth";
 import { createSchedule, updateSchedule, deleteSchedule } from "@/libs/aws/scheduler";
 import { subscribe } from "@/libs/aws/sns";

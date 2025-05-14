@@ -1,10 +1,12 @@
 import { drizzle } from "drizzle-orm/neon-http";
-import { neon } from "@neondatabase/serverless";
-import { UserTable, UserTasksTable } from "./schema";
-import { UserInDB } from "@/types/user";
-import { mockUser } from "./mock-data";
-import "dotenv-flow/config";
 import { eq } from "drizzle-orm";
+import "dotenv-flow/config";
+
+import { neon } from "@neondatabase/serverless";
+import { UserInDB } from "@/types/user";
+
+import { UserTable, UserTasksTable } from "./schema";
+import { mockUser } from "./mock-data";
 
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql);
