@@ -2,19 +2,18 @@
 
 import { eq, and, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { redirect } from 'next/navigation';
 
 import { db } from "@/app/drizzle/db";
 import { UserTable, UserTasksTable } from "@/app/drizzle/schema";
 import { auth, signIn, signOut } from "@/auth";
-import { createSchedule, updateSchedule, deleteSchedule } from "@/app/aws/scheduler";
-import { subscribe } from "@/app/aws/sns";
+import { createSchedule, updateSchedule, deleteSchedule } from "@/libs/aws/scheduler";
+import { subscribe } from "@/libs/aws/sns";
 
 import { UserInDB, Task, FormValues, AIPromptType, UserDateTimePromptType, UserGoogle } from "@/app/lib/definitions";
 import { convertToUTCDate, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/app/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/app/utils/database";
 
-import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/app/openai/chat";
+import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/libs/openai/chat";
 
 import log from "../utils/log";
 import { parseTask } from "../utils/task";

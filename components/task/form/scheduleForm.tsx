@@ -4,7 +4,7 @@ import timezones from "timezones-list";
 import { CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/libs/utils"
 import {
   FormControl,
   FormDescription,

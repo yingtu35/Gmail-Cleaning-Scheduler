@@ -6,13 +6,13 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/libs/utils';
 import {
   FormValues,
 } from '@/app/lib/definitions';
 import { updateTask } from '@/app/lib/actions';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { formValuesSchema }  from '@/app/lib/validation/form'
+import { formValuesSchema }  from '@/validations/form'
 import {
   AlertDialog,
   AlertDialogAction,

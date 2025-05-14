@@ -4,7 +4,7 @@ import {
   AIPromptType,
   UserDateTimePromptType
 } from '@/app/lib/definitions';
-import log from "../utils/log";
+import log from "../../app/utils/log";
 
 // TODO: Improve the system prompt to be more specific
 export async function getEmailSearchesExplanation(query: string) {

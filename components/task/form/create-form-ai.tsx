@@ -10,9 +10,9 @@ import {
   FormValues,
   AIFormValues,
 } from '@/app/lib/definitions';
-import { AIFormValuesSchema } from '@/app/lib/validation/form';
+import { AIFormValuesSchema } from '@/validations/form';
 import { createTask } from '@/app/lib/actions';
-import { cn } from '@/lib/utils';
+import { cn } from '@/libs/utils';
 import {
   AlertDialog,
   AlertDialogAction,

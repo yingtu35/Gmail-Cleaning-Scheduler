@@ -1,13 +1,7 @@
 // This file contains type definitions for the data.
 // It describes the shape of the data, and what data type each property should accept.
 import { z } from 'zod';
-import { formValuesSchema, PromptSchema, AIFormValuesSchema } from './validation/form';
-
-export type UserIconType = {
-  name: string;
-  avatarUrl: string;
-  htmlUrl: string;
-}
+import { formValuesSchema, PromptSchema, AIFormValuesSchema } from '@/validations/form';
 
 export type UserGoogle = {
   name: string;
@@ -65,12 +59,6 @@ export type CommandInput = {
   scheduleExpressionTimezone: string;
   state: string;
   input: string;
-}
-
-export type SchedulePromptType = {
-  isOneTime: boolean;
-  oneTimePrompt: string;
-  recurringPrompt: string;
 }
 
 export type AIPromptType = z.infer<typeof PromptSchema>;

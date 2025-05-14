@@ -1,4 +1,4 @@
-import { snsClient as client } from '@/app/aws/client';
+import { snsClient as client } from '@/libs/aws/client';
 import { 
   SubscribeCommand, 
   SubscribeCommandInput,
