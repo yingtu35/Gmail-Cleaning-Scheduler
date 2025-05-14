@@ -3,7 +3,7 @@
 import { Separator } from '@/components/ui/separator';
 import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
 import { TEMPLATES, AI_TEMPLATE_CARD } from '@/app/constants/template';
-import { Template } from '@/app/types/createTask';
+import { TaskTemplate } from '@/types/task';
 
 import TemplateCard from './templateCard';
 
@@ -29,7 +29,7 @@ export default function TemplateSelection({ onSelectTemplate }: TemplateSelectio
           <Separator className="w-full my-4" />
           <div className="mt-4 pb-6">
             <h3 className="text-xl font-medium mb-2">Start from a Template</h3>
-            {TEMPLATES.map((template: Template) => (
+            {TEMPLATES.map((template: TaskTemplate) => (
               <div key={template.title} className="mb-3">
                 <TemplateCard
                   template={template}

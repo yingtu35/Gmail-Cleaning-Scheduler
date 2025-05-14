@@ -9,14 +9,15 @@ import { auth, signIn, signOut } from "@/auth";
 import { createSchedule, updateSchedule, deleteSchedule } from "@/libs/aws/scheduler";
 import { subscribe } from "@/libs/aws/sns";
 
-import { UserInDB, Task, FormValues, AIPromptType, UserDateTimePromptType, UserGoogle } from "@/app/lib/definitions";
+import { UserInDB, UserGoogle, UserDateTimePromptType } from "@/types/user";
+import { Task, FormValues, AIPromptType } from "@/types/task";
 import { convertToUTCDate, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/app/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/app/utils/database";
 
 import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/libs/openai/chat";
 
-import log from "../utils/log";
-import { parseTask } from "../utils/task";
+import log from "../app/utils/log";
+import { parseTask } from "../app/utils/task";
 
 export async function authenticate() {
   await signIn('google', { callbackUrl: '/' });

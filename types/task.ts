@@ -1,26 +1,14 @@
-// This file contains type definitions for the data.
-// It describes the shape of the data, and what data type each property should accept.
 import { z } from 'zod';
 import { formValuesSchema, PromptSchema, AIFormValuesSchema } from '@/validations/form';
+import { TEMPLATE_TITLE, TEMPLATE_FORM_TYPE, TEMPLATE_TYPE, TEMPLATE_BACKGROUND_COLOR, TEMPLATE_DESCRIPTION } from "@/app/constants/createTask";
 
-export type UserGoogle = {
-  name: string;
-  email: string;
-  image: string;
-  accessToken: string;
-  expiresAt: Date;
-  refreshToken: string | undefined;
-}
-
-export type UserInDB = {
-  id: string;
-  name: string;
-  email: string;
-  image: string;
-  accessToken: string;
-  expiresAt: Date;
-  refreshToken: string | undefined;
-  createdAt?: Date;
+export type TaskTemplate = {
+  title: TEMPLATE_TITLE;
+  formType: TEMPLATE_FORM_TYPE;
+  templateType: TEMPLATE_TYPE;
+  backgroundColor: TEMPLATE_BACKGROUND_COLOR;
+  description: TEMPLATE_DESCRIPTION;
+  src: string;
 }
 
 /**
@@ -41,26 +29,6 @@ export type Task = {
 
 export type FormValues = z.infer<typeof formValuesSchema>
 
-export type LambdaInput = {
-  email: string;
-  access_token: string;
-  refresh_token: string;
-  expires_at: string;
-  q: string;
-  task_name: string;
-}
-
-export type CommandInput = {
-  name: string;
-  scheduleExpression: string;
-  description: string;
-  startDate?: Date;
-  endDate?: Date;
-  scheduleExpressionTimezone: string;
-  state: string;
-  input: string;
-}
-
 export type AIPromptType = z.infer<typeof PromptSchema>;
 
 export type AIFormValues = z.infer<typeof AIFormValuesSchema>
@@ -80,10 +48,4 @@ export type SizeValue = {
   comparison: "greater than" | "less than";
   unit: "Bytes" | "KB" | "MB";
   value: number;
-}
-
-export type UserDateTimePromptType = {
-  date: string;
-  time: string;
-  timezone: string;
 }

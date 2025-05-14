@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 import { DEFAULT_SCHEDULE, DATE_THREE_YEARS_FROM_NOW } from "@/app/constants/formValues";
-import { FormValues } from "@/app/lib/definitions";
+import { FormValues } from "@/types/task";
 
 import { SectionWrapper } from "./wrapper/sectionWrapper";
 import { FormWrapper } from "./wrapper/formWrapper"

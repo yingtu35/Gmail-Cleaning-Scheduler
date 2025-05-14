@@ -1,6 +1,6 @@
 import {
   FormValues,
-} from '@/app/lib/definitions';
+} from '@/types/task';
 
 export const DEFAULT_TIME_ZONE = '(UTC-08:00) America/Los_Angeles';
 

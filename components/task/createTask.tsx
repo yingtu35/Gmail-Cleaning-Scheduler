@@ -5,7 +5,7 @@ import CreateForm from './form/create-form';
 import CreateFormAI from './form/create-form-ai';
 import {
   FormValues,
-} from '@/app/lib/definitions';
+} from '@/types/task';
 import { QUERY_TEMPLATE } from '@/app/constants/formValues';
 import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
 import TemplateSelection from '@/components/task/form/template-selection/TemplateSelection';

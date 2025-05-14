@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { authenticate } from "@/app/lib/actions";
+import { authenticate } from "@/libs/actions";
 import useLoadingButton from "@/hooks/useLoadingButton";
 import { Loader } from "./loader";
 

@@ -1,4 +1,4 @@
-import { UserInDB } from "@/app/lib/definitions";
+import { UserInDB } from "@/types/user";
 import { MAX_TASKS_COUNT } from "@/app/constants/createTask";
 
 export function isValidUser(user: UserInDB | null): user is UserInDB{

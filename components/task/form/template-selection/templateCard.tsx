@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Template } from '@/app/types/createTask';
+import { TaskTemplate } from '@/types/task';
 import TemplateIcon from './templateIcon';
 import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
 import {
@@ -11,7 +10,7 @@ import {
 } from "@/components/ui/card";
 
 interface TemplateCardProps {
-  template: Template;
+  template: TaskTemplate;
   onSelectTemplate: (templateFormType: TEMPLATE_FORM_TYPE, templateType: TEMPLATE_TYPE) => void;
 }
 

@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 import { UserTable, UserTasksTable } from "./schema";
-import { UserInDB, Task } from "@/app/lib/definitions";
+import { UserInDB } from "@/types/user";
 import { mockUser } from "./mock-data";
 import "dotenv-flow/config";
 import { eq } from "drizzle-orm";

@@ -1,6 +1,6 @@
 import React from 'react'
-import { Task } from "@/app/lib/definitions";
-import { getTasks } from "@/app/lib/actions";
+import { Task } from "@/types/task";
+import { getTasks } from "@/libs/actions";
 import { mockTasks } from '@/app/data/mock-task';
 
 import { columns } from './columns';

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Task } from "@/app/lib/definitions";
+import { Task } from "@/types/task";
 
 
 export const columns: ColumnDef<Task>[] = [

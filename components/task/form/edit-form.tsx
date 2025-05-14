@@ -9,8 +9,8 @@ import { toast } from 'sonner';
 import { cn } from '@/libs/utils';
 import {
   FormValues,
-} from '@/app/lib/definitions';
-import { updateTask } from '@/app/lib/actions';
+} from '@/types/task';
+import { updateTask } from '@/libs/actions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formValuesSchema }  from '@/validations/form'
 import {

@@ -3,9 +3,9 @@ import { UseFormSetValue, UseFormWatch } from 'react-hook-form';
 
 import {
   AIFormValues,
-} from '@/app/lib/definitions';
+} from '@/types/task';
 import { Button } from '@/components/ui/button';
-import { generateScheduleByPrompt } from '@/app/lib/actions';
+import { generateScheduleByPrompt } from '@/libs/actions';
 
 import { ScheduleDetail } from '@/components/task/detail/schedule-detail';
 import { TaskDetail } from '@/components/task/detail/task-detail';

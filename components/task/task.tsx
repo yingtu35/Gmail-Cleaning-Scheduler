@@ -6,10 +6,10 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { ChevronDownIcon } from "lucide-react"
 
-import { FormValues, Task as TaskType } from "@/app/lib/definitions"
+import { FormValues, Task as TaskType } from "@/types/task"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { deleteTask } from "@/app/lib/actions"
+import { deleteTask } from "@/libs/actions"
 import { ScheduleDetail } from "@/components/task/detail/schedule-detail"
 import { TaskDetail } from "@/components/task/detail/task-detail"
 import {

@@ -1,4 +1,5 @@
-import { UserInDB, Task } from "@/app/lib/definitions"
+import { UserInDB } from "@/types/user";
+
 export const mockUser: UserInDB = {
   id: "58b0fb58-48bb-4002-b2d9-4cc9ce1ce928",
   name: "Test User",

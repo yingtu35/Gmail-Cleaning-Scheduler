@@ -1,6 +1,6 @@
 import {
   AIFormValues
-} from '@/app/lib/definitions';
+} from '@/types/task';
 import { QUERY_TEMPLATE } from './formValues';
 
 export const INITIAL_AI_STATE: AIFormValues = {

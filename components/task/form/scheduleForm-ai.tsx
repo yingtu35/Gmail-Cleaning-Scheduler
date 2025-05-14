@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Control, UseFormWatch, useFormContext } from 'react-hook-form';
 
-import { AIFormValues } from '@/app/lib/definitions';
+import { AIFormValues } from '@/types/task';
 import {
   FormControl,
   FormDescription,

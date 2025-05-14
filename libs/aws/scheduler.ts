@@ -9,7 +9,7 @@ import { CreateScheduleCommand,
    DeleteScheduleCommandOutput
 } from "@aws-sdk/client-scheduler";
 import { schedulerClient as client } from "./client";
-import { CommandInput } from "@/app/lib/definitions";
+import { CommandInput } from "@/types/aws";
 import log from "@/app/utils/log";
 
 export const createSchedule = async (commandInput: CommandInput) => {

@@ -1,8 +1,8 @@
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
-import { UserGoogle } from "@/app/lib/definitions";
+import { UserGoogle } from "@/types/user";
 import { epochToDate } from "@/app/utils/date";
-import { createUserOnSignIn, getUserIdByEmail, updateUserOnSignIn, subscribeEmailNotification } from "@/app/lib/actions";
+import { createUserOnSignIn, getUserIdByEmail, updateUserOnSignIn, subscribeEmailNotification } from "@/libs/actions";
 import log from "@/app/utils/log";
 
 export const autoConfig = {

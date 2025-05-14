@@ -2,8 +2,8 @@ import { UseFormWatch } from "react-hook-form";
 import { useState } from "react";
 
 import { formatFields } from "@/app/utils/schedule";
-import { getSearchQueryExplanation } from "@/app/lib/actions";
-import { FormValues } from "@/app/lib/definitions"
+import { getSearchQueryExplanation } from "@/libs/actions";
+import { FormValues } from "@/types/task"
 import { Button } from "@/components/ui/button";
 import {
   Popover,

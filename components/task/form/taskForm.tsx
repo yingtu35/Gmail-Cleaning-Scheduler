@@ -41,7 +41,7 @@ import {
   AGE_UNIT_ENUM,
   TIME_COMPARISON_ENUM,
  } from "@/app/constants/formValues";
- import { FormValues } from "@/app/lib/definitions";
+ import { FormValues } from "@/types/task";
  import { cn } from "@/libs/utils";
 
  import { SectionWrapper } from "./wrapper/sectionWrapper";

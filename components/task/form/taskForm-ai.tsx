@@ -1,6 +1,6 @@
 import { Control } from "react-hook-form";
 
-import { AIFormValues } from "@/app/lib/definitions";
+import { AIFormValues } from "@/types/task";
 import {
   FormControl,
   FormDescription,

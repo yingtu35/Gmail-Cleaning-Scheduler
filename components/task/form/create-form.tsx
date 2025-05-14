@@ -8,9 +8,9 @@ import { toast } from 'sonner';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/libs/utils';
-import { createTask } from '@/app/lib/actions';
+import { createTask } from '@/libs/actions';
 import { formValuesSchema }  from '@/validations/form'
-import type { FormValues }    from '@/app/lib/definitions'
+import type { FormValues } from '@/types/task'
 import {
   AlertDialog,
   AlertDialogAction,

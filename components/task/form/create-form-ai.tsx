@@ -9,9 +9,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   FormValues,
   AIFormValues,
-} from '@/app/lib/definitions';
+} from '@/types/task';
 import { AIFormValuesSchema } from '@/validations/form';
-import { createTask } from '@/app/lib/actions';
+import { createTask } from '@/libs/actions';
 import { cn } from '@/libs/utils';
 import {
   AlertDialog,
