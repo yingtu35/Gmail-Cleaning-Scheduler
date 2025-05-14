@@ -1,6 +1,6 @@
 import React from 'react'
 import Logo from './Logo'
-import { LandingSubtitle } from '@/app/constants/landing'
+import { LandingSubtitle } from './constants/landing'
 
 export default function LandingContent() {
   return (

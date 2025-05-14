@@ -1,6 +1,6 @@
 import Image from "next/image";
 import logo from "@/public/logo.svg";
-import { LandingLogo } from "@/app/constants/landing";
+import { LandingLogo } from "./constants/landing";
 export default function Logo() {
   return (
     <Image

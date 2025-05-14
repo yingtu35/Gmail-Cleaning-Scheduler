@@ -1,10 +1,14 @@
 "use client"
 
 import { Separator } from '@/components/ui/separator';
-import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
-import { TEMPLATES, AI_TEMPLATE_CARD } from '@/app/constants/template';
-import { TaskTemplate } from '@/types/task';
 
+import { 
+  TEMPLATES,
+  AI_TEMPLATE_CARD,
+  TEMPLATE_FORM_TYPE,
+  TEMPLATE_TYPE
+} from './constants';
+import { TaskTemplateType } from './types';
 import TemplateCard from './templateCard';
 
 interface TemplateSelectionProps {
@@ -29,7 +33,7 @@ export default function TemplateSelection({ onSelectTemplate }: TemplateSelectio
           <Separator className="w-full my-4" />
           <div className="mt-4 pb-6">
             <h3 className="text-xl font-medium mb-2">Start from a Template</h3>
-            {TEMPLATES.map((template: TaskTemplate) => (
+            {TEMPLATES.map((template: TaskTemplateType) => (
               <div key={template.title} className="mb-3">
                 <TemplateCard
                   template={template}

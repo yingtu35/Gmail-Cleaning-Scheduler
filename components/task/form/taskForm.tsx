@@ -35,12 +35,14 @@ import {
   HAS_OPTIONS,
   CATEGORY_OPTIONS,
   EMAIL_IN_OPTIONS,
+ } from "@/components/task/form/constants/formValues";
+ import {
   SIZE_COMPARISON_ENUM,
   SIZE_UNIT_ENUM,
   AGE_COMPARISON_ENUM,
   AGE_UNIT_ENUM,
   TIME_COMPARISON_ENUM,
- } from "@/app/constants/formValues";
+ } from "@/validations/form";
  import { FormValues } from "@/types/task";
  import { cn } from "@/utils/cn";
 

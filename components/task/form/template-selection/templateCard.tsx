@@ -1,6 +1,6 @@
-import { TaskTemplate } from '@/types/task';
+import { TaskTemplateType } from './types';
 import TemplateIcon from './templateIcon';
-import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
+import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from './constants';
 import {
   Card,
   CardHeader,
@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 
 interface TemplateCardProps {
-  template: TaskTemplate;
+  template: TaskTemplateType;
   onSelectTemplate: (templateFormType: TEMPLATE_FORM_TYPE, templateType: TEMPLATE_TYPE) => void;
 }
 

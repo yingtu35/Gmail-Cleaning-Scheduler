@@ -28,7 +28,7 @@ import {
   Form,
 } from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
-import { INITIAL_AI_STATE } from '@/app/constants/aiPromptValues';
+import { INITIAL_AI_STATE } from '@/components/task/form/constants/aiPromptValues';
 import { FormControlBarWrapper } from '@/components/task/form/wrapper/form-control-bar-wrapper';
 
 import useMultiStepForm from './hooks/useMultiStepForm';

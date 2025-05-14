@@ -1,5 +1,5 @@
 import { openai } from "./client";
-import { SYSTEM_PROMPT } from "@/app/constants/prompts";
+import { SYSTEM_PROMPT } from "./prompts";
 import { AIPromptType } from '@/types/task';
 import { UserDateTimePromptType } from "@/types/user";
 

@@ -1,17 +1,19 @@
 import { z } from 'zod';
 
-import {
-  SIZE_COMPARISON_ENUM,
-  SIZE_UNIT_ENUM,
-  AGE_COMPARISON_ENUM,
-  AGE_UNIT_ENUM,
-  TIME_COMPARISON_ENUM,
-  RATE_UNIT_ENUM,
-  EMAIL_IS_ENUM,
-  HAS_ENUM,
-  CATEGORY_ENUM,
-  EMAIL_IN_ENUM,
-} from '@/app/constants/formValues';
+export const SIZE_COMPARISON_ENUM = ['greater than', 'less than'] as const;
+export const SIZE_UNIT_ENUM       = ['MB', 'KB', 'Bytes'] as const;
+export const AGE_COMPARISON_ENUM  = ['older than', 'newer than'] as const;
+export const AGE_UNIT_ENUM        = ['days', 'months', 'years'] as const;
+export const TIME_COMPARISON_ENUM = ['after', 'before'] as const;
+export const RATE_UNIT_ENUM       = ['minutes', 'hours', 'days'] as const;
+export const EMAIL_IS_ENUM        = ['unread', 'read', 'starred', 'important'] as const;
+export const HAS_ENUM             = [
+  'attachment','drive','document','spreadsheet','presentation','image','video'
+] as const;
+export const CATEGORY_ENUM       = [
+  'primary','social','promotions','updates','forums','reservations','purchases'
+] as const;
+export const EMAIL_IN_ENUM        = ['inbox', 'draft', 'sent', 'chats', 'scheduled'] as const;
 
 // primitive enums
 const SizeComparison = z.enum(SIZE_COMPARISON_ENUM);

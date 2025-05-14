@@ -1,15 +1,5 @@
 import { z } from 'zod';
 import { formValuesSchema, PromptSchema, AIFormValuesSchema } from '@/validations/form';
-import { TEMPLATE_TITLE, TEMPLATE_FORM_TYPE, TEMPLATE_TYPE, TEMPLATE_BACKGROUND_COLOR, TEMPLATE_DESCRIPTION } from "@/app/constants/createTask";
-
-export type TaskTemplate = {
-  title: TEMPLATE_TITLE;
-  formType: TEMPLATE_FORM_TYPE;
-  templateType: TEMPLATE_TYPE;
-  backgroundColor: TEMPLATE_BACKGROUND_COLOR;
-  description: TEMPLATE_DESCRIPTION;
-  src: string;
-}
 
 /**
  * Defines the type of a task in the database.

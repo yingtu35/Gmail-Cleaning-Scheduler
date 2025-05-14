@@ -1,5 +1,13 @@
 import { UserDateTimePromptType } from "@/types/user";
-import { timezonesMap } from "@/app/constants/timezones";
+import timezones from "timezones-list";
+
+const timezonesMap = timezones.reduce((acc, tz) => {
+  acc[tz.tzCode] = {
+    label: tz.tzCode,
+    value: `(UTC${tz.utc}) ${tz.tzCode}`
+  };
+  return acc;
+}, {} as Record<string, { label: string; value: string }>);
 
 export const epochToDate = (epoch: number | undefined) => {
   if (!epoch) {

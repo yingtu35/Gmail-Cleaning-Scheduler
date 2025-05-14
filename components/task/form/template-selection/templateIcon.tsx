@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import { TEMPLATE_TITLE } from '@/app/constants/createTask';
+import { TEMPLATE_TITLE } from './constants';
 
 interface TemplateIconProps {
   src: string;

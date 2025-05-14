@@ -6,9 +6,10 @@ import CreateFormAI from './form/create-form-ai';
 import {
   FormValues,
 } from '@/types/task';
-import { QUERY_TEMPLATE } from '@/app/constants/formValues';
-import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
-import TemplateSelection from '@/components/task/form/template-selection/TemplateSelection';
+
+import { QUERY_TEMPLATE } from './form/constants/formValues';
+import TemplateSelection from './form/template-selection/TemplateSelection';
+import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from './form/template-selection/constants';
 
 export default function CreateTask() {
   const [formValues, setFormValues] = useState<FormValues>(QUERY_TEMPLATE.QUERY_EMPTY_FORM);

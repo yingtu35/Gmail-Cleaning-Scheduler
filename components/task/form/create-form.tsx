@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
 import { FormControlBarWrapper } from '@/components/task/form/wrapper/form-control-bar-wrapper';
-import { FIELDS_TO_VALIDATE } from '@/app/constants/formValues';
+import { FIELDS_TO_VALIDATE } from '@/components/task/form/constants/formValues';
 
 import StepIndicator, { StepConfig } from './StepIndicator';
 import { ScheduleForm } from './scheduleForm';

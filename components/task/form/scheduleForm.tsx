@@ -30,7 +30,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
-import { DEFAULT_SCHEDULE, DATE_THREE_YEARS_FROM_NOW } from "@/app/constants/formValues";
+import { DEFAULT_SCHEDULE, DATE_THREE_YEARS_FROM_NOW } from "@/components/task/form/constants/formValues";
 import { FormValues } from "@/types/task";
 
 import { SectionWrapper } from "./wrapper/sectionWrapper";

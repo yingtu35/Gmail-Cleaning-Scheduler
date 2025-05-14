@@ -1,8 +1,14 @@
 import {
   FormValues,
 } from '@/types/task';
+import {
+  EMAIL_IS_ENUM,
+  HAS_ENUM,
+  CATEGORY_ENUM,
+  EMAIL_IN_ENUM,
+} from '@/validations/form';
 
-export const DEFAULT_TIME_ZONE = '(UTC-08:00) America/Los_Angeles';
+const DEFAULT_TIME_ZONE = '(UTC-08:00) America/Los_Angeles';
 
 const DATE_NOW = new Date();
 const DATE_ONE_DAY_FROM_NOW = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -32,21 +38,6 @@ const DEFAULT_RECURRING_SCHEDULE = {
     time: CURRENT_TIME,
   }
 }
-
-export const SIZE_COMPARISON_ENUM = ['greater than', 'less than'] as const;
-export const SIZE_UNIT_ENUM       = ['MB', 'KB', 'Bytes'] as const;
-export const AGE_COMPARISON_ENUM  = ['older than', 'newer than'] as const;
-export const AGE_UNIT_ENUM        = ['days', 'months', 'years'] as const;
-export const TIME_COMPARISON_ENUM = ['after', 'before'] as const;
-export const RATE_UNIT_ENUM       = ['minutes', 'hours', 'days'] as const;
-export const EMAIL_IS_ENUM        = ['unread', 'read', 'starred', 'important'] as const;
-export const HAS_ENUM             = [
-  'attachment','drive','document','spreadsheet','presentation','image','video'
-] as const;
-export const CATEGORY_ENUM       = [
-  'primary','social','promotions','updates','forums','reservations','purchases'
-] as const;
-export const EMAIL_IN_ENUM        = ['inbox', 'draft', 'sent', 'chats', 'scheduled'] as const;
 
 export const EMAIL_IS_OPTIONS = EMAIL_IS_ENUM.map((emailIs) => ({
   label: emailIs.charAt(0).toUpperCase() + emailIs.slice(1),
@@ -516,7 +507,7 @@ const QUERY_NOT_PRIMARY: FormValues = {
   },
 }
 // Simple template satisfying formValuesSchema
-export const QUERY_AI_TEMPLATE: FormValues = {
+const QUERY_AI_TEMPLATE: FormValues = {
   name: 'a',
   description: '',
   occurrence: {
@@ -538,7 +529,7 @@ export const QUERY_AI_TEMPLATE: FormValues = {
   emailIn: { enabled: true, emailIn: ["inbox"] },
 };
 
-export type QueryName = 'QUERY_EMPTY_FORM' | 
+type QueryName = 'QUERY_EMPTY_FORM' | 
 'QUERY_OLD_UNREAD_FORM' | 
 'QUERY_LARGE_READ_FORM' | 
 'QUERY_LAST_YEAR_FORM' | 
