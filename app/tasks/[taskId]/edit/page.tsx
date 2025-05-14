@@ -1,6 +1,6 @@
 import { FormValues, Task as TaskType } from "@/app/lib/definitions";
 import { getTaskById } from "@/app/lib/actions";
-import EditForm from "@/app/components/tasks/edit-form";
+import EditForm from "@/components/task/form/edit-form";
 
 import { mockTasks } from "@/app/data/mock-task";
 

@@ -13,8 +13,8 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea";
 
-import { FormWrapper } from './formWrapper';
-import { SectionWrapper } from '@/components/task/sectionWrapper';
+import { FormWrapper } from './wrapper/formWrapper';
+import { SectionWrapper } from './wrapper/sectionWrapper';
 
 type ScheduleFormAIProps = {
   title: string;

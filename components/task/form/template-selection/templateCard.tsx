@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Template } from '@/app/types/createTask';
-import TemplateIcon from './templateIcons/templateIcon';
+import TemplateIcon from './templateIcon';
 import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
 import {
   Card,

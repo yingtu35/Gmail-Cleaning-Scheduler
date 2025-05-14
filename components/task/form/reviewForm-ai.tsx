@@ -11,8 +11,8 @@ import { ScheduleDetail } from '@/components/task/detail/schedule-detail';
 import { TaskDetail } from '@/components/task/detail/task-detail';
 import { getUserDateTimePrompt } from '@/app/utils/date';
 
-import { FormWrapper } from './formWrapper';
-import { SectionWrapper } from '@/components/task/sectionWrapper';
+import { FormWrapper } from './wrapper/formWrapper';
+import { SectionWrapper } from './wrapper/sectionWrapper';
 
 type ReviewFormAIProps = {
   title: string;

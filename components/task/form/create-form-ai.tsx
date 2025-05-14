@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
 import { INITIAL_AI_STATE } from '@/app/constants/aiPromptValues';
-import { FormControlBarWrapper } from '@/components/task/form/form-control-bar-wrapper';
+import { FormControlBarWrapper } from '@/components/task/form/wrapper/form-control-bar-wrapper';
 
 import ScheduleFormAI from './scheduleForm-ai';
 import TaskFormAI from './taskForm-ai';

@@ -1,14 +1,14 @@
 "use client"
 
 import { useState } from 'react';
-import CreateForm from './create-form';
-import CreateFormAI from './create-form-ai';
+import CreateForm from './form/create-form';
+import CreateFormAI from './form/create-form-ai';
 import {
   FormValues,
 } from '@/app/lib/definitions';
 import { QUERY_TEMPLATE } from '@/app/constants/formValues';
 import { TEMPLATE_FORM_TYPE, TEMPLATE_TYPE } from '@/app/constants/createTask';
-import TemplateSelection from './TemplateSelection';
+import TemplateSelection from '@/components/task/form/template-selection/TemplateSelection';
 
 export default function CreateTask() {
   const [formValues, setFormValues] = useState<FormValues>(QUERY_TEMPLATE.QUERY_EMPTY_FORM);

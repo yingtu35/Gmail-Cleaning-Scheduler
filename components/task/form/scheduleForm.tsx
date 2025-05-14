@@ -33,8 +33,8 @@ import { Button } from "@/components/ui/button"
 import { DEFAULT_SCHEDULE, DATE_THREE_YEARS_FROM_NOW } from "@/app/constants/formValues";
 import { FormValues } from "@/app/lib/definitions";
 
-import { SectionWrapper } from "@/components/task/sectionWrapper";
-import { FormWrapper } from "./formWrapper"
+import { SectionWrapper } from "./wrapper/sectionWrapper";
+import { FormWrapper } from "./wrapper/formWrapper"
 
 
 interface ScheduleFormProps {

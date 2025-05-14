@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { ChevronDownIcon } from "lucide-react"
 
 import { FormValues, Task as TaskType } from "@/app/lib/definitions"
 import { Button } from "@/components/ui/button"
@@ -34,12 +35,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-
-
-import { SectionWrapper } from "@/components/task/sectionWrapper"
-import { InfoDetail } from "@/components/task/detail/info-detail"
 import { PingWrapper } from "@/components/ui/ping-wrapper"
-import { ChevronDownIcon } from "lucide-react"
+
+import { SectionWrapper } from "./form/wrapper/sectionWrapper"
+import { InfoDetail } from "./detail/info-detail"
 
 interface StatusAndActionsGroupProps {
   taskId: string

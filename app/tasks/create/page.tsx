@@ -1,4 +1,4 @@
-import CreateTask from "@/app/components/tasks/createTask"
+import CreateTask from "@/components/task/createTask"
 
 export default function Page() {
   return (

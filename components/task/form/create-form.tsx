@@ -1,19 +1,17 @@
 "use client"
 
 import React from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { toast } from 'sonner';
 
-import useMultiStepForm from '@/app/hooks/useMultiStepForm';
-import { cn } from '@/lib/utils';
-import {
-  FormValues,
-} from '@/app/lib/definitions';
-import { updateTask } from '@/app/lib/actions';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { cn } from '@/lib/utils';
+import useMultiStepForm from '@/app/hooks/useMultiStepForm';
+import { createTask } from '@/app/lib/actions';
 import { formValuesSchema }  from '@/app/lib/validation/form'
+import type { FormValues }    from '@/app/lib/definitions'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,13 +27,13 @@ import {
   Form,
 } from "@/components/ui/form"
 import { Button } from '@/components/ui/button';
-import { FormControlBarWrapper } from '@/components/task/form/form-control-bar-wrapper';
+import { FormControlBarWrapper } from '@/components/task/form/wrapper/form-control-bar-wrapper';
 import { FIELDS_TO_VALIDATE } from '@/app/constants/formValues';
 
+import StepIndicator, { StepConfig } from './StepIndicator';
 import { ScheduleForm } from './scheduleForm';
 import { TaskForm } from './taskForm';
 import { ReviewForm } from './reviewForm';
-import StepIndicator, { StepConfig } from './StepIndicator';
 
 interface FormControlGroupProps {
   isFirstStep: boolean;
@@ -69,7 +67,7 @@ const FormControlGroup = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure you want to go back?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will take you back to task page and you will lose all your progress.
+            This will take you back to template selection and you will lose all your progress.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -104,7 +102,7 @@ const FormControlGroup = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure you want to cancel?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will cancel the editing process and you will lose all your progress.
+              This will cancel the task creation process and you will lose all your progress.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -129,42 +127,50 @@ const FormControlGroup = ({
         disabled={!isLastStep}
         className={cn(isLastStep ? "cursor-pointer" : "cursor-not-allowed")}
       >
-        Update
+        Create
       </Button>
     </div>
   )
 }
 
-const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
+interface CreateFormProps {
+  formValues: FormValues;
+  resetTemplate: () => void;
+}
+
+const CreateForm = ({
+  formValues,
+  resetTemplate
+}: CreateFormProps) => {
   const router = useRouter();
-  
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formValuesSchema),
-    defaultValues: task,
+    defaultValues: formValues,
     mode: 'onChange'
   });
   const { handleSubmit, control, watch, formState: { errors }, trigger } = form;
-
+  
+  // define steps with labels and components
   const stepDefinitions = [
-      { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Step 1: Schedule Details" control={control} watch={watch} /> },
-      { label: 'Task', element: <TaskForm key="Task" title="Step 2: Task Details" control={control} watch={watch} errors={errors} /> },
-      { label: 'Review', element: <ReviewForm key="Review" watch={watch} /> },
-    ];
-
+    { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Step 1: Schedule Details" control={control} watch={watch} /> },
+    { label: 'Task', element: <TaskForm key="Task" title="Step 2: Task Details" control={control} watch={watch} errors={errors} /> },
+    { label: 'Review', element: <ReviewForm key="Review" watch={watch} /> },
+  ];
   const stepConfigs: StepConfig[] = stepDefinitions.map(d => ({ label: d.label }));
-    const { stepRefs, visibleSteps, currentStep, maxStep, isFirstStep, isLastStep, nextStep, prevStep, goToStep } =
-    useMultiStepForm(stepDefinitions.map(d => d.element));
+  const { stepRefs, visibleSteps, currentStep, maxStep, isFirstStep, isLastStep, nextStep, prevStep, goToStep } =
+  useMultiStepForm(stepDefinitions.map(d => d.element));
 
   const onBackClicked = () => {
     if (isFirstStep) {
-      router.back();
+      resetTemplate();
     } else {
       prevStep();
     }
   }
 
   const onCancelClicked = () => {
-    router.back();
+    router.push('/');
   }
 
   const onNextClicked = async () => {
@@ -184,34 +190,34 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
     nextStep();
   }
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = async (values: FormValues) => {
     if (!isLastStep) {
       console.warn("onSubmit called before last step, this should be handled by onNextClicked");
       return;
     }
 
     toast.promise(
-      updateTask(values, taskId),
+      createTask(values),
       {
-        loading: `Updating task ${values.name}...`,
+        loading: `Creating task ${values.name}...`,
         success: (taskId) => {
           router.push(`/tasks/${taskId}`);
-          return `Task ${values.name} updated successfully!`;
+          return `Task ${values.name} created successfully!`; 
         },
         error: (error) => {
-          return error.message || "Error updating task. Please try again later.";
+          return error.message || "Error creating task. Please try again later."; 
         },
       }
     )
   }
 
-  const onError = (error: any) => {
-    console.error("Form submission error:", error);
+  const onError = (errors: any) => {
+    console.error(errors);
   }
 
   return (
     <Form {...form}>
-      <form id="edit-task-form" onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col h-screen">
+      <form id="task-form" onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col h-screen">
         {/* Form header */}
         <FormControlBarWrapper>
           <div className="flex-1">
@@ -247,4 +253,4 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
   );
 };
 
-export default EditForm;
+export default CreateForm;
