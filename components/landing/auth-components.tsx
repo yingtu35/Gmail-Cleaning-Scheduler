@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { authenticate } from "@/app/lib/actions";
-import useLoadingButton from "@/app/hooks/useLoadingButton";
+import useLoadingButton from "@/hooks/useLoadingButton";
 import { Loader } from "./loader";
 
 export function SignIn({

@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import useMultiStepForm from '@/app/hooks/useMultiStepForm';
 import { cn } from '@/lib/utils';
 import {
   FormValues,
@@ -36,6 +35,7 @@ import { ScheduleForm } from './scheduleForm';
 import { TaskForm } from './taskForm';
 import { ReviewForm } from './reviewForm';
 import StepIndicator, { StepConfig } from './StepIndicator';
+import useMultiStepForm from './hooks/useMultiStepForm';
 
 interface FormControlGroupProps {
   isFirstStep: boolean;

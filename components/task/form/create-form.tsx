@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/lib/utils';
-import useMultiStepForm from '@/app/hooks/useMultiStepForm';
 import { createTask } from '@/app/lib/actions';
 import { formValuesSchema }  from '@/app/lib/validation/form'
 import type { FormValues }    from '@/app/lib/definitions'
@@ -34,6 +33,7 @@ import StepIndicator, { StepConfig } from './StepIndicator';
 import { ScheduleForm } from './scheduleForm';
 import { TaskForm } from './taskForm';
 import { ReviewForm } from './reviewForm';
+import useMultiStepForm from './hooks/useMultiStepForm';
 
 interface FormControlGroupProps {
   isFirstStep: boolean;
