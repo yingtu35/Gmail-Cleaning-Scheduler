@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -137,6 +137,7 @@ const FormControlGroup = ({
 
 const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
   const router = useRouter();
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formValuesSchema),
@@ -189,16 +190,19 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
       console.warn("onSubmit called before last step, this should be handled by onNextClicked");
       return;
     }
+    setIsFormSubmitting(true);
 
     toast.promise(
       updateTask(values, taskId),
       {
         loading: `Updating task ${values.name}...`,
         success: (taskId) => {
+          setIsFormSubmitting(false);
           router.push(`/tasks/${taskId}`);
           return `Task ${values.name} updated successfully!`;
         },
         error: (error) => {
+          setIsFormSubmitting(false);
           return error.message || "Error updating task. Please try again later.";
         },
       }
@@ -213,7 +217,7 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
     <Form {...form}>
       <form id="edit-task-form" onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col h-screen">
         {/* Form header */}
-        <FormControlBarWrapper>
+        <FormControlBarWrapper hide={isFormSubmitting}>
           <div className="flex-1">
             <StepIndicator
               steps={stepConfigs}

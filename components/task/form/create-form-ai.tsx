@@ -1,6 +1,7 @@
 "use client"
 
 import Link from 'next/link';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -173,6 +174,7 @@ export default function CreateFormAI({
   resetTemplate
 }: CreateFormAIProps) {
   const router = useRouter();
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const form = useForm<AIFormValues>({
     resolver: zodResolver(AIFormValuesSchema),
     defaultValues: INITIAL_AI_STATE,
@@ -217,15 +219,19 @@ export default function CreateFormAI({
   const onSubmit = (values: AIFormValues) => {
     if (!isLastStep) return nextStep();
     const formValues = values.formValues.value;
+    setIsFormSubmitting(true);
+
     toast.promise(
       createTask(formValues),
       {
         loading: `Creating task ${formValues.name}...`,
         success: (taskId) => {
+          setIsFormSubmitting(false);
           router.push(`/tasks/${taskId}`);
           return `Task ${formValues.name} created successfully!`;
         },
         error: (error) => {
+          setIsFormSubmitting(false);
           return error.message || "Error creating task. Please try again later.";
         },
       }
@@ -235,7 +241,7 @@ export default function CreateFormAI({
   return (
     <Form {...form}>
       <form id="task-form-ai" onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col h-screen">
-        <FormControlBarWrapper>
+        <FormControlBarWrapper hide={isFormSubmitting}>
           <div className="flex-1">
             <StepIndicator
               steps={stepConfigs}

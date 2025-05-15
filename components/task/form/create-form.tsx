@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -143,6 +143,7 @@ const CreateForm = ({
   resetTemplate
 }: CreateFormProps) => {
   const router = useRouter();
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formValuesSchema),
@@ -196,15 +197,19 @@ const CreateForm = ({
       return;
     }
 
+    setIsFormSubmitting(true);
+
     toast.promise(
       createTask(values),
       {
         loading: `Creating task ${values.name}...`,
         success: (taskId) => {
+          setIsFormSubmitting(false);
           router.push(`/tasks/${taskId}`);
           return `Task ${values.name} created successfully!`; 
         },
         error: (error) => {
+          setIsFormSubmitting(false);
           return error.message || "Error creating task. Please try again later."; 
         },
       }
@@ -219,7 +224,7 @@ const CreateForm = ({
     <Form {...form}>
       <form id="task-form" onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col h-screen">
         {/* Form header */}
-        <FormControlBarWrapper>
+        <FormControlBarWrapper hide={isFormSubmitting}>
           <div className="flex-1">
             <StepIndicator
               steps={stepConfigs}
