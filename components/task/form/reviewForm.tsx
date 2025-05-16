@@ -1,6 +1,7 @@
 import { UseFormWatch } from "react-hook-form";
 import { useCompletion } from '@ai-sdk/react';
 
+import log from "@/utils/log";
 import { formatFields } from "@/utils/schedule";
 import { FormValues } from "@/types/task"
 import { Button } from "@/components/ui/button";
@@ -77,6 +78,13 @@ interface ReviewFormProps {
 export function ReviewForm({ watch }: ReviewFormProps) {
   const { complete, completion, isLoading, error } = useCompletion({
     api: '/api/tasks/explanation',
+    // TODO: implement logging
+    onError: (error: Error) => {
+      log.error(`[ReviewForm] onError: ${error}`);
+    },
+    onFinish: (prompt, completion) => {
+      log.info(`[ReviewForm] onFinish: ${prompt}, ${completion}`);
+    },
   });
 
   const formValues = watch();
