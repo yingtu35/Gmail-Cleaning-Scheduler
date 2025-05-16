@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { cn } from "@/utils/cn";
 
 export const NavSecondary = ({
   items,
@@ -18,6 +19,7 @@ export const NavSecondary = ({
     title: string
     href: string
     icon: LucideIcon
+    rightIcon?: LucideIcon
     target?: string
     rel?: string
   }[]
@@ -29,9 +31,12 @@ export const NavSecondary = ({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <Link href={item.href} target={item.target || '_self'} rel={item.rel || undefined}>
-                <SidebarMenuButton className='py-4'>
-                  <item.icon />
-                  {item.title}
+                <SidebarMenuButton className={cn('py-4', item.rightIcon && 'justify-between')}>
+                  <div className="flex items-center gap-2">
+                    <item.icon />
+                    {item.title}
+                  </div>
+                  {item.rightIcon && <item.rightIcon />}
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
