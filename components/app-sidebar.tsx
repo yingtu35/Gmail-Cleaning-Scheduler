@@ -1,6 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ExternalLink } from 'lucide-react';
+
 import logo from '@/public/logo.svg';
 import {
   BarChartIcon,
@@ -41,6 +43,7 @@ const navSecondary = [
   { title: 'GitHub',
     href: 'https://github.com/yingtu35/Gmail-Cleaning-Scheduler',
     icon: Github,
+    rightIcon: ExternalLink,
     target: '_blank',
     rel: 'noopener noreferrer',
   }
