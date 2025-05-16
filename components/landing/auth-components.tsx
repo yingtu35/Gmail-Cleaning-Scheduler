@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { authenticate } from "@/libs/actions";
 import useLoadingButton from "@/hooks/useLoadingButton";
-import { Loader } from "./loader";
+import { Loader } from "../loader";
 
 export function SignIn({
   provider,
