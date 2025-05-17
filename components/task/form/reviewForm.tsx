@@ -1,8 +1,8 @@
 import { UseFormWatch } from "react-hook-form";
-import { useState } from "react";
+import { useCompletion } from '@ai-sdk/react';
 
+import log from "@/utils/log";
 import { formatFields } from "@/utils/schedule";
-import { getSearchQueryExplanation } from "@/libs/actions";
 import { FormValues } from "@/types/task"
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/popover"
 import { ScheduleDetail } from "@/components/task/detail/schedule-detail";
 import { TaskDetail } from "@/components/task/detail/task-detail";
+import { Loader } from "@/components/loader";
 
 import { FormWrapper } from "./wrapper/formWrapper"
 import { SectionWrapper } from "./wrapper/sectionWrapper";
@@ -23,7 +24,7 @@ function AIExplanation({
   isLoading,
 }: {
   result: string | null;
-  error: string | null;
+  error: Error | undefined;
   onGenerateButtonClicked: () => void;
   isLoading: boolean;
 }) {
@@ -54,11 +55,18 @@ function AIExplanation({
           onClick={onGenerateButtonClicked}
           disabled={isLoading}
         >
-          {isLoading ? "Generating..." : "Generate"}
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <Loader />
+              <span>Generating</span>
+            </div>
+          ) : (
+            "Generate"
+          )}
         </Button>
       )}
       {result && <p>{result}</p>}
-      {error && <p className="text-red-500">{error}</p>}
+      {error && <p className="text-red-500">{error.message}</p>}
     </div>
   );
 }
@@ -68,28 +76,25 @@ interface ReviewFormProps {
 }
 
 export function ReviewForm({ watch }: ReviewFormProps) {
+  const { complete, completion, isLoading, error } = useCompletion({
+    api: '/api/tasks/explanation',
+    // TODO: implement logging
+    onError: (error: Error) => {
+      log.error(`[ReviewForm] onError: ${error}`);
+    },
+    onFinish: (prompt, completion) => {
+      log.info(`[ReviewForm] onFinish: ${prompt}, ${completion}`);
+    },
+  });
+
   const formValues = watch();
   const aggregatedEntries = Object.entries(formValues);
   const scheduleEntries = aggregatedEntries.slice(0, 3);
   const taskEntries = aggregatedEntries.slice(3);
 
-  const fullSearchQueries = formatFields(formValues);
-
-  const [result, setResult] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
   const onGenerateButtonClicked = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const res = await getSearchQueryExplanation(undefined, fullSearchQueries);
-      setResult(res);
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setIsLoading(false);
-    }
+    const fullSearchQueries = formatFields(formValues);
+    await complete(fullSearchQueries);
   };
 
   return (
@@ -97,7 +102,7 @@ export function ReviewForm({ watch }: ReviewFormProps) {
       <FormWrapper title="Schedule Review">
         <SectionWrapper title="AI Explanation">
           <AIExplanation
-            result={result}
+            result={completion}
             error={error}
             isLoading={isLoading}
             onGenerateButtonClicked={onGenerateButtonClicked}
