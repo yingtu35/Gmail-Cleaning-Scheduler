@@ -1,5 +1,7 @@
 import { UseFormWatch } from "react-hook-form";
 import { useCompletion } from '@ai-sdk/react';
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { useState } from "react";
 
 import log from "@/utils/log";
 import { formatFields } from "@/utils/schedule";
@@ -28,6 +30,13 @@ function AIExplanation({
   onGenerateButtonClicked: () => void;
   isLoading: boolean;
 }) {
+  const [feedback, setFeedback] = useState<"liked" | "disliked" | null>(null);
+
+  const handleFeedback = (liked: boolean) => {
+    setFeedback(liked ? "liked" : "disliked");
+    // TODO: send feedback to the server
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex items-center">
@@ -65,7 +74,37 @@ function AIExplanation({
           )}
         </Button>
       )}
-      {result && <p>{result}</p>}
+      {result && (
+        <>
+          <p>{result}</p>
+          {!isLoading && (
+            <div className="flex items-center gap-2">
+              {feedback !== "disliked" && (
+                <Button
+                  variant={feedback === "liked" ? "default" : "ghost"}
+                  size="icon"
+                  type="button"
+                  onClick={() => handleFeedback(true)}
+                  disabled={feedback === "liked"}
+                >
+                  <ThumbsUp />
+                </Button>
+              )}
+              {feedback !== "liked" && (
+                <Button
+                  variant={feedback === "disliked" ? "default" : "ghost"}
+                  size="icon"
+                  type="button"
+                  onClick={() => handleFeedback(false)}
+                  disabled={feedback === "disliked"}
+                >
+                  <ThumbsDown />
+                </Button>
+              )}
+            </div>
+          )}
+        </>
+      )}
       {error && <p className="text-red-500">{error.message}</p>}
     </div>
   );
