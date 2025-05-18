@@ -5,30 +5,6 @@ import { UserDateTimePromptType } from "@/types/user";
 
 import log from "@/utils/log";
 
-// TODO: Improve the system prompt to be more specific
-export async function getEmailSearchesExplanation(query: string) {
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "You are an assistant specializing in explaining complex Gmail search operators. Explain in one sentence without using jargon.",
-        },
-        {
-          role: "user",
-          content: query,
-        },
-      ],
-    })
-    log.debug("response", response);
-    return response.choices[0].message.content;
-  } catch (error) {
-    log.error("error", error);
-    return "Sorry, There was an error processing your request. Please try again later."
-  }
-}
-
 export async function getScheduleByPrompt(userDateTimePrompt: UserDateTimePromptType, prompt: AIPromptType) {
   try {
     const response = await openai.chat.completions.create({

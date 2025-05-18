@@ -14,7 +14,7 @@ import { Task, FormValues, AIPromptType } from "@/types/task";
 import { convertToUTCDate, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
 
-import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/libs/openai/chat";
+import { getScheduleByPrompt } from "@/libs/openai/chat";
 
 import log from "../utils/log";
 import { parseTask } from "../utils/task";
