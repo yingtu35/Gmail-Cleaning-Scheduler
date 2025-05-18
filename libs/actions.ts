@@ -386,11 +386,6 @@ export async function subscribeEmailNotification(email: string) {
   return;
 }
 
-export async function getSearchQueryExplanation(prevState: any, query: string) {
-  const result = await getEmailSearchesExplanation(query);
-  return result;
-}
-
 export async function generateScheduleByPrompt(userDateTimePrompt: UserDateTimePromptType, prompt: AIPromptType): Promise<FormValues | string>{
   const result = await getScheduleByPrompt(userDateTimePrompt, prompt);
   if (!result) {
