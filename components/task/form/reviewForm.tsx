@@ -1,5 +1,7 @@
 import { UseFormWatch } from "react-hook-form";
 import { useCompletion } from '@ai-sdk/react';
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { useState } from "react";
 
 import log from "@/utils/log";
 import { formatFields } from "@/utils/schedule";
@@ -16,7 +18,7 @@ import { Loader } from "@/components/loader";
 
 import { FormWrapper } from "./wrapper/formWrapper"
 import { SectionWrapper } from "./wrapper/sectionWrapper";
-
+import { useAIExplanationFeedback } from "./hooks/useAIExplanationFeedback";
 function AIExplanation({
   result,
   error,
@@ -28,6 +30,8 @@ function AIExplanation({
   onGenerateButtonClicked: () => void;
   isLoading: boolean;
 }) {
+  const { handleFeedback, isFeedbackDisliked, isFeedbackLiked } = useAIExplanationFeedback(result);
+
   return (
     <div className="space-y-2">
       <div className="flex items-center">
@@ -65,7 +69,37 @@ function AIExplanation({
           )}
         </Button>
       )}
-      {result && <p>{result}</p>}
+      {result && (
+        <>
+          <p>{result}</p>
+          {!isLoading && (
+            <div className="flex items-center gap-2">
+              {!isFeedbackDisliked && (
+                <Button
+                  variant={isFeedbackLiked ? "default" : "ghost"}
+                  size="icon"
+                  type="button"
+                  onClick={() => handleFeedback(true)}
+                  disabled={isFeedbackLiked}
+                >
+                  <ThumbsUp />
+                </Button>
+              )}
+              {!isFeedbackLiked && (
+                <Button
+                  variant={isFeedbackDisliked ? "default" : "ghost"}
+                  size="icon"
+                  type="button"
+                  onClick={() => handleFeedback(false)}
+                  disabled={isFeedbackDisliked}
+                >
+                  <ThumbsDown />
+                </Button>
+              )}
+            </div>
+          )}
+        </>
+      )}
       {error && <p className="text-red-500">{error.message}</p>}
     </div>
   );

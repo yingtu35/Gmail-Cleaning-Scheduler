@@ -14,7 +14,7 @@ import { Task, FormValues, AIPromptType } from "@/types/task";
 import { convertToUTCDate, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
 
-import { getEmailSearchesExplanation, getScheduleByPrompt } from "@/libs/openai/chat";
+import { getScheduleByPrompt } from "@/libs/openai/chat";
 
 import log from "../utils/log";
 import { parseTask } from "../utils/task";
@@ -384,11 +384,6 @@ export async function subscribeEmailNotification(email: string) {
     throw new Error("Error subscribing");
   }
   return;
-}
-
-export async function getSearchQueryExplanation(prevState: any, query: string) {
-  const result = await getEmailSearchesExplanation(query);
-  return result;
 }
 
 export async function generateScheduleByPrompt(userDateTimePrompt: UserDateTimePromptType, prompt: AIPromptType): Promise<FormValues | string>{
