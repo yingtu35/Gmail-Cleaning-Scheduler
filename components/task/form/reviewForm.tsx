@@ -18,7 +18,7 @@ import { Loader } from "@/components/loader";
 
 import { FormWrapper } from "./wrapper/formWrapper"
 import { SectionWrapper } from "./wrapper/sectionWrapper";
-
+import { useAIExplanationFeedback } from "./hooks/useAIExplanationFeedback";
 function AIExplanation({
   result,
   error,
@@ -30,12 +30,7 @@ function AIExplanation({
   onGenerateButtonClicked: () => void;
   isLoading: boolean;
 }) {
-  const [feedback, setFeedback] = useState<"liked" | "disliked" | null>(null);
-
-  const handleFeedback = (liked: boolean) => {
-    setFeedback(liked ? "liked" : "disliked");
-    // TODO: send feedback to the server
-  };
+  const { handleFeedback, isFeedbackDisliked, isFeedbackLiked } = useAIExplanationFeedback(result);
 
   return (
     <div className="space-y-2">
@@ -79,24 +74,24 @@ function AIExplanation({
           <p>{result}</p>
           {!isLoading && (
             <div className="flex items-center gap-2">
-              {feedback !== "disliked" && (
+              {!isFeedbackDisliked && (
                 <Button
-                  variant={feedback === "liked" ? "default" : "ghost"}
+                  variant={isFeedbackLiked ? "default" : "ghost"}
                   size="icon"
                   type="button"
                   onClick={() => handleFeedback(true)}
-                  disabled={feedback === "liked"}
+                  disabled={isFeedbackLiked}
                 >
                   <ThumbsUp />
                 </Button>
               )}
-              {feedback !== "liked" && (
+              {!isFeedbackLiked && (
                 <Button
-                  variant={feedback === "disliked" ? "default" : "ghost"}
+                  variant={isFeedbackDisliked ? "default" : "ghost"}
                   size="icon"
                   type="button"
                   onClick={() => handleFeedback(false)}
-                  disabled={feedback === "disliked"}
+                  disabled={isFeedbackDisliked}
                 >
                   <ThumbsDown />
                 </Button>
