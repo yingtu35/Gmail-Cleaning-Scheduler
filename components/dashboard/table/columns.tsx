@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Task } from "@/types/task";
+import { taskStatusEnum } from "@/models/schema";
 
 
 export const columns: ColumnDef<Task>[] = [
@@ -64,7 +65,7 @@ export const columns: ColumnDef<Task>[] = [
     }
   },
   {
-    accessorKey: "repeatCount",
+    accessorKey: "successCounts",
     header: ({ column }) => {
       return (
         <div className="text-right">
@@ -72,38 +73,52 @@ export const columns: ColumnDef<Task>[] = [
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Repeat Count
+            Success Counts
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         </div>
       )
     },
     cell: ({ row }) => {
-      return <div className="text-right pr-4">{row.original.repeatCount || 0}</div>
+      return <div className="text-right pr-4">{row.original.successCounts || 0}</div>
+    }
+  },
+  {
+    accessorKey: "errorCounts",
+    header: ({ column }) => {
+      return (
+        <div className="text-right">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Error Counts
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      )
+    },
+    cell: ({ row }) => {
+      return <div className="text-right pr-4">{row.original.errorCounts || 0}</div>
     }
   },
   {
     id: "status",
     header: "Status",
     cell: ({ row }) => {
-      const expiresAt = row.original.expiresAt;
-      const isExpired = expiresAt ? new Date(expiresAt) < new Date() : false;
+      if (!row.original.status) {
+        return <div>N/A</div>
+      }
+      const status = row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1);
       return (
-        <div className={isExpired ? "text-red-500" : "text-green-500"}>
-          {isExpired ? "Expired" : "Active"}
-        </div>
+        <div className={row.original.status === "active" ? "text-green-500" : row.original.status === "paused" ? "text-yellow-500" : "text-red-500"}>{status}</div>
       )
     },
     filterFn: (row, id, filterValue) => {
-      const expiresAt = row.original.expiresAt;
-      const isExpired = expiresAt ? new Date(expiresAt) < new Date() : false;
-      
-      // If filterValue is "Active", return true if not expired
-      if (filterValue === "Active") return !isExpired;
-      
-      // If filterValue is "Expired", return true if expired
-      if (filterValue === "Expired") return isExpired;
-      
+      // If filterValue is one of the statuses, return true if the status matches
+      if (taskStatusEnum.enumValues.includes(filterValue)) {
+        return row.original.status === filterValue;
+      }
       // Default case: no filtering (should never reach here due to the dropdown values)
       return true;
     }

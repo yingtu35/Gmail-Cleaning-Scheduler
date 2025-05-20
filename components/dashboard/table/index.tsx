@@ -12,7 +12,7 @@ async function getMockTasks() {
 }
 
 export default async function Table() {
-  const tasks: Task[] = await getTasks();
+  const tasks: Task[] = await getMockTasks();
 
   return (
     <div className="w-full px-4 lg:px-6">
