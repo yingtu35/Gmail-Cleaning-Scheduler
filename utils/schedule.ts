@@ -1,6 +1,6 @@
 import moment from "moment-timezone";
 
-import { UserInDB } from "@/types/user"
+import { User } from "@/types/user"
 import { 
   FormValues,
   TimeValue,
@@ -138,7 +138,7 @@ export function formatFields(jsonObj: FormValues): string {
   return resultArray.join(' AND ');
 }
 
-function createLambdaInput(q: string, user:UserInDB, taskName: string): LambdaInput {
+function createLambdaInput(q: string, user:User, taskName: string): LambdaInput {
   return {
     email: user.email,
     access_token: user.accessToken,
@@ -207,7 +207,7 @@ function createOneTimeScheduleExpression(date: Date, time: string): string {
   return `at(${dateString}T${time}:00)`;
 }
 
-export function generateCreateScheduleCommand(data: FormValues, user: UserInDB) {
+export function generateCreateScheduleCommand(data: FormValues, user: User) {
   let commandInput;
   let scheduleExpression = '';
 
@@ -250,7 +250,7 @@ export function generateCreateScheduleCommand(data: FormValues, user: UserInDB) 
   return commandInput;
 }
 
-export function generateUpdateScheduleCommand(data: FormValues, user: UserInDB, scheduleName: string) {
+export function generateUpdateScheduleCommand(data: FormValues, user: User, scheduleName: string) {
   let commandInput;
 
   const name = scheduleName;

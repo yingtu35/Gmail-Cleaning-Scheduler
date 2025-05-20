@@ -9,7 +9,7 @@ import { auth, signIn, signOut } from "@/auth";
 import { createSchedule, updateSchedule, deleteSchedule } from "@/libs/aws/scheduler";
 import { subscribe } from "@/libs/aws/sns";
 
-import { UserInDB, UserGoogle, UserDateTimePromptType } from "@/types/user";
+import { User, NewUser, UserDateTimePromptType } from "@/types/user";
 import { Task, FormValues, AIPromptType } from "@/types/task";
 import { convertToUTCDate, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
@@ -60,7 +60,7 @@ export async function getUserIdByEmail(email: string) {
   const user = await db.query.UserTable.findFirst({
     where: eq(UserTable.email, email),
     columns: { id: true}
-  }) as UserInDB;
+  });
   return user;
 }
 
@@ -72,10 +72,10 @@ export async function getUserByEmail(email: string) {
   if (!user) {
     return null;
   }
-  return user as UserInDB;
+  return user as User;
 }
 
-export async function updateUserOnSignIn(user: UserGoogle) {
+export async function updateUserOnSignIn(user: NewUser) {
   await db.update(UserTable).set({
     name: user.name,
     image: user.image,
@@ -88,7 +88,7 @@ export async function updateUserOnSignIn(user: UserGoogle) {
 }
 
 // create a new user in the database
-export async function createUserOnSignIn(user: UserGoogle) {
+export async function createUserOnSignIn(user: NewUser) {
   await db.insert(UserTable).values(user)
   .onConflictDoUpdate({
     target: UserTable.email,
@@ -136,7 +136,7 @@ export async function getTasks(): Promise<Task[]> {
   return formattedTasks;
 }
 
-export async function getTasksCount(user: UserInDB): Promise<number> {
+export async function getTasksCount(user: User): Promise<number> {
   const numOfTasks = await db
     .select({
       value: count(UserTasksTable.id),
