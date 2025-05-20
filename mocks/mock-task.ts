@@ -6,8 +6,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 1",
     createdAt: new Date("2025-03-10T10:00:00Z"),
     updatedAt: new Date("2025-03-10T10:00:00Z"),
-    expiresAt: new Date("2025-05-10T10:00:00Z"), // future
-    repeatCount: 0,
+    status: "active",
+    emailsDeleted: 150,
+    successCounts: 5,
+    errorCounts: 1,
     userId: "user-123",
     formValues: {
       name: "Clean up old newsletters",
@@ -69,8 +71,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 2",
     createdAt: new Date("2025-02-15T14:30:00Z"),
     updatedAt: new Date("2025-02-15T14:30:00Z"),
-    expiresAt: new Date("2025-04-01T14:30:00Z"), // expired
-    repeatCount: 5,
+    status: "completed",
+    emailsDeleted: 2500,
+    successCounts: 25,
+    errorCounts: 0,
     userId: "user-123",
     formValues: {
       name: "Delete large attachments",
@@ -149,8 +153,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 3",
     createdAt: new Date("2025-03-01T09:15:00Z"),
     updatedAt: new Date("2025-03-05T11:20:00Z"),
-    expiresAt: null,
-    repeatCount: 12,
+    status: "paused",
+    emailsDeleted: 50,
+    successCounts: 2,
+    errorCounts: 3,
     userId: "user-123",
     formValues: {
       name: "Archive social media notifications",
@@ -233,8 +239,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 4",
     createdAt: new Date("2025-01-20T16:45:00Z"),
     updatedAt: new Date("2025-01-20T16:45:00Z"),
-    expiresAt: new Date("2025-04-20T16:45:00Z"), // future
-    repeatCount: 0,
+    status: "active",
+    emailsDeleted: 0,
+    successCounts: 0,
+    errorCounts: 0,
     userId: "user-456",
     formValues: {
       name: "Clean up old drafts",
@@ -313,8 +321,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 5",
     createdAt: new Date("2025-03-25T08:30:00Z"),
     updatedAt: new Date("2025-03-25T08:30:00Z"),
-    expiresAt: new Date("2025-04-10T08:30:00Z"), // expired
-    repeatCount: 2,
+    status: "completed",
+    emailsDeleted: 1230,
+    successCounts: 10,
+    errorCounts: 2,
     userId: "user-456",
     formValues: {
       name: "Delete promotional emails",
@@ -393,8 +403,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 6",
     createdAt: new Date("2025-02-28T17:00:00Z"),
     updatedAt: new Date("2025-03-01T09:15:00Z"),
-    expiresAt: new Date("2026-02-28T17:00:00Z"), // future
-    repeatCount: 8,
+    status: "active",
+    emailsDeleted: 75,
+    successCounts: 3,
+    errorCounts: 0,
     userId: "user-789",
     formValues: {
       name: "Archive purchase receipts",
@@ -477,8 +489,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 7",
     createdAt: new Date("2025-03-15T11:20:00Z"),
     updatedAt: new Date("2025-03-15T11:20:00Z"),
-    expiresAt: new Date("2025-04-05T11:20:00Z"), // expired
-    repeatCount: 0,
+    status: "paused",
+    emailsDeleted: 5,
+    successCounts: 1,
+    errorCounts: 1,
     userId: "user-789",
     formValues: {
       name: "Delete emails from specific sender",
@@ -557,8 +571,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 8",
     createdAt: new Date("2025-01-05T13:40:00Z"),
     updatedAt: new Date("2025-01-10T15:25:00Z"),
-    expiresAt: null,
-    repeatCount: 15,
+    status: "active",
+    emailsDeleted: 420,
+    successCounts: 12,
+    errorCounts: 5,
     userId: "user-123",
     formValues: {
       name: "Move starred emails to important",
@@ -641,8 +657,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 9",
     createdAt: new Date("2025-02-20T10:10:00Z"),
     updatedAt: new Date("2025-02-22T14:30:00Z"),
-    expiresAt: new Date("2025-05-20T10:10:00Z"), // future
-    repeatCount: 3,
+    status: "completed",
+    emailsDeleted: 300,
+    successCounts: 30,
+    errorCounts: 0,
     userId: "user-456",
     formValues: {
       name: "Clean up sent items",
@@ -721,8 +739,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 10",
     createdAt: new Date("2025-03-30T09:00:00Z"),
     updatedAt: new Date("2025-03-30T09:00:00Z"),
-    expiresAt: new Date("2025-04-30T09:00:00Z"), // future
-    repeatCount: 0,
+    status: "active",
+    emailsDeleted: 99,
+    successCounts: 9,
+    errorCounts: 0,
     userId: "user-789",
     formValues: {
       name: "Archive forum discussions",
@@ -805,8 +825,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 11",
     createdAt: new Date("2025-02-05T15:45:00Z"),
     updatedAt: new Date("2025-02-10T09:15:00Z"),
-    expiresAt: null,
-    repeatCount: 6,
+    status: "paused",
+    emailsDeleted: 10,
+    successCounts: 0,
+    errorCounts: 2,
     userId: "user-123",
     formValues: {
       name: "Clean up calendar invites",
@@ -889,8 +911,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 12",
     createdAt: new Date("2025-03-12T11:30:00Z"),
     updatedAt: new Date("2025-03-12T11:30:00Z"),
-    expiresAt: new Date("2025-06-12T11:30:00Z"), // future
-    repeatCount: 0,
+    status: "active",
+    emailsDeleted: 600,
+    successCounts: 60,
+    errorCounts: 3,
     userId: "user-456",
     formValues: {
       name: "Archive travel confirmations",
@@ -969,8 +993,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 13",
     createdAt: new Date("2025-03-20T14:15:00Z"),
     updatedAt: new Date("2025-03-22T09:30:00Z"),
-    expiresAt: new Date("2025-04-10T14:15:00Z"), // expired
-    repeatCount: 2,
+    status: "completed",
+    emailsDeleted: 1500,
+    successCounts: 150,
+    errorCounts: 0,
     userId: "user-789",
     formValues: {
       name: "Clean up Google Drive notifications",
@@ -1049,8 +1075,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 14",
     createdAt: new Date("2025-01-15T17:00:00Z"),
     updatedAt: new Date("2025-01-20T10:45:00Z"),
-    expiresAt: new Date("2026-01-15T17:00:00Z"), // future
-    repeatCount: 24,
+    status: "active",
+    emailsDeleted: 80,
+    successCounts: 4,
+    errorCounts: 1,
     userId: "user-123",
     formValues: {
       name: "Organize important emails",
@@ -1133,8 +1161,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 15",
     createdAt: new Date("2025-03-08T12:00:00Z"),
     updatedAt: new Date("2025-03-08T12:00:00Z"),
-    expiresAt: new Date("2025-04-08T12:00:00Z"), // expired
-    repeatCount: 4,
+    status: "paused",
+    emailsDeleted: 22,
+    successCounts: 2,
+    errorCounts: 0,
     userId: "user-456",
     formValues: {
       name: "Clean up newsletter subscriptions",
@@ -1217,8 +1247,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 16",
     createdAt: new Date("2025-02-25T08:20:00Z"),
     updatedAt: new Date("2025-02-25T08:20:00Z"),
-    expiresAt: null,
-    repeatCount: 10,
+    status: "active",
+    emailsDeleted: 1000,
+    successCounts: 100,
+    errorCounts: 10,
     userId: "user-789",
     formValues: {
       name: "Archive completed project emails",
@@ -1301,8 +1333,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 17",
     createdAt: new Date("2025-03-28T16:35:00Z"),
     updatedAt: new Date("2025-03-28T16:35:00Z"),
-    expiresAt: new Date("2025-05-28T16:35:00Z"), // future
-    repeatCount: 0,
+    status: "completed",
+    emailsDeleted: 550,
+    successCounts: 55,
+    errorCounts: 0,
     userId: "user-123",
     formValues: {
       name: "Clean up email notifications",
@@ -1381,8 +1415,10 @@ export const mockTasks: Task[] = [
     scheduleName: "Schedule 18",
     createdAt: new Date("2025-03-01T10:00:00Z"),
     updatedAt: new Date("2025-03-05T14:20:00Z"),
-    expiresAt: new Date("2025-04-01T10:00:00Z"), // expired
-    repeatCount: 7,
+    status: "active",
+    emailsDeleted: 30,
+    successCounts: 3,
+    errorCounts: 0,
     userId: "user-456",
     formValues: {
       name: "Delete old chat notifications",

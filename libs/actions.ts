@@ -1,6 +1,6 @@
 'use server'
 
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/models/db";
@@ -9,9 +9,9 @@ import { auth, signIn, signOut } from "@/auth";
 import { createSchedule, updateSchedule, deleteSchedule } from "@/libs/aws/scheduler";
 import { subscribe } from "@/libs/aws/sns";
 
-import { UserInDB, UserGoogle, UserDateTimePromptType } from "@/types/user";
-import { Task, FormValues, AIPromptType } from "@/types/task";
-import { convertToUTCDate, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
+import { User, NewUser, UserDateTimePromptType } from "@/types/user";
+import { Task, FormValues, AIPromptType, NewTask } from "@/types/task";
+import { generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
 
 import { getScheduleByPrompt } from "@/libs/openai/chat";
@@ -60,7 +60,7 @@ export async function getUserIdByEmail(email: string) {
   const user = await db.query.UserTable.findFirst({
     where: eq(UserTable.email, email),
     columns: { id: true}
-  }) as UserInDB;
+  });
   return user;
 }
 
@@ -72,10 +72,10 @@ export async function getUserByEmail(email: string) {
   if (!user) {
     return null;
   }
-  return user as UserInDB;
+  return user as User;
 }
 
-export async function updateUserOnSignIn(user: UserGoogle) {
+export async function updateUserOnSignIn(user: NewUser) {
   await db.update(UserTable).set({
     name: user.name,
     image: user.image,
@@ -88,7 +88,7 @@ export async function updateUserOnSignIn(user: UserGoogle) {
 }
 
 // create a new user in the database
-export async function createUserOnSignIn(user: UserGoogle) {
+export async function createUserOnSignIn(user: NewUser) {
   await db.insert(UserTable).values(user)
   .onConflictDoUpdate({
     target: UserTable.email,
@@ -115,7 +115,7 @@ export async function getTaskById(taskId: string): Promise<Task | null> {
   }
   const task = await db.query.UserTasksTable.findFirst({
     where: and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)),
-  })
+  }) as Task | null;
   if (!task) {
     return null;
   }
@@ -130,13 +130,13 @@ export async function getTasks(): Promise<Task[]> {
   // get the tasks for the user
   const tasks = await db.query.UserTasksTable.findMany({
     where: eq(UserTasksTable.userId, user.id as string),
-    orderBy: (task, { desc }) => desc(task.updatedAt),
+    orderBy: [desc(UserTasksTable.updatedAt)],
   })
   const formattedTasks = tasks.map(parseTask);
   return formattedTasks;
 }
 
-export async function getTasksCount(user: UserInDB): Promise<number> {
+export async function getTasksCount(user: User): Promise<number> {
   const numOfTasks = await db
     .select({
       value: count(UserTasksTable.id),
@@ -179,10 +179,8 @@ export async function createTask(data: FormValues) {
       throw new Error("Failed to set up the task schedule. Please try again later or contact support.");
     }
     // create a new task in the database
-    const newTask: Task = {
+    const newTask: NewTask = {
       scheduleName: commandInput.name,
-      expiresAt: data.occurrence.Occurrence === 'Recurring' ? convertToUTCDate(data.occurrence.Schedule.endDateAndTime, data.occurrence.TimeZone) : null,
-      repeatCount: 0,
       formValues: data,
       userId: user.id as string,
     }
@@ -254,8 +252,6 @@ export async function updateTask(data: FormValues, taskId: string) {
     await db.update(UserTasksTable)
       .set({
         updatedAt: new Date(),
-        expiresAt: data.occurrence.Occurrence === 'Recurring' ? convertToUTCDate(data.occurrence.Schedule.endDateAndTime, data.occurrence.TimeZone) : null,
-        repeatCount: 0,
         formValues: data,
       })
       .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
@@ -305,16 +301,7 @@ export async function deleteTask(taskId: string) {
 
     const deletedTaskFromDB = await db.delete(UserTasksTable)
       .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
-      .returning({
-        id: UserTasksTable.id,
-        scheduleName: UserTasksTable.scheduleName,
-        createdAt: UserTasksTable.createdAt,
-        updatedAt: UserTasksTable.updatedAt,
-        expiresAt: UserTasksTable.expiresAt,
-        repeatCount: UserTasksTable.repeatCount,
-        formValues: UserTasksTable.formValues,
-        userId: UserTasksTable.userId,
-      });
+      .returning();
 
     if (!deletedTaskFromDB || deletedTaskFromDB.length === 0) {
       log.error("Error deleting task from DB for deleteTask", { taskId });

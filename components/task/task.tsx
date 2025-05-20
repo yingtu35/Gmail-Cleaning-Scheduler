@@ -96,7 +96,7 @@ function StatusAndActionsGroup({
 export default function Task({ task }: { task: TaskType }) {
   const router = useRouter()
 
-  const { createdAt, updatedAt } = task
+  const { status, createdAt, updatedAt } = task
   const taskId = task.id as string
   const formValues: FormValues = task.formValues
 
@@ -134,7 +134,7 @@ export default function Task({ task }: { task: TaskType }) {
           <h1 className="text-2xl font-bold">{name}</h1>
           <PingWrapper status="active">
             <Badge variant="outline">
-              Active
+              {status}
             </Badge>
           </PingWrapper>
         </div>

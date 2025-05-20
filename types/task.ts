@@ -1,21 +1,11 @@
 import { z } from 'zod';
+
+import { UserTasksTable } from '@/models/schema';
 import { formValuesSchema, PromptSchema, AIFormValuesSchema } from '@/validations/form';
 
-/**
- * Defines the type of a task in the database.
- * 
- * This type is used to represent a task that has been created by a user.
- */
-export type Task = {
-  id?: string;
-  scheduleName: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  expiresAt: Date | null;
-  repeatCount?: number;
-  formValues: FormValues;
-  userId: string;
-}
+export type Task = typeof UserTasksTable.$inferSelect;
+
+export type NewTask = typeof UserTasksTable.$inferInsert;
 
 export type FormValues = z.infer<typeof formValuesSchema>
 

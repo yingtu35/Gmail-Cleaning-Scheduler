@@ -45,6 +45,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import { hasReachedTaskLimit } from '@/utils/database';
+import { taskStatusEnum } from "@/models/schema"
 
 const DEFAULT_PAGE_SIZE = 5
 
@@ -135,8 +136,9 @@ export function DataTable<TData, TValue>({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All">All</SelectItem>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="Expired">Expired</SelectItem>
+              {taskStatusEnum.enumValues.map((status) => (
+                <SelectItem key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

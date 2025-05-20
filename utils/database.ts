@@ -1,6 +1,6 @@
-import { UserInDB } from "@/types/user";
+import { User } from "@/types/user";
 
-export function isValidUser(user: UserInDB | null): user is UserInDB{
+export function isValidUser(user: User | null): user is User{
   return user !== null
 }
 

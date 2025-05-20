@@ -1,22 +1,8 @@
-export type UserGoogle = {
-  name: string;
-  email: string;
-  image: string;
-  accessToken: string;
-  expiresAt: Date;
-  refreshToken: string | undefined;
-}
+import { UserTable } from '@/models/schema';
 
-export type UserInDB = {
-  id: string;
-  name: string;
-  email: string;
-  image: string;
-  accessToken: string;
-  expiresAt: Date;
-  refreshToken: string | undefined;
-  createdAt?: Date;
-}
+export type NewUser = typeof UserTable.$inferInsert;
+
+export type User = typeof UserTable.$inferSelect;
 
 export type UserDateTimePromptType = {
   date: string;

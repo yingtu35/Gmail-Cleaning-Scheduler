@@ -9,8 +9,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx app/drizzle/migrate.ts",
-    "db:test": "tsx app/drizzle/test.ts",
+    "db:migrate": "tsx models/migrate.ts",
+    "db:test": "tsx models/test.ts",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {

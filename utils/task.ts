@@ -1,24 +1,9 @@
 import { Task } from "@/types/task";
 import { parseJsonToFormValues } from "./schedule";
 
-type TaskFromDB = {
-  formValues: unknown;
-  id: string;
-  repeatCount: number | null;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-  scheduleName: string;
-  expiresAt: Date | null;
-  userId: string;
-}
-
-export function parseTask(task: TaskFromDB): Task {
+export function parseTask(task: Task): Task {
   return {
     ...task,
-    createdAt: task.createdAt || undefined,
-    updatedAt: task.updatedAt || undefined,
-    expiresAt: task.expiresAt || null,
-    repeatCount: task.repeatCount || 0,
     formValues: parseJsonToFormValues(JSON.stringify(task.formValues)),
   }
 }
