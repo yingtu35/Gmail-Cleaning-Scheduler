@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Task } from "@/types/task";
 import { taskStatusEnum } from "@/models/schema";
+import { taskStatusColorMap } from "@/components/constants";
 
 
 export const columns: ColumnDef<Task>[] = [
@@ -109,9 +110,10 @@ export const columns: ColumnDef<Task>[] = [
       if (!row.original.status) {
         return <div>N/A</div>
       }
-      const status = row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1);
+      const statusColor = taskStatusColorMap[row.original.status as keyof typeof taskStatusColorMap] || "green";
+      const shownStatus = row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1);
       return (
-        <div className={row.original.status === "active" ? "text-green-500" : row.original.status === "paused" ? "text-yellow-500" : "text-red-500"}>{status}</div>
+        <div className={`text-${statusColor}-500`}>{shownStatus}</div>
       )
     },
     filterFn: (row, id, filterValue) => {

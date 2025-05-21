@@ -1,18 +1,14 @@
 import React from "react";
 
+import { TaskStatus } from "@/types/task";
+import { taskStatusColorMap } from "@/components/constants";
 interface PingWrapperProps {
   children: React.ReactNode;
-  status?: "active" | "new" | "alert";
+  status?: TaskStatus;
 }
 
-const statusColorMap = {
-  active: "green",
-  new: "sky",
-  alert: "red",
-};
-
 export const PingWrapper: React.FC<PingWrapperProps> = ({ children, status = "active" }) => {
-  const color = statusColorMap[status] || "green";
+  const color = taskStatusColorMap[status as keyof typeof taskStatusColorMap] || "green";
   return (
     <div className="relative inline-flex items-center">
       {children}

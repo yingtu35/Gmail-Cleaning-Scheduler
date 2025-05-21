@@ -91,10 +91,6 @@ export const updateSchedule = async (commandInput: CommandInput) => {
       Target: { // Target
         Arn: schedule.Target?.Arn || process.env.LAMBDA_TARGET_ARN, // required
         RoleArn: schedule.Target?.RoleArn || process.env.SCHEDULER_ROLE_ARN, // required
-        RetryPolicy: schedule.Target?.RetryPolicy || { // RetryPolicy
-          MaximumEventAgeInSeconds: 60,
-          MaximumRetryAttempts: 2,
-        },
         Input: commandInput.input, //* Must be a JSON string
         ...schedule.Target,
       },
@@ -116,5 +112,34 @@ export const updateSchedule = async (commandInput: CommandInput) => {
       throw error;
     }
   }
+}
 
+export const pauseSchedule = async (name: string) => {
+  try {
+    const schedule = await getSchedule(name);
+    if (schedule.State === "ENABLED") {
+      const input: UpdateScheduleCommandInput = {
+        Name: schedule.Name,
+        ScheduleExpression: schedule.ScheduleExpression,
+        Target: schedule.Target,
+        FlexibleTimeWindow: schedule.FlexibleTimeWindow,
+        State: "DISABLED",
+        ...schedule,
+      };
+      const command = new UpdateScheduleCommand(input);
+      const response: UpdateScheduleCommandOutput = await client.send(command);
+      return response;
+    } else {
+      log.debug("Schedule is already disabled", { name });
+      return schedule;
+    }
+  } catch (error: unknown) {
+    if (error instanceof ResourceNotFoundException) {
+      log.error(error);
+      throw new Error("Schedule not found");
+    } else {
+      log.error(error);
+      throw error;
+    }
+  }
 }

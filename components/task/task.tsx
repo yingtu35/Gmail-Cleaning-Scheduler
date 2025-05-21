@@ -9,7 +9,7 @@ import { ChevronDownIcon } from "lucide-react"
 import { FormValues, Task as TaskType } from "@/types/task"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { deleteTask } from "@/libs/actions"
+import { deleteTask, pauseTask } from "@/libs/actions"
 import { ScheduleDetail } from "@/components/task/detail/schedule-detail"
 import { TaskDetail } from "@/components/task/detail/task-detail"
 import {
@@ -36,17 +36,22 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { PingWrapper } from "@/components/ui/ping-wrapper"
+import { TaskStatus } from "@/types/task"
 
 import { SectionWrapper } from "./form/wrapper/sectionWrapper"
 import { InfoDetail } from "./detail/info-detail"
 
 interface StatusAndActionsGroupProps {
   taskId: string
+  status: TaskStatus
   onDeleteTask: () => void
+  onPauseTask: () => void
 }
 function StatusAndActionsGroup({
   taskId,
+  status,
   onDeleteTask,
+  onPauseTask,
 }: StatusAndActionsGroupProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   return (
@@ -59,7 +64,12 @@ function StatusAndActionsGroup({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem>Pause</DropdownMenuItem>
+          {status === "active" && (
+            <DropdownMenuItem onClick={onPauseTask}>Pause</DropdownMenuItem>
+          )}
+          {status === "paused" && (
+            <DropdownMenuItem>Resume</DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href={`/tasks/${taskId}/edit`}>Edit</Link>
@@ -112,6 +122,21 @@ export default function Task({ task }: { task: TaskType }) {
     ["Updated Date"]: updatedAt ? new Date(updatedAt).toLocaleString() : "N/A",
   })
 
+  const onPauseTask = async () => {
+    toast.promise(
+      pauseTask(taskId),
+      {
+        loading: `Pausing task ${formValues.name}...`,
+        success: () => {
+          return `Task ${formValues.name} paused successfully!`;
+        },
+        error: (error) => {
+          return error.message || "Error pausing task. Please try again later.";
+        },
+      }
+    )
+  }
+
   const onDeleteTask = async () => {
     toast.promise(
       deleteTask(taskId),
@@ -127,20 +152,24 @@ export default function Task({ task }: { task: TaskType }) {
       }
     )
   }
+
+  const shownStatus = status ? status.charAt(0).toUpperCase() + status.slice(1) : 'N/A'
   return (
     <div className="p-4 space-y-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4 py-2">
           <h1 className="text-2xl font-bold">{name}</h1>
-          <PingWrapper status="active">
+          <PingWrapper status={status}>
             <Badge variant="outline">
-              {status}
+              {shownStatus}
             </Badge>
           </PingWrapper>
         </div>
         <StatusAndActionsGroup
           taskId={taskId}
+          status={status}
           onDeleteTask={onDeleteTask}
+          onPauseTask={onPauseTask}
         />
       </div>
       <SectionWrapper title="Information">
