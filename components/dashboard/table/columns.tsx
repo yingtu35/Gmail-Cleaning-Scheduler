@@ -1,20 +1,15 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, ArrowUpDown } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Task } from "@/types/task";
 import { taskStatusEnum } from "@/models/schema";
 import { taskStatusColorMap } from "@/components/constants";
 import { capitalizeFirstLetter } from "@/utils/strings";
+
+import { TaskActionsCell } from "./TaskActionsCell";
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -116,38 +111,16 @@ export const columns: ColumnDef<Task>[] = [
       )
     },
     filterFn: (row, id, filterValue) => {
-      // If filterValue is one of the statuses, return true if the status matches
       if (taskStatusEnum.enumValues.includes(filterValue)) {
         return row.original.status === filterValue;
       }
-      // Default case: no filtering (should never reach here due to the dropdown values)
       return true;
     }
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const task = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <MoreHorizontal className="cursor-pointer" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <a href={`/tasks/${task.id}`}>View</a>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <a href={`/tasks/${task.id}/edit`}>Edit</a>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-500">
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
+      return <TaskActionsCell task={row.original} />;
     }
   }
 ]

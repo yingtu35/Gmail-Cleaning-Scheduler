@@ -21,13 +21,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  DestructiveAlertDialogAction,
 } from "@/components/ui/alert-dialog"
 import {
   Tabs,
@@ -100,11 +100,11 @@ function StatusAndActionsGroup({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <DestructiveAlertDialogAction 
               onClick={onDeleteTask}
             >
               Delete
-            </AlertDialogAction>
+            </DestructiveAlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

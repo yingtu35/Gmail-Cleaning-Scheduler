@@ -7,6 +7,7 @@ import {
   CATEGORY_ENUM,
   EMAIL_IN_ENUM,
 } from '@/validations/form';
+import { capitalizeFirstLetter } from '@/utils/strings';
 
 const DEFAULT_TIME_ZONE = '(UTC-08:00) America/Los_Angeles';
 
@@ -40,20 +41,20 @@ const DEFAULT_RECURRING_SCHEDULE = {
 }
 
 export const EMAIL_IS_OPTIONS = EMAIL_IS_ENUM.map((emailIs) => ({
-  label: emailIs.charAt(0).toUpperCase() + emailIs.slice(1),
+  label: capitalizeFirstLetter(emailIs),
   value: emailIs,
 }))
 
 export const HAS_OPTIONS = HAS_ENUM.map((has) => ({
-  label: has.charAt(0).toUpperCase() + has.slice(1),
+  label: capitalizeFirstLetter(has),
   value: has,
 }))
 export const CATEGORY_OPTIONS = CATEGORY_ENUM.map((category) => ({
-  label: category.charAt(0).toUpperCase() + category.slice(1),
+  label: capitalizeFirstLetter(category),
   value: category,
 }))
 export const EMAIL_IN_OPTIONS = EMAIL_IN_ENUM.map((emailIn) => ({
-  label: emailIn.charAt(0).toUpperCase() + emailIn.slice(1),
+  label: capitalizeFirstLetter(emailIn),
   value: emailIn,
 }))
 
