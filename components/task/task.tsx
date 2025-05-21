@@ -44,6 +44,7 @@ import { InfoDetail } from "./detail/info-detail"
 interface StatusAndActionsGroupProps {
   taskId: string
   status: TaskStatus
+  isRecurring: boolean
   onDeleteTask: () => void
   onPauseTask: () => void
   onResumeTask: () => void
@@ -51,6 +52,7 @@ interface StatusAndActionsGroupProps {
 function StatusAndActionsGroup({
   taskId,
   status,
+  isRecurring,
   onDeleteTask,
   onPauseTask,
   onResumeTask,
@@ -66,13 +68,17 @@ function StatusAndActionsGroup({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          {status === "active" && (
-            <DropdownMenuItem onClick={onPauseTask}>Pause</DropdownMenuItem>
+          { isRecurring && (
+            <>
+              {status === "active" && (
+                <DropdownMenuItem onClick={onPauseTask}>Pause</DropdownMenuItem>
+              )}
+              {status === "paused" && (
+              <DropdownMenuItem onClick={onResumeTask}>Resume</DropdownMenuItem>
+            )}
+              <DropdownMenuSeparator />
+            </>
           )}
-          {status === "paused" && (
-            <DropdownMenuItem onClick={onResumeTask}>Resume</DropdownMenuItem>
-          )}
-          <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href={`/tasks/${taskId}/edit`}>Edit</Link>
           </DropdownMenuItem>
@@ -108,11 +114,11 @@ function StatusAndActionsGroup({
 export default function Task({ task }: { task: TaskType }) {
   const router = useRouter()
 
-  const { status, createdAt, updatedAt } = task
-  const taskId = task.id as string
-  const formValues: FormValues = task.formValues
+  const { id: taskId, status, createdAt, updatedAt, formValues } = task
 
-  const { name, description, ...restFormValues } = formValues
+  const { name, description, occurrence, ...restFormValues } = formValues
+  const isRecurring = occurrence.Occurrence === "Recurring"
+
   const aggregatedEntries = Object.entries(restFormValues)
   // extract the first 3 entries
   const scheduleEntries = aggregatedEntries.slice(0, 3)
@@ -185,6 +191,7 @@ export default function Task({ task }: { task: TaskType }) {
         <StatusAndActionsGroup
           taskId={taskId}
           status={status}
+          isRecurring={isRecurring}
           onDeleteTask={onDeleteTask}
           onPauseTask={onPauseTask}
           onResumeTask={onResumeTask}
