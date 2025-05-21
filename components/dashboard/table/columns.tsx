@@ -1,25 +1,15 @@
 "use client"
 
-import Link from "next/link";
-import { toast } from "sonner";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, ArrowUpDown } from "lucide-react"
-import {
-
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Task } from "@/types/task";
 import { taskStatusEnum } from "@/models/schema";
 import { taskStatusColorMap } from "@/components/constants";
 import { capitalizeFirstLetter } from "@/utils/strings";
-import { deleteTask } from "@/libs/actions";
 
+import { TaskActionsCell } from "./TaskActionsCell";
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -121,56 +111,16 @@ export const columns: ColumnDef<Task>[] = [
       )
     },
     filterFn: (row, id, filterValue) => {
-      // If filterValue is one of the statuses, return true if the status matches
       if (taskStatusEnum.enumValues.includes(filterValue)) {
         return row.original.status === filterValue;
       }
-      // Default case: no filtering (should never reach here due to the dropdown values)
       return true;
     }
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const task = row.original;
-
-      const handleDeleteClick = async () => {
-        toast.promise(
-          deleteTask(task.id),
-          {
-            loading: `Deleting task ${task.formValues.name}...`,
-            success: () => {
-              return `Task ${task.formValues.name} deleted successfully!`;
-            },
-            error: (error) => {
-              return error.message || "Error deleting task. Please try again later.";
-            },
-          }
-        );
-      };
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <MoreHorizontal className="cursor-pointer" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem asChild>
-              <Link href={`/tasks/${task.id}`}>View</Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href={`/tasks/${task.id}/edit`}>Edit</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={handleDeleteClick} 
-              className="text-red-500 cursor-pointer"
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
+      return <TaskActionsCell task={row.original} />;
     }
   }
 ]
