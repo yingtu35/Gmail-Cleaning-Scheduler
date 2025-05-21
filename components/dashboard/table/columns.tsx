@@ -1,9 +1,11 @@
 "use client"
 
 import Link from "next/link";
+import { toast } from "sonner";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, ArrowUpDown } from "lucide-react"
 import {
+
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -16,6 +18,8 @@ import { Task } from "@/types/task";
 import { taskStatusEnum } from "@/models/schema";
 import { taskStatusColorMap } from "@/components/constants";
 import { capitalizeFirstLetter } from "@/utils/strings";
+import { deleteTask } from "@/libs/actions";
+
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -130,6 +134,21 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => {
       const task = row.original;
 
+      const handleDeleteClick = async () => {
+        toast.promise(
+          deleteTask(task.id),
+          {
+            loading: `Deleting task ${task.formValues.name}...`,
+            success: () => {
+              return `Task ${task.formValues.name} deleted successfully!`;
+            },
+            error: (error) => {
+              return error.message || "Error deleting task. Please try again later.";
+            },
+          }
+        );
+      };
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -143,7 +162,10 @@ export const columns: ColumnDef<Task>[] = [
             <DropdownMenuItem asChild>
               <Link href={`/tasks/${task.id}/edit`}>Edit</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="text-red-500">
+            <DropdownMenuItem 
+              onClick={handleDeleteClick} 
+              className="text-red-500 cursor-pointer"
+            >
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
