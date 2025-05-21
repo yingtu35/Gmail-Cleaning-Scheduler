@@ -9,7 +9,7 @@ import { ChevronDownIcon } from "lucide-react"
 import { FormValues, Task as TaskType } from "@/types/task"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { deleteTask, pauseTask } from "@/libs/actions"
+import { deleteTask, pauseTask, resumeTask } from "@/libs/actions"
 import { ScheduleDetail } from "@/components/task/detail/schedule-detail"
 import { TaskDetail } from "@/components/task/detail/task-detail"
 import {
@@ -46,12 +46,14 @@ interface StatusAndActionsGroupProps {
   status: TaskStatus
   onDeleteTask: () => void
   onPauseTask: () => void
+  onResumeTask: () => void
 }
 function StatusAndActionsGroup({
   taskId,
   status,
   onDeleteTask,
   onPauseTask,
+  onResumeTask,
 }: StatusAndActionsGroupProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   return (
@@ -68,7 +70,7 @@ function StatusAndActionsGroup({
             <DropdownMenuItem onClick={onPauseTask}>Pause</DropdownMenuItem>
           )}
           {status === "paused" && (
-            <DropdownMenuItem>Resume</DropdownMenuItem>
+            <DropdownMenuItem onClick={onResumeTask}>Resume</DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
@@ -137,6 +139,21 @@ export default function Task({ task }: { task: TaskType }) {
     )
   }
 
+  const onResumeTask = async () => {
+    toast.promise(
+      resumeTask(taskId),
+      {
+        loading: `Resuming task ${formValues.name}...`,
+        success: () => {
+          return `Task ${formValues.name} resumed successfully!`;
+        },
+        error: (error) => {
+          return error.message || "Error resuming task. Please try again later.";
+        },
+      }
+    )
+  }
+
   const onDeleteTask = async () => {
     toast.promise(
       deleteTask(taskId),
@@ -170,6 +187,7 @@ export default function Task({ task }: { task: TaskType }) {
           status={status}
           onDeleteTask={onDeleteTask}
           onPauseTask={onPauseTask}
+          onResumeTask={onResumeTask}
         />
       </div>
       <SectionWrapper title="Information">

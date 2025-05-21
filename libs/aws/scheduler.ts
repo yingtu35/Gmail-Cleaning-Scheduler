@@ -118,19 +118,71 @@ export const pauseSchedule = async (name: string) => {
   try {
     const schedule = await getSchedule(name);
     if (schedule.State === "ENABLED") {
-      const input: UpdateScheduleCommandInput = {
+      const input: UpdateScheduleCommandInput = { // UpdateScheduleInput
         Name: schedule.Name,
-        ScheduleExpression: schedule.ScheduleExpression,
-        Target: schedule.Target,
-        FlexibleTimeWindow: schedule.FlexibleTimeWindow,
+        ScheduleExpression: schedule.ScheduleExpression, // required
+        StartDate: schedule.StartDate,
+        EndDate: schedule.EndDate,
+        Description: schedule.Description,
+        ScheduleExpressionTimezone: schedule.ScheduleExpressionTimezone,
         State: "DISABLED",
-        ...schedule,
+        Target: { // Target
+          Arn: schedule.Target?.Arn || process.env.LAMBDA_TARGET_ARN, // required
+          RoleArn: schedule.Target?.RoleArn || process.env.SCHEDULER_ROLE_ARN, // required
+          Input: schedule.Target?.Input, //* Must be a JSON string
+          ...schedule.Target,
+        },
+        FlexibleTimeWindow: schedule.FlexibleTimeWindow || {
+          Mode: "OFF",
+        },
+        ActionAfterCompletion: schedule.ActionAfterCompletion || "DELETE"
       };
       const command = new UpdateScheduleCommand(input);
       const response: UpdateScheduleCommandOutput = await client.send(command);
       return response;
     } else {
       log.debug("Schedule is already disabled", { name });
+      return schedule;
+    }
+  } catch (error: unknown) {
+    if (error instanceof ResourceNotFoundException) {
+      log.error(error);
+      throw new Error("Schedule not found");
+    } else {
+      log.error(error);
+      throw error;
+    }
+  }
+}
+
+export const resumeSchedule = async (name: string) => {
+  try {
+    const schedule = await getSchedule(name);
+    if (schedule.State === "DISABLED") {
+      const input: UpdateScheduleCommandInput = { // UpdateScheduleInput
+        Name: schedule.Name,
+        ScheduleExpression: schedule.ScheduleExpression, // required
+        StartDate: schedule.StartDate,
+        EndDate: schedule.EndDate,
+        Description: schedule.Description,
+        ScheduleExpressionTimezone: schedule.ScheduleExpressionTimezone,
+        State: "ENABLED",
+        Target: { // Target
+          Arn: schedule.Target?.Arn || process.env.LAMBDA_TARGET_ARN, // required
+          RoleArn: schedule.Target?.RoleArn || process.env.SCHEDULER_ROLE_ARN, // required
+          Input: schedule.Target?.Input, //* Must be a JSON string
+          ...schedule.Target,
+        },
+        FlexibleTimeWindow: schedule.FlexibleTimeWindow || {
+          Mode: "OFF",
+        },
+        ActionAfterCompletion: schedule.ActionAfterCompletion || "DELETE"
+      };
+      const command = new UpdateScheduleCommand(input);
+      const response: UpdateScheduleCommandOutput = await client.send(command);
+      return response;
+    } else {
+      log.debug("Schedule is already enabled", { name });
       return schedule;
     }
   } catch (error: unknown) {
