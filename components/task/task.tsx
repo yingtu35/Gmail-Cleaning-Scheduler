@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { ChevronDownIcon } from "lucide-react"
 
-import { FormValues, Task as TaskType } from "@/types/task"
+import { Task as TaskType } from "@/types/task"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { deleteTask, pauseTask, resumeTask } from "@/libs/actions"
@@ -67,7 +67,7 @@ function StatusAndActionsGroup({
             <ChevronDownIcon />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent align="end">
           { isRecurring && (
             <>
               {status === "active" && (
