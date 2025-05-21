@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Task } from "@/types/task";
 import { taskStatusEnum } from "@/models/schema";
 import { taskStatusColorMap } from "@/components/constants";
+import { capitalizeFirstLetter } from "@/utils/strings";
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -109,7 +110,7 @@ export const columns: ColumnDef<Task>[] = [
       if (!row.original.status) {
         return <div>N/A</div>
       }
-      const shownStatus = row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1);
+      const shownStatus = capitalizeFirstLetter(row.original.status);
       return (
         <div className={taskStatusColorMap[row.original.status as keyof typeof taskStatusColorMap]}>{shownStatus}</div>
       )

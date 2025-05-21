@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/tabs"
 import { PingWrapper } from "@/components/ui/ping-wrapper"
 import { TaskStatus } from "@/types/task"
+import { capitalizeFirstLetter } from "@/utils/strings"
 
 import { SectionWrapper } from "./form/wrapper/sectionWrapper"
 import { InfoDetail } from "./detail/info-detail"
@@ -176,7 +177,7 @@ export default function Task({ task }: { task: TaskType }) {
     )
   }
 
-  const shownStatus = status ? status.charAt(0).toUpperCase() + status.slice(1) : 'N/A'
+  const shownStatus = status ? capitalizeFirstLetter(status) : 'N/A'
   return (
     <div className="p-4 space-y-4">
       <div className="flex justify-between items-center">

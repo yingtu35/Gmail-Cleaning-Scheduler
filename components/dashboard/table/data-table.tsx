@@ -45,6 +45,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import { hasReachedTaskLimit } from '@/utils/database';
+import { capitalizeFirstLetter } from '@/utils/strings';
 import { taskStatusEnum } from "@/models/schema"
 
 const DEFAULT_PAGE_SIZE = 5
@@ -137,7 +138,7 @@ export function DataTable<TData, TValue>({
             <SelectContent>
               <SelectItem value="All">All</SelectItem>
               {taskStatusEnum.enumValues.map((status) => (
-                <SelectItem key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</SelectItem>
+                <SelectItem key={status} value={status}>{capitalizeFirstLetter(status)}</SelectItem>
               ))}
             </SelectContent>
           </Select>
