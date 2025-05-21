@@ -1,11 +1,13 @@
 import { z } from 'zod';
 
-import { UserTasksTable } from '@/models/schema';
+import { UserTasksTable, taskStatusEnum } from '@/models/schema';
 import { formValuesSchema, PromptSchema, AIFormValuesSchema } from '@/validations/form';
 
 export type Task = typeof UserTasksTable.$inferSelect;
 
 export type NewTask = typeof UserTasksTable.$inferInsert;
+
+export type TaskStatus = (typeof taskStatusEnum)[keyof typeof taskStatusEnum] | null
 
 export type FormValues = z.infer<typeof formValuesSchema>
 

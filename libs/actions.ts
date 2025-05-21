@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/models/db";
 import { UserTable, UserTasksTable } from "@/models/schema";
 import { auth, signIn, signOut } from "@/auth";
-import { createSchedule, updateSchedule, deleteSchedule } from "@/libs/aws/scheduler";
+import { createSchedule, updateSchedule, deleteSchedule, pauseSchedule, resumeSchedule } from "@/libs/aws/scheduler";
 import { subscribe } from "@/libs/aws/sns";
 
 import { User, NewUser, UserDateTimePromptType } from "@/types/user";
@@ -360,6 +360,132 @@ export async function deleteTask(taskId: string) {
 
     error.cause = { nextNoDigest: true, originalCause: error.cause };
     throw new Error("An unexpected error occurred while deleting your task. Our team has been notified. Please try again later.");
+  }
+}
+
+export async function pauseTask(taskId: string): Promise<void> {
+  try {
+    const user = await getUser();
+    if (!isValidUser(user)) {
+      log.debug("User is not valid for pauseTask");
+      throw new Error("Authentication error. Please sign in again.");
+    }
+
+    // check if the task exists
+    const task = await getTaskById(taskId);
+    if (!task) {
+      log.warn("Task not found for pauseTask", { taskId });
+      throw new Error("Task not found. It might have been already deleted.");
+    }
+    // check if the user is the owner of the task
+    if (task.userId !== user.id) {
+      log.warn("User is not the owner of the task for pauseTask", { taskId, userId: user.id });
+      throw new Error("You are not authorized to pause this task.");
+    }
+
+    // pause the schedule for the task
+    const response = await pauseSchedule(task.scheduleName);
+    if (response.$metadata.httpStatusCode !== 200) {
+      log.error("Error pausing AWS schedule for pauseTask", {
+        statusCode: response.$metadata.httpStatusCode,
+        requestId: response.$metadata.requestId,
+        errorDetails: response,
+        taskId,
+      });
+      throw new Error("Failed to pause the task. Please try again later or contact support.");
+    }
+    // update the task in the database
+    await db.update(UserTasksTable)
+      .set({
+        status: "paused",
+      })
+      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
+    
+    log.debug("Paused task successfully in DB", { taskId });
+    revalidatePath(`/tasks/${taskId}`);
+    return;
+  } catch (error: any) {
+    log.error("Exception caught in pauseTask", {
+      originalMessage: error.message,
+      stack: error.stack,
+      taskId,
+    });
+
+    const knownUserFriendlyMessages = [
+      "Authentication error. Please sign in again.",
+      "Task not found. It might have been already deleted.",
+      "You are not authorized to pause this task.",
+    ];
+
+    if (knownUserFriendlyMessages.includes(error.message)) {
+      throw error;
+    }
+
+    error.cause = { nextNoDigest: true, originalCause: error.cause };
+    throw new Error("An unexpected error occurred while pausing your task. Our team has been notified. Please try again later.");
+  }
+}
+
+export async function resumeTask(taskId: string): Promise<void> {
+  try {
+    const user = await getUser();
+    if (!isValidUser(user)) {
+      log.debug("User is not valid for resumeTask");
+      throw new Error("Authentication error. Please sign in again.");
+    }
+
+    // check if the task exists
+    const task = await getTaskById(taskId);
+    if (!task) {
+      log.warn("Task not found for resumeTask", { taskId });
+      throw new Error("Task not found. It might have been already deleted.");
+    }
+    // check if the user is the owner of the task
+    if (task.userId !== user.id) {
+      log.warn("User is not the owner of the task for resumeTask", { taskId, userId: user.id });
+      throw new Error("You are not authorized to resume this task.");
+    }
+
+    // resume the schedule for the task
+    const response = await resumeSchedule(task.scheduleName);
+    if (response.$metadata.httpStatusCode !== 200) {
+      log.error("Error resuming AWS schedule for resumeTask", {
+        statusCode: response.$metadata.httpStatusCode,
+        requestId: response.$metadata.requestId,
+        errorDetails: response,
+        taskId,
+      });
+      throw new Error("Failed to resume the task. Please try again later or contact support.");
+    }
+    // update the task in the database
+    await db.update(UserTasksTable)
+      .set({
+        status: "active",
+      })
+      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
+    
+    log.debug("Resumed task successfully in DB", { taskId });
+    revalidatePath(`/tasks/${taskId}`);
+    return;
+  } catch (error: any) {
+    log.error("Exception caught in resumeTask", {
+      originalMessage: error.message,
+      stack: error.stack,
+      taskId,
+    });
+
+    const knownUserFriendlyMessages = [
+      "Authentication error. Please sign in again.",
+      "Task not found. It might have been already deleted.",
+      "You are not authorized to resume this task.",
+    ];
+
+    if (knownUserFriendlyMessages.includes(error.message)) {
+      throw error;
+    }
+
+    error.cause = { nextNoDigest: true, originalCause: error.cause };
+    throw new Error("An unexpected error occurred while resuming your task. Our team has been notified. Please try again later.");
   }
 }
 

@@ -6,10 +6,10 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { ChevronDownIcon } from "lucide-react"
 
-import { FormValues, Task as TaskType } from "@/types/task"
+import { Task as TaskType } from "@/types/task"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { deleteTask } from "@/libs/actions"
+import { deleteTask, pauseTask, resumeTask } from "@/libs/actions"
 import { ScheduleDetail } from "@/components/task/detail/schedule-detail"
 import { TaskDetail } from "@/components/task/detail/task-detail"
 import {
@@ -36,17 +36,27 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { PingWrapper } from "@/components/ui/ping-wrapper"
+import { TaskStatus } from "@/types/task"
+import { capitalizeFirstLetter } from "@/utils/strings"
 
 import { SectionWrapper } from "./form/wrapper/sectionWrapper"
 import { InfoDetail } from "./detail/info-detail"
 
 interface StatusAndActionsGroupProps {
   taskId: string
+  status: TaskStatus
+  isRecurring: boolean
   onDeleteTask: () => void
+  onPauseTask: () => void
+  onResumeTask: () => void
 }
 function StatusAndActionsGroup({
   taskId,
+  status,
+  isRecurring,
   onDeleteTask,
+  onPauseTask,
+  onResumeTask,
 }: StatusAndActionsGroupProps) {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   return (
@@ -58,9 +68,18 @@ function StatusAndActionsGroup({
             <ChevronDownIcon />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem>Pause</DropdownMenuItem>
-          <DropdownMenuSeparator />
+        <DropdownMenuContent align="end">
+          { isRecurring && (
+            <>
+              {status === "active" && (
+                <DropdownMenuItem onClick={onPauseTask}>Pause</DropdownMenuItem>
+              )}
+              {status === "paused" && (
+              <DropdownMenuItem onClick={onResumeTask}>Resume</DropdownMenuItem>
+            )}
+              <DropdownMenuSeparator />
+            </>
+          )}
           <DropdownMenuItem asChild>
             <Link href={`/tasks/${taskId}/edit`}>Edit</Link>
           </DropdownMenuItem>
@@ -96,11 +115,11 @@ function StatusAndActionsGroup({
 export default function Task({ task }: { task: TaskType }) {
   const router = useRouter()
 
-  const { status, createdAt, updatedAt } = task
-  const taskId = task.id as string
-  const formValues: FormValues = task.formValues
+  const { id: taskId, status, createdAt, updatedAt, formValues } = task
 
-  const { name, description, ...restFormValues } = formValues
+  const { name, description, occurrence, ...restFormValues } = formValues
+  const isRecurring = occurrence.Occurrence === "Recurring"
+
   const aggregatedEntries = Object.entries(restFormValues)
   // extract the first 3 entries
   const scheduleEntries = aggregatedEntries.slice(0, 3)
@@ -111,6 +130,36 @@ export default function Task({ task }: { task: TaskType }) {
     ["Created Date"]: createdAt ? new Date(createdAt).toLocaleString() : "N/A",
     ["Updated Date"]: updatedAt ? new Date(updatedAt).toLocaleString() : "N/A",
   })
+
+  const onPauseTask = async () => {
+    toast.promise(
+      pauseTask(taskId),
+      {
+        loading: `Pausing task ${formValues.name}...`,
+        success: () => {
+          return `Task ${formValues.name} paused successfully!`;
+        },
+        error: (error) => {
+          return error.message || "Error pausing task. Please try again later.";
+        },
+      }
+    )
+  }
+
+  const onResumeTask = async () => {
+    toast.promise(
+      resumeTask(taskId),
+      {
+        loading: `Resuming task ${formValues.name}...`,
+        success: () => {
+          return `Task ${formValues.name} resumed successfully!`;
+        },
+        error: (error) => {
+          return error.message || "Error resuming task. Please try again later.";
+        },
+      }
+    )
+  }
 
   const onDeleteTask = async () => {
     toast.promise(
@@ -127,20 +176,26 @@ export default function Task({ task }: { task: TaskType }) {
       }
     )
   }
+
+  const shownStatus = status ? capitalizeFirstLetter(status) : 'N/A'
   return (
     <div className="p-4 space-y-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4 py-2">
           <h1 className="text-2xl font-bold">{name}</h1>
-          <PingWrapper status="active">
+          <PingWrapper status={status}>
             <Badge variant="outline">
-              {status}
+              {shownStatus}
             </Badge>
           </PingWrapper>
         </div>
         <StatusAndActionsGroup
           taskId={taskId}
+          status={status}
+          isRecurring={isRecurring}
           onDeleteTask={onDeleteTask}
+          onPauseTask={onPauseTask}
+          onResumeTask={onResumeTask}
         />
       </div>
       <SectionWrapper title="Information">
