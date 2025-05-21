@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, ArrowUpDown } from "lucide-react"
 import {
@@ -135,14 +136,14 @@ export const columns: ColumnDef<Task>[] = [
             <MoreHorizontal className="cursor-pointer" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <a href={`/tasks/${task.id}`}>View</a>
+            <DropdownMenuItem asChild>
+              <Link href={`/tasks/${task.id}`}>View</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <a href={`/tasks/${task.id}/edit`}>Edit</a>
+            <DropdownMenuItem asChild>
+              <Link href={`/tasks/${task.id}/edit`}>Edit</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-500">
+            <DropdownMenuItem asChild className="text-red-500">
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
