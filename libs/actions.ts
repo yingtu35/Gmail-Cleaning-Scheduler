@@ -485,7 +485,7 @@ export async function resumeTask(taskId: string): Promise<void> {
     }
 
     error.cause = { nextNoDigest: true, originalCause: error.cause };
-    throw new Error("An unexpected error occurred while pausing your task. Our team has been notified. Please try again later.");
+    throw new Error("An unexpected error occurred while resuming your task. Our team has been notified. Please try again later.");
   }
 }
 

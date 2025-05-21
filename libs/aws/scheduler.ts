@@ -89,10 +89,10 @@ export const updateSchedule = async (commandInput: CommandInput) => {
       ScheduleExpressionTimezone: commandInput.scheduleExpressionTimezone,
       State: commandInput.state === "ENABLED" ? "ENABLED" : "DISABLED",
       Target: { // Target
+        ...schedule.Target,
         Arn: schedule.Target?.Arn || process.env.LAMBDA_TARGET_ARN, // required
         RoleArn: schedule.Target?.RoleArn || process.env.SCHEDULER_ROLE_ARN, // required
         Input: commandInput.input, //* Must be a JSON string
-        ...schedule.Target,
       },
       FlexibleTimeWindow: schedule.FlexibleTimeWindow || {
         Mode: "OFF",
@@ -127,10 +127,10 @@ export const pauseSchedule = async (name: string) => {
         ScheduleExpressionTimezone: schedule.ScheduleExpressionTimezone,
         State: "DISABLED",
         Target: { // Target
+          ...schedule.Target,
           Arn: schedule.Target?.Arn || process.env.LAMBDA_TARGET_ARN, // required
           RoleArn: schedule.Target?.RoleArn || process.env.SCHEDULER_ROLE_ARN, // required
           Input: schedule.Target?.Input, //* Must be a JSON string
-          ...schedule.Target,
         },
         FlexibleTimeWindow: schedule.FlexibleTimeWindow || {
           Mode: "OFF",
@@ -168,10 +168,10 @@ export const resumeSchedule = async (name: string) => {
         ScheduleExpressionTimezone: schedule.ScheduleExpressionTimezone,
         State: "ENABLED",
         Target: { // Target
+          ...schedule.Target,
           Arn: schedule.Target?.Arn || process.env.LAMBDA_TARGET_ARN, // required
           RoleArn: schedule.Target?.RoleArn || process.env.SCHEDULER_ROLE_ARN, // required
           Input: schedule.Target?.Input, //* Must be a JSON string
-          ...schedule.Target,
         },
         FlexibleTimeWindow: schedule.FlexibleTimeWindow || {
           Mode: "OFF",
