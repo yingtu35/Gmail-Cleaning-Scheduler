@@ -446,7 +446,7 @@ export async function resumeTask(taskId: string): Promise<void> {
       throw new Error("You are not authorized to resume this task.");
     }
 
-    // pause the schedule for the task
+    // resume the schedule for the task
     const response = await resumeSchedule(task.scheduleName);
     if (response.$metadata.httpStatusCode !== 200) {
       log.error("Error resuming AWS schedule for resumeTask", {

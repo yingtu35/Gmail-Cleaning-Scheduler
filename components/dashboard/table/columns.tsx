@@ -15,7 +15,6 @@ import { Task } from "@/types/task";
 import { taskStatusEnum } from "@/models/schema";
 import { taskStatusColorMap } from "@/components/constants";
 
-
 export const columns: ColumnDef<Task>[] = [
   {
     id: "select",
@@ -110,10 +109,9 @@ export const columns: ColumnDef<Task>[] = [
       if (!row.original.status) {
         return <div>N/A</div>
       }
-      const statusColor = taskStatusColorMap[row.original.status as keyof typeof taskStatusColorMap] || "green";
       const shownStatus = row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1);
       return (
-        <div className={`text-${statusColor}-500`}>{shownStatus}</div>
+        <div className={taskStatusColorMap[row.original.status as keyof typeof taskStatusColorMap]}>{shownStatus}</div>
       )
     },
     filterFn: (row, id, filterValue) => {
