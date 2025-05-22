@@ -27,7 +27,6 @@ export async function getScheduleByPrompt(userDateTimePrompt: UserDateTimePrompt
         "type": "json_object",
       }
     })
-    log.debug("response", response);
     return response.choices[0].message.content;
   } catch (error) {
     log.error("error", error);
@@ -53,7 +52,6 @@ export async function getTaskByPrompt(prompt: string) {
         "type": "json_object",
       }
     })
-    log.debug("response", response);
     return response.choices[0].message.content;
   } catch (error) {
     log.error("error", error);

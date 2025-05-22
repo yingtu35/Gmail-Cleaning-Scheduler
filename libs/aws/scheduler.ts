@@ -49,7 +49,6 @@ export const createSchedule = async (commandInput: CommandInput) => {
   };
   const command = new CreateScheduleCommand(input);
   const response: CreateScheduleCommandOutput = await client.send(command);
-  log.debug("response", response);
   // { // CreateScheduleOutput
   //   ScheduleArn: "STRING_VALUE", // required
   // };
@@ -102,7 +101,6 @@ export const updateSchedule = async (commandInput: CommandInput) => {
     };
     const command = new UpdateScheduleCommand(input);
     const response: UpdateScheduleCommandOutput = await client.send(command);
-    log.debug(response); // { // UpdateScheduleOutput
     return response;
   } catch (error: unknown) {
     if (error instanceof ResourceNotFoundException) {
@@ -147,7 +145,6 @@ export const pauseSchedule = async (name: string) => {
       const response: UpdateScheduleCommandOutput = await client.send(command);
       return response;
     } else {
-      log.debug("Schedule is already disabled", { name });
       const response: UpdateScheduleCommandOutput = {
         $metadata: {
           httpStatusCode: 200,
@@ -176,7 +173,6 @@ export const resumeSchedule = async (name: string) => {
       const response: UpdateScheduleCommandOutput = await client.send(command);
       return response;
     } else {
-      log.debug("Schedule is already enabled", { name });
       const response: UpdateScheduleCommandOutput = {
         $metadata: {
           httpStatusCode: 200,

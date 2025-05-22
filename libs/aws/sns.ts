@@ -22,6 +22,5 @@ import {
   };
   const command = new SubscribeCommand(input);
   const response: SubscribeCommandOutput = await client.send(command);
-  log.debug("Subscription response:", response);
   return response;
  }

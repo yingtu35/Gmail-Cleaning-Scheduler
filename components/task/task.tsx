@@ -117,10 +117,10 @@ export default function Task({ task }: { task: TaskType }) {
 
   const { id: taskId, status, createdAt, updatedAt, formValues } = task
 
-  const { name, description, occurrence, ...restFormValues } = formValues
+  const { name, description, occurrence } = formValues
   const isRecurring = occurrence.Occurrence === "Recurring"
 
-  const aggregatedEntries = Object.entries(restFormValues)
+  const aggregatedEntries = Object.entries(formValues)
   // extract the first 3 entries
   const scheduleEntries = aggregatedEntries.slice(0, 3)
   const taskEntries = aggregatedEntries.slice(3)

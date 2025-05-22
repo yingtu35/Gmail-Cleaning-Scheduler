@@ -9,7 +9,7 @@ import { auth, signIn, signOut } from "@/auth";
 import { createSchedule, updateSchedule, deleteSchedule, pauseSchedule, resumeSchedule } from "@/libs/aws/scheduler";
 import { subscribe } from "@/libs/aws/sns";
 
-import { User, NewUser, UserDateTimePromptType } from "@/types/user";
+import { User, NewUser, UserDateTimePromptType, SessionUser } from "@/types/user";
 import { Task, FormValues, AIPromptType, NewTask } from "@/types/task";
 import { generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
@@ -36,24 +36,38 @@ export const getAuthenticatedUser = async () => {
   return { isAuthenticated: true, user };
 }
 
-async function getUser() {
-  const email = await getUserEmail();
-  if (!email) {
+// New function to get a lean user object from the session
+export async function getSessionUser(): Promise<SessionUser | null> {
+  const session = await auth();
+
+  if (!session?.user?.id) { // Check for id as the primary indicator of a valid session user
+    log.warn("getSessionUser: Session, session.user, or session.user.id is missing.");
     return null;
   }
-  const user = await getUserByEmail(email);
+
+  const sessionUser: SessionUser = {
+    id: session.user.id,
+    name: session.user.name ?? null,
+    email: session.user.email ?? null,
+    image: session.user.image ?? null,
+    accessToken: session.access_token ?? null,
+    expiresAt: session.expiresAt ?? null,
+  };
+
+  return sessionUser;
+}
+
+async function getDatabaseUser(): Promise<User | null> {
+  const session = await auth();
+  if (!session?.user?.id) { // Check for id as the primary indicator of a valid session user
+    log.warn("getSessionUser: Session, session.user, or session.user.id is missing.");
+    return null;
+  }
+  const user = await getDatabaseUserById(session.user.id);
   if (!user) {
     return null;
   }
   return user;
-}
-
-async function getUserEmail() {
-  const session = await auth();
-  if (!session || !session.user.email) {
-    return null;
-  }
-  return session.user.email;
 }
 
 export async function getUserIdByEmail(email: string) {
@@ -64,10 +78,10 @@ export async function getUserIdByEmail(email: string) {
   return user;
 }
 
-// get user by email from the database
-export async function getUserByEmail(email: string) {
+// get user by id from the database
+export async function getDatabaseUserById(id: string) {
   const user = await db.query.UserTable.findFirst({
-    where: eq(UserTable.email, email)
+    where: eq(UserTable.id, id)
   });
   if (!user) {
     return null;
@@ -105,8 +119,8 @@ export async function createUserOnSignIn(user: NewUser) {
 
 
 export async function getTaskById(taskId: string): Promise<Task | null> {
-  const user = await getUser();
-  if (!isValidUser(user)) {
+  const sessionUser = await getSessionUser();
+  if (!sessionUser) {
     return null;
   }
   // check if taskId follows the correct format
@@ -114,7 +128,7 @@ export async function getTaskById(taskId: string): Promise<Task | null> {
     return null;
   }
   const task = await db.query.UserTasksTable.findFirst({
-    where: and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)),
+    where: and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, sessionUser.id)),
   }) as Task | null;
   if (!task) {
     return null;
@@ -123,49 +137,54 @@ export async function getTaskById(taskId: string): Promise<Task | null> {
 }
 
 export async function getTasks(): Promise<Task[]> {
-  const user = await getUser();
-  if (!isValidUser(user)) {
+  const sessionUser = await getSessionUser();
+  if (!sessionUser) {
     return [];
   }
   // get the tasks for the user
   const tasks = await db.query.UserTasksTable.findMany({
-    where: eq(UserTasksTable.userId, user.id as string),
+    where: eq(UserTasksTable.userId, sessionUser.id),
     orderBy: [desc(UserTasksTable.updatedAt)],
   })
   const formattedTasks = tasks.map(parseTask);
   return formattedTasks;
 }
 
-export async function getTasksCount(user: User): Promise<number> {
+export async function getTasksCount(userId: string): Promise<number> {
   const numOfTasks = await db
     .select({
       value: count(UserTasksTable.id),
     })
     .from(UserTasksTable)
-    .where(eq(UserTasksTable.userId, user.id as string))
+    .where(eq(UserTasksTable.userId, userId))
   return numOfTasks[0].value;
 }
 
 // create a new task for the user in the database
 export async function createTask(data: FormValues) {
   try {
-    const user = await getUser();
-    if (!isValidUser(user)) {
+    const sessionUser = await getSessionUser();
+    if (!sessionUser) {
       log.debug("User is not valid for createTask");
       // Directly throw the error message you want on the toast
       throw new Error("Authentication error. Please sign in again.");
     }
-
+    
     // check if user has reached the limit of tasks
-    const numOfTasks = await getTasksCount(user);
+    const numOfTasks = await getTasksCount(sessionUser.id);
     if (hasReachedTaskLimit(numOfTasks)) {
       log.debug("User has reached the task limit");
       // Directly throw the error message you want on the toast
       throw new Error("You've reached the maximum number of tasks allowed.");
     }
+    const user = await getDatabaseUserById(sessionUser.id);
+    if (!isValidUser(user)) {
+      log.debug("User is not valid for createTask");
+      // Directly throw the error message you want on the toast
+      throw new Error("Authentication error. Please sign in again.");
+    }
     // create a schedule for the task
     const commandInput = generateCreateScheduleCommand(data, user);
-    log.debug("Generated createSchedule command input:", { commandInput }); // Log object for better structure
 
     const response = await createSchedule(commandInput);
     if (response.$metadata.httpStatusCode !== 200) {
@@ -193,7 +212,6 @@ export async function createTask(data: FormValues) {
       throw new Error("Failed to save task details. Please try again later or contact support.");
     }
     const returnedTaskId = result[0].id;
-    log.debug("Created task successfully in DB", { taskId: returnedTaskId });
     revalidatePath("/");
     return returnedTaskId;
   } catch (error: any) {
@@ -226,7 +244,7 @@ export async function createTask(data: FormValues) {
 
 export async function updateTask(data: FormValues, taskId: string) {
   try {
-    const user = await getUser();
+    const user = await getDatabaseUser();
     if (!isValidUser(user)) {
       log.debug("User is not valid for updateTask");
       throw new Error("Authentication error. Please sign in again.");
@@ -282,8 +300,8 @@ export async function updateTask(data: FormValues, taskId: string) {
 
 export async function deleteTask(taskId: string) {
   try {
-    const user = await getUser();
-    if (!isValidUser(user)) {
+    const sessionUser = await getSessionUser();
+    if (!sessionUser) {
       log.debug("User is not valid for deleteTask");
       throw new Error("Authentication error. Please sign in again.");
     }
@@ -293,14 +311,9 @@ export async function deleteTask(taskId: string) {
       log.warn("Task not found for deleteTask", { taskId });
       throw new Error("Task not found. It might have been already deleted.");
     }
-    // check if the user is the owner of the task
-    if (task.userId !== user.id) {
-      log.warn("User is not the owner of the task for deleteTask", { taskId, userId: user.id });
-      throw new Error("You are not authorized to delete this task.");
-    }
 
     const deletedTaskFromDB = await db.delete(UserTasksTable)
-      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
+      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, sessionUser.id)))
       .returning();
 
     if (!deletedTaskFromDB || deletedTaskFromDB.length === 0) {
@@ -365,8 +378,8 @@ export async function deleteTask(taskId: string) {
 
 export async function pauseTask(taskId: string): Promise<void> {
   try {
-    const user = await getUser();
-    if (!isValidUser(user)) {
+    const sessionUser = await getSessionUser();
+    if (!sessionUser) {
       log.debug("User is not valid for pauseTask");
       throw new Error("Authentication error. Please sign in again.");
     }
@@ -376,11 +389,6 @@ export async function pauseTask(taskId: string): Promise<void> {
     if (!task) {
       log.warn("Task not found for pauseTask", { taskId });
       throw new Error("Task not found. It might have been already deleted.");
-    }
-    // check if the user is the owner of the task
-    if (task.userId !== user.id) {
-      log.warn("User is not the owner of the task for pauseTask", { taskId, userId: user.id });
-      throw new Error("You are not authorized to pause this task.");
     }
 
     // pause the schedule for the task
@@ -399,7 +407,7 @@ export async function pauseTask(taskId: string): Promise<void> {
       .set({
         status: "paused",
       })
-      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
+      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, sessionUser.id)))
     
     log.debug("Paused task successfully in DB", { taskId });
     revalidatePath(`/tasks/${taskId}`);
@@ -428,8 +436,8 @@ export async function pauseTask(taskId: string): Promise<void> {
 
 export async function resumeTask(taskId: string): Promise<void> {
   try {
-    const user = await getUser();
-    if (!isValidUser(user)) {
+    const sessionUser = await getSessionUser();
+    if (!sessionUser) {
       log.debug("User is not valid for resumeTask");
       throw new Error("Authentication error. Please sign in again.");
     }
@@ -439,11 +447,6 @@ export async function resumeTask(taskId: string): Promise<void> {
     if (!task) {
       log.warn("Task not found for resumeTask", { taskId });
       throw new Error("Task not found. It might have been already deleted.");
-    }
-    // check if the user is the owner of the task
-    if (task.userId !== user.id) {
-      log.warn("User is not the owner of the task for resumeTask", { taskId, userId: user.id });
-      throw new Error("You are not authorized to resume this task.");
     }
 
     // resume the schedule for the task
@@ -462,7 +465,7 @@ export async function resumeTask(taskId: string): Promise<void> {
       .set({
         status: "active",
       })
-      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
+      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, sessionUser.id)))
     
     log.debug("Resumed task successfully in DB", { taskId });
     revalidatePath(`/tasks/${taskId}`);
