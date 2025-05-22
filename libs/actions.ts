@@ -50,18 +50,20 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     name: session.user.name ?? null,
     email: session.user.email ?? null,
     image: session.user.image ?? null,
+    accessToken: session.access_token ?? null,
+    expiresAt: session.expiresAt ?? null,
   };
 
   return sessionUser;
 }
 
-async function getUser(): Promise<User | null> {
+async function getDatabaseUser(): Promise<User | null> {
   const session = await auth();
   if (!session?.user?.id) { // Check for id as the primary indicator of a valid session user
     log.warn("getSessionUser: Session, session.user, or session.user.id is missing.");
     return null;
   }
-  const user = await getUserById(session.user.id);
+  const user = await getDatabaseUserById(session.user.id);
   if (!user) {
     return null;
   }
@@ -77,7 +79,7 @@ export async function getUserIdByEmail(email: string) {
 }
 
 // get user by id from the database
-export async function getUserById(id: string) {
+export async function getDatabaseUserById(id: string) {
   const user = await db.query.UserTable.findFirst({
     where: eq(UserTable.id, id)
   });
@@ -175,7 +177,7 @@ export async function createTask(data: FormValues) {
       // Directly throw the error message you want on the toast
       throw new Error("You've reached the maximum number of tasks allowed.");
     }
-    const user = await getUserById(sessionUser.id);
+    const user = await getDatabaseUserById(sessionUser.id);
     if (!isValidUser(user)) {
       log.debug("User is not valid for createTask");
       // Directly throw the error message you want on the toast
@@ -242,7 +244,7 @@ export async function createTask(data: FormValues) {
 
 export async function updateTask(data: FormValues, taskId: string) {
   try {
-    const user = await getUser();
+    const user = await getDatabaseUser();
     if (!isValidUser(user)) {
       log.debug("User is not valid for updateTask");
       throw new Error("Authentication error. Please sign in again.");
