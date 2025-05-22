@@ -148,32 +148,38 @@ export async function getTasks(): Promise<Task[]> {
   return formattedTasks;
 }
 
-export async function getTasksCount(user: User): Promise<number> {
+export async function getTasksCount(userId: string): Promise<number> {
   const numOfTasks = await db
     .select({
       value: count(UserTasksTable.id),
     })
     .from(UserTasksTable)
-    .where(eq(UserTasksTable.userId, user.id as string))
+    .where(eq(UserTasksTable.userId, userId))
   return numOfTasks[0].value;
 }
 
 // create a new task for the user in the database
 export async function createTask(data: FormValues) {
   try {
-    const user = await getUser();
-    if (!isValidUser(user)) {
+    const sessionUser = await getSessionUser();
+    if (!sessionUser) {
       log.debug("User is not valid for createTask");
       // Directly throw the error message you want on the toast
       throw new Error("Authentication error. Please sign in again.");
     }
-
+    
     // check if user has reached the limit of tasks
-    const numOfTasks = await getTasksCount(user);
+    const numOfTasks = await getTasksCount(sessionUser.id);
     if (hasReachedTaskLimit(numOfTasks)) {
       log.debug("User has reached the task limit");
       // Directly throw the error message you want on the toast
       throw new Error("You've reached the maximum number of tasks allowed.");
+    }
+    const user = await getUserById(sessionUser.id);
+    if (!isValidUser(user)) {
+      log.debug("User is not valid for createTask");
+      // Directly throw the error message you want on the toast
+      throw new Error("Authentication error. Please sign in again.");
     }
     // create a schedule for the task
     const commandInput = generateCreateScheduleCommand(data, user);
@@ -303,11 +309,6 @@ export async function deleteTask(taskId: string) {
       log.warn("Task not found for deleteTask", { taskId });
       throw new Error("Task not found. It might have been already deleted.");
     }
-    // check if the user is the owner of the task
-    if (task.userId !== sessionUser.id) {
-      log.warn("User is not the owner of the task for deleteTask", { taskId, userId: sessionUser.id });
-      throw new Error("You are not authorized to delete this task.");
-    }
 
     const deletedTaskFromDB = await db.delete(UserTasksTable)
       .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, sessionUser.id)))
@@ -387,11 +388,6 @@ export async function pauseTask(taskId: string): Promise<void> {
       log.warn("Task not found for pauseTask", { taskId });
       throw new Error("Task not found. It might have been already deleted.");
     }
-    // check if the user is the owner of the task
-    if (task.userId !== sessionUser.id) {
-      log.warn("User is not the owner of the task for pauseTask", { taskId, userId: sessionUser.id });
-      throw new Error("You are not authorized to pause this task.");
-    }
 
     // pause the schedule for the task
     const response = await pauseSchedule(task.scheduleName);
@@ -449,11 +445,6 @@ export async function resumeTask(taskId: string): Promise<void> {
     if (!task) {
       log.warn("Task not found for resumeTask", { taskId });
       throw new Error("Task not found. It might have been already deleted.");
-    }
-    // check if the user is the owner of the task
-    if (task.userId !== sessionUser.id) {
-      log.warn("User is not the owner of the task for resumeTask", { taskId, userId: sessionUser.id });
-      throw new Error("You are not authorized to resume this task.");
     }
 
     // resume the schedule for the task
