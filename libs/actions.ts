@@ -24,7 +24,7 @@ export async function authenticate() {
 }
 
 export async function logOut() {
-  await signOut();
+  await signOut({ redirectTo: '/' });
 }
 
 export const getAuthenticatedUser = async () => {
