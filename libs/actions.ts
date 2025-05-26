@@ -9,7 +9,7 @@ import { auth, signIn, signOut } from "@/auth";
 import { createSchedule, updateSchedule, deleteSchedule, pauseSchedule, resumeSchedule } from "@/libs/aws/scheduler";
 import { subscribe } from "@/libs/aws/sns";
 
-import { User, NewUser, UserInfo, UserDateTimePromptType, SessionUser } from "@/types/user";
+import { User, NewUser, UserInfo, UserDateTimePromptType, SessionUser, UserInfoFromGoogle } from "@/types/user";
 import { Task, FormValues, AIPromptType, NewTask } from "@/types/task";
 import { generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
@@ -97,13 +97,10 @@ export async function getDatabaseUserById(id: string) {
   return user as User;
 }
 
-export async function updateUserOnSignIn(user: NewUser) {
+export async function updateUserOnSignIn(user: UserInfoFromGoogle) {
   await db.update(UserTable).set({
     name: user.name,
     image: user.image,
-    accessToken: user.accessToken,
-    expiresAt: user.expiresAt,
-    refreshToken: user.refreshToken,
   })
   .where(eq(UserTable.email, user.email))
   return;
@@ -118,7 +115,7 @@ export async function createUserOnSignIn(user: NewUser) {
       name: user.name,
       image: user.image,
       accessToken: user.accessToken,
-      expiresAt: user.expiresAt,
+      accessTokenUpdatedAt: user.accessTokenUpdatedAt,
       refreshToken: user.refreshToken,
     }
   })

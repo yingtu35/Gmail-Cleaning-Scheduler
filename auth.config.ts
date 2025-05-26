@@ -1,6 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
-import { NewUser } from "@/types/user";
+import { NewUser, UserInfoFromGoogle } from "@/types/user";
 import { epochToDate } from "@/utils/date";
 import { createUserOnSignIn, getUserInfoByEmail, updateUserOnSignIn, subscribeEmailNotification } from "@/libs/actions";
 import log from "@/utils/log";
@@ -17,8 +17,9 @@ export const autoConfig = {
           access_type: "offline",
           response_type: "code",
           scope: "openid email profile https://mail.google.com/"
+        }
       }
-    }}),
+    }),
   ],
   // pages: {
   //   signIn: "/", // ? Redirect to home page
@@ -76,28 +77,42 @@ export const autoConfig = {
     async signIn({ user, account, profile }) {
       log.debug("signIn: ", user, account, profile);
       // reject sign in if email is not verified
-      if (account?.email_verified === false) {
+      if (!account || !profile) {
+        log.error("signIn: No account or profile found");
+        return false;
+      }
+      if (!profile.email_verified || !account.access_token) {
+        log.error("signIn: Account is not verified or access token is missing");
         return false;
       }
       if (!user.email || !user.name) {
+        log.error("signIn: User email or name is missing");
         return false;
       }
-      const newUser: NewUser = {
+
+      const userInfo: UserInfoFromGoogle = {
         name: user.name,
         email: user.email,
         image: user.image as string,
-        accessToken: account?.access_token as string,
-        expiresAt: epochToDate(account?.expires_at),
-        refreshToken: account?.refresh_token,
-      };
+      }
       const existingUser = await getUserInfoByEmail(user.email);
       if (!existingUser) {
+        if (!account.refresh_token) {
+          log.error("signIn: User does not exist, and no refresh token found");
+          return false;
+        }
+        const newUser: NewUser = {
+          ...userInfo,
+          accessToken: account.access_token,
+          accessTokenUpdatedAt: epochToDate(account.expires_at),
+          refreshToken: account.refresh_token,
+        }
         log.debug("signIn: User does not exist, creating user", { newUser });
         await createUserOnSignIn(newUser);
         await subscribeEmailNotification(user.email);
-      } else if (hasChangedUserInfo(existingUser, newUser)) {
-        log.debug("signIn: User info has changed, updating user", { newUser });
-        await updateUserOnSignIn(newUser);
+      } else if (hasChangedUserInfo(existingUser, userInfo)) {
+        log.debug("signIn: User info has changed, updating user", { userInfo });
+        await updateUserOnSignIn(userInfo);
       }
       return true;
     },

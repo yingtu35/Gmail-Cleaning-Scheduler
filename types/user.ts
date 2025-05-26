@@ -6,6 +6,8 @@ export type User = typeof UserTable.$inferSelect;
 
 export type UserInfo = Pick<User, 'id' | 'name' | 'email' | 'image'>;
 
+export type UserInfoFromGoogle = Pick<UserInfo, 'name' | 'email' | 'image'>
+
 export type UserDateTimePromptType = {
   date: string;
   time: string;

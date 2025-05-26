@@ -143,7 +143,6 @@ function createLambdaInput(q: string, user:User, taskName: string): LambdaInput 
     email: user.email,
     access_token: user.accessToken,
     refresh_token: user.refreshToken as string,
-    expires_at: user.expiresAt.toISOString(),
     q,
     task_name: taskName
   };
