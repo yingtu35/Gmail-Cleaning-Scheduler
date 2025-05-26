@@ -527,6 +527,7 @@ export function TaskForm({
                       <Input
                         id="sizeValueField"
                         type="number"
+                        min={1}
                         disabled={!watchSizeEnabled}
                         {...field}
                       />
@@ -619,6 +620,7 @@ export function TaskForm({
                       <Input
                         id="ageValueField"
                         type="number"
+                        min={1}
                         disabled={!watchAgeEnabled}
                         {...field}
                       />
