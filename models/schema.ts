@@ -4,8 +4,8 @@ import { relations } from 'drizzle-orm';
 import { type FormValues } from '@/types/task';
 
 const timestamps = {
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' }).defaultNow(),
 }
 
 export const UserTable = pgTable('user', {
@@ -14,7 +14,7 @@ export const UserTable = pgTable('user', {
   email: varchar('email').notNull().unique(),
   image: varchar('image'),
   accessToken: varchar('access_token').notNull(),
-  accessTokenUpdatedAt: timestamp('access_token_updated_at').notNull(),
+  accessTokenUpdatedAt: timestamp('access_token_updated_at', { withTimezone: true, mode: 'date' }).notNull(),
   refreshToken: varchar('refresh_token').notNull(),
   ...timestamps,
 }, table => { 
@@ -34,7 +34,7 @@ export const UserTasksTable = pgTable('task', {
   successCounts: integer('success_counts').default(0),
   errorCounts: integer('error_counts').default(0),
   formValues: json('form_values').$type<FormValues>().notNull(),
-  lastExecutedAt: timestamp('last_executed_at'),
+  lastExecutedAt: timestamp('last_executed_at', { withTimezone: true, mode: 'date' }),
   userId: uuid('user_id')
     .references(() => UserTable.id)
     .notNull(),
