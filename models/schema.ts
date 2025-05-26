@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, uuid, integer, varchar, timestamp, boolean, interval, uniqueIndex, json } from 'drizzle-orm/pg-core';
+import { pgEnum, pgTable, uuid, integer, varchar, timestamp, index, uniqueIndex, json } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 import { type FormValues } from '@/types/task';
@@ -14,12 +14,13 @@ export const UserTable = pgTable('user', {
   email: varchar('email').notNull().unique(),
   image: varchar('image'),
   accessToken: varchar('access_token').notNull(),
-  expiresAt: timestamp('expires_at').notNull(),
-  refreshToken: varchar('refresh_token'),
+  accessTokenUpdatedAt: timestamp('access_token_updated_at').notNull(),
+  refreshToken: varchar('refresh_token').notNull(),
   ...timestamps,
-}, table => {
+}, table => { 
   return {
-    emailIndex: uniqueIndex('email_index').on(table.email)
+    emailIndex: uniqueIndex('email_index').on(table.email),
+    indexAccessTokenUpdatedAt: index('index_access_token_updated_at').on(table.accessTokenUpdatedAt)
   }
 });
 
@@ -33,6 +34,7 @@ export const UserTasksTable = pgTable('task', {
   successCounts: integer('success_counts').default(0),
   errorCounts: integer('error_counts').default(0),
   formValues: json('form_values').$type<FormValues>().notNull(),
+  lastExecutedAt: timestamp('last_executed_at'),
   userId: uuid('user_id')
     .references(() => UserTable.id)
     .notNull(),

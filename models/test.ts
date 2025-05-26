@@ -19,7 +19,7 @@ async function createUser(user: NewUser) {
     email: user.email,
     image: user.image,
     accessToken: user.accessToken,
-    expiresAt: user.expiresAt,
+    accessTokenUpdatedAt: user.accessTokenUpdatedAt,
     refreshToken: user.refreshToken,
   }).returning();
   console.log("User created");
