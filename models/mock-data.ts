@@ -6,7 +6,7 @@ export const mockNewUser: NewUser = {
   email: "test@gmail.com",
   image: "https://example.com/image.jpg",
   accessToken: "test-access-token",
-  expiresAt: new Date(),
+  accessTokenUpdatedAt: new Date(),
   refreshToken: "test-refresh-token",
 }
 

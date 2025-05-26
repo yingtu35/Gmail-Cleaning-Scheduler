@@ -1,0 +1,1 @@
+ALTER TABLE "user" ALTER COLUMN "refresh_token" SET NOT NULL;
