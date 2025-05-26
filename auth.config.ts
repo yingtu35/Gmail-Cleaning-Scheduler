@@ -2,8 +2,9 @@ import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import { NewUser } from "@/types/user";
 import { epochToDate } from "@/utils/date";
-import { createUserOnSignIn, getUserIdByEmail, updateUserOnSignIn, subscribeEmailNotification } from "@/libs/actions";
+import { createUserOnSignIn, getUserInfoByEmail, updateUserOnSignIn, subscribeEmailNotification } from "@/libs/actions";
 import log from "@/utils/log";
+import { hasChangedUserInfo } from "@/utils/database";
 
 export const autoConfig = {
   providers: [
@@ -13,8 +14,8 @@ export const autoConfig = {
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
       authorization: {
         params: { 
-          access_type: "offline", 
-          // prompt: "consent", 
+          access_type: "offline",
+          response_type: "code",
           scope: "openid email profile https://mail.google.com/"
       }
     }}),
@@ -34,7 +35,7 @@ export const autoConfig = {
         token.image = user.image;
 
         if (user.email) {
-          const userIdRecord = await getUserIdByEmail(user.email);
+          const userIdRecord = await getUserInfoByEmail(user.email);
           if (userIdRecord && userIdRecord.id) {
             token.userId = userIdRecord.id;
             log.debug("JWT callback: userId added to token during initial sign-in", { userId: userIdRecord.id });
@@ -89,12 +90,14 @@ export const autoConfig = {
         expiresAt: epochToDate(account?.expires_at),
         refreshToken: account?.refresh_token,
       };
-      const existingUserId = await getUserIdByEmail(user.email);
-      if (existingUserId) {
-        await updateUserOnSignIn(newUser);
-      } else {
+      const existingUser = await getUserInfoByEmail(user.email);
+      if (!existingUser) {
+        log.debug("signIn: User does not exist, creating user", { newUser });
         await createUserOnSignIn(newUser);
         await subscribeEmailNotification(user.email);
+      } else if (hasChangedUserInfo(existingUser, newUser)) {
+        log.debug("signIn: User info has changed, updating user", { newUser });
+        await updateUserOnSignIn(newUser);
       }
       return true;
     },

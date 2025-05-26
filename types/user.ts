@@ -4,6 +4,8 @@ export type NewUser = typeof UserTable.$inferInsert;
 
 export type User = typeof UserTable.$inferSelect;
 
+export type UserInfo = Pick<User, 'id' | 'name' | 'email' | 'image'>;
+
 export type UserDateTimePromptType = {
   date: string;
   time: string;

@@ -9,7 +9,7 @@ import { auth, signIn, signOut } from "@/auth";
 import { createSchedule, updateSchedule, deleteSchedule, pauseSchedule, resumeSchedule } from "@/libs/aws/scheduler";
 import { subscribe } from "@/libs/aws/sns";
 
-import { User, NewUser, UserDateTimePromptType, SessionUser } from "@/types/user";
+import { User, NewUser, UserInfo, UserDateTimePromptType, SessionUser } from "@/types/user";
 import { Task, FormValues, AIPromptType, NewTask } from "@/types/task";
 import { generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
@@ -70,12 +70,20 @@ async function getDatabaseUser(): Promise<User | null> {
   return user;
 }
 
-export async function getUserIdByEmail(email: string) {
+export async function getUserInfoByEmail(email: string): Promise<UserInfo | null> {
   const user = await db.query.UserTable.findFirst({
     where: eq(UserTable.email, email),
-    columns: { id: true}
+    columns: { 
+      id: true,
+      name: true,
+      email: true,
+      image: true
+    }
   });
-  return user;
+  if (!user) {
+    return null;
+  }
+  return user as UserInfo;
 }
 
 // get user by id from the database
