@@ -1,4 +1,4 @@
-import { User } from "@/types/user";
+import { NewUser, User, UserInfo } from "@/types/user";
 
 export function isValidUser(user: User | null): user is User{
   return user !== null
@@ -7,6 +7,10 @@ export function isValidUser(user: User | null): user is User{
 export function isValidUUID(id: string): boolean {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(id);
+}
+
+export function hasChangedUserInfo(existingUser: UserInfo, newUser: NewUser): boolean {
+  return existingUser.name !== newUser.name || existingUser.email !== newUser.email || existingUser.image !== newUser.image;
 }
 
 enum MAX_TASKS_COUNT {
