@@ -29,12 +29,13 @@ export const taskStatusEnum = pgEnum('status', ['active', 'paused', 'completed']
 export const UserTasksTable = pgTable('task', {
   id: uuid('id').primaryKey().defaultRandom(),
   scheduleName: varchar('schedule_name', { length: 61 }).notNull().unique(),
-  status: taskStatusEnum('status').default('active'),
-  emailsDeleted: integer('emails_deleted').default(0),
-  successCounts: integer('success_counts').default(0),
-  errorCounts: integer('error_counts').default(0),
+  status: taskStatusEnum('status').notNull().default('active'),
+  emailsDeleted: integer('emails_deleted').notNull().default(0),
+  successCounts: integer('success_counts').notNull().default(0),
+  errorCounts: integer('error_counts').notNull().default(0),
   formValues: json('form_values').$type<FormValues>().notNull(),
   lastExecutedAt: timestamp('last_executed_at', { withTimezone: true, mode: 'date' }),
+  nextExecutedAt: timestamp('next_executed_at', { withTimezone: true, mode: 'date' }),
   userId: uuid('user_id')
     .references(() => UserTable.id)
     .notNull(),
