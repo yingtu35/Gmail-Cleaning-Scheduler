@@ -5,6 +5,7 @@ import { db } from "@/models/db";
 import { UserTable, UserTasksTable } from "@/models/schema";
 import log from "@/utils/log";
 import { calculateNextExecutionDatetime, convertDateTimeObjectToDate, isStringDateFormat } from "@/utils/date";
+import { parseJsonToFormValues } from "@/utils/schedule";
 
 export async function POST(request: NextRequest) {
   const apiKey = request.headers.get("x-api-key");
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { formValues } = task;
-    const { occurrence } = formValues;
+    const { occurrence } = parseJsonToFormValues(JSON.stringify(formValues));
     const lastExecutedAtDate = new Date(lastExecutedAt);
     const accessTokenUpdatedAtDate = new Date(accessTokenUpdatedAt);
 
