@@ -50,6 +50,44 @@ export const isStringDateFormat = (dateString: string): boolean => {
 }
 
 /**
+ * Function to calculate the next execution datetime
+ * @param lastExecutedAt - The last executed datetime
+ * @param rate - The rate of the next execution
+ * @returns - The next execution datetime
+ */
+export const calculateNextExecutionDatetime = (
+  lastExecutedAt: Date,
+  rate: {
+    value: number;
+    unit: "minutes" | "hours" | "days";
+  }
+): Date => {
+  const nextExecutionDate = new Date(lastExecutedAt);
+
+  if (rate.unit === "minutes") {
+    nextExecutionDate.setMinutes(nextExecutionDate.getMinutes() + rate.value);
+  } else if (rate.unit === "hours") {
+    nextExecutionDate.setHours(nextExecutionDate.getHours() + rate.value);
+  } else if (rate.unit === "days") {
+    nextExecutionDate.setDate(nextExecutionDate.getDate() + rate.value);
+  }
+
+  return nextExecutionDate;
+}
+
+/**
+ * Function to convert a date and time object to a Date object
+ * @param dateTime - The date and time object
+ * @returns - A Date object
+ */
+export const convertDateTimeObjectToDate = (dateTime: { date: Date, time: string }): Date => {
+  const { date, time } = dateTime;
+  const dateString = date.toISOString().split('T')[0];
+  const timeString = time.split(':').join(':');
+  return new Date(`${dateString}T${timeString}`);
+}
+
+/**
  * Function to convert a date string format to a Date object
  * @param dateString - The date string in YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss.SSSZ format
  * @returns - A Date object, ignoring the time part if present
