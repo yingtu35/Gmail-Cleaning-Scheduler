@@ -30,7 +30,7 @@ const EmailInEnum    = z.enum(EMAIL_IN_ENUM);
 // schedule schemas
 const OneTimeScheduleSchema = z.object({ date: z.date(), time: z.string() }).required();
 const RecurringScheduleSchema = z.object({
-  rate: z.object({ value: z.coerce.number(), unit: RateUnit }).required(),
+  rate: z.object({ value: z.coerce.number().min(1).max(365), unit: RateUnit }).required(),
   startDateAndTime: z.object({ date: z.date(), time: z.string() }),
   endDateAndTime: z.object({ date: z.date(), time: z.string() }),
 }).superRefine((obj, ctx) => {
@@ -169,11 +169,11 @@ const CategorySchema    = z.object({ enabled: z.boolean(), category: CategoryEnu
   });
 const SizeSchema        = z.object({
   enabled: z.boolean(),
-  size: z.object({ comparison: SizeComparison, value: z.coerce.number(), unit: SizeUnit }),
+  size: z.object({ comparison: SizeComparison, value: z.coerce.number().min(1), unit: SizeUnit }),
 });
 const AgeSchema         = z.object({
   enabled: z.boolean(),
-  age: z.object({ comparison: AgeComparison, value: z.coerce.number(), unit: AgeUnit }),
+  age: z.object({ comparison: AgeComparison, value: z.coerce.number().min(1), unit: AgeUnit }),
 });
 const TimeSchemaField   = z.object({
   enabled: z.boolean(),

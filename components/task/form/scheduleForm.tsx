@@ -306,6 +306,8 @@ export function ScheduleForm({
                     <Input
                       type="number"
                       placeholder="30"
+                      min={1}
+                      max={365}
                       {...field}
                     />
                   </FormControl>
@@ -330,8 +332,8 @@ export function ScheduleForm({
                     </FormControl>
                     <SelectContent>
                       {["minutes", "hours", "days"].map((unit) => (
-                        <SelectItem key={unit} value={unit}>
-                          {unit}
+                        <SelectItem key={unit} value={unit} disabled={unit === "minutes" || unit === "hours"}>
+                          {unit} {unit === "minutes" || unit === "hours" ? "(premium only)" : ""}
                         </SelectItem>
                       ))}
                     </SelectContent>
