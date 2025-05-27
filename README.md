@@ -51,8 +51,7 @@
     <a href="https://github.com/yingtu35/Gmail-Cleaning-Scheduler"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <!-- <a href="Gmail-Cleaning-Scheduler">View Website (coming soon)</a> -->
-    <span>View Website (coming soon)</span>
+    <a href="https://shortenme.link/6O">View Website</a>
     ·
     <a href="https://github.com/yingtu35/Gmail-Cleaning-Scheduler/issues">Report Bug</a>
     ·
