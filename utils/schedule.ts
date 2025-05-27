@@ -138,13 +138,15 @@ export function formatFields(jsonObj: FormValues): string {
   return resultArray.join(' AND ');
 }
 
-function createLambdaInput(q: string, user:User, taskName: string): LambdaInput {
+function createLambdaInput(q: string, user:User, taskName: string, taskId: string): LambdaInput {
   return {
+    user_id: user.id,
     email: user.email,
     access_token: user.accessToken,
     refresh_token: user.refreshToken as string,
     q,
-    task_name: taskName
+    task_name: taskName,
+    task_id: taskId
   };
 }
 
@@ -196,7 +198,7 @@ function formatName(name: string): string {
  * @param userId 
  * @returns Schedule name
  */
-function createScheduleName(userId: string): string {
+export function createScheduleName(userId: string): string {
   const timestamp = convertDateToAWSString(new Date());
   return `${userId}-${timestamp}`;
 }
@@ -206,16 +208,16 @@ function createOneTimeScheduleExpression(date: Date, time: string): string {
   return `at(${dateString}T${time}:00)`;
 }
 
-export function generateCreateScheduleCommand(data: FormValues, user: User) {
+export function generateCreateScheduleCommand(data: FormValues, user: User, taskId: string, scheduleName: string) {
   let commandInput;
   let scheduleExpression = '';
 
-  const name = createScheduleName(user.id);
+  const name = scheduleName;
   const description = data.description;
   const scheduleExpressionTimezone = getTzTimeZone(data.occurrence.TimeZone);
   const state = 'ENABLED';
   const q: string = formatFields(data);
-  const input = JSON.stringify(createLambdaInput(q, user, data.name));
+  const input = JSON.stringify(createLambdaInput(q, user, data.name, taskId));
   if ('date' in data.occurrence.Schedule) {
     scheduleExpression = createOneTimeScheduleExpression(
       data.occurrence.Schedule.date,
@@ -249,7 +251,7 @@ export function generateCreateScheduleCommand(data: FormValues, user: User) {
   return commandInput;
 }
 
-export function generateUpdateScheduleCommand(data: FormValues, user: User, scheduleName: string) {
+export function generateUpdateScheduleCommand(data: FormValues, user: User, taskId: string, scheduleName: string) {
   let commandInput;
 
   const name = scheduleName;
@@ -257,7 +259,7 @@ export function generateUpdateScheduleCommand(data: FormValues, user: User, sche
   const scheduleExpressionTimezone = getTzTimeZone(data.occurrence.TimeZone);
   const state = 'ENABLED';
   const q: string = formatFields(data);
-  const input = JSON.stringify(createLambdaInput(q, user, data.name));
+  const input = JSON.stringify(createLambdaInput(q, user, data.name, taskId));
   if ('date' in data.occurrence.Schedule) {
     const scheduleExpression = createOneTimeScheduleExpression(
       data.occurrence.Schedule.date,

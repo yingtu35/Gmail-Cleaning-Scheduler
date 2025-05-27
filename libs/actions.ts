@@ -11,7 +11,7 @@ import { subscribe } from "@/libs/aws/sns";
 
 import { User, NewUser, UserInfo, UserDateTimePromptType, SessionUser, UserInfoFromGoogle } from "@/types/user";
 import { Task, FormValues, AIPromptType, NewTask } from "@/types/task";
-import { generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
+import { createScheduleName, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
 
 import { getScheduleByPrompt } from "@/libs/openai/chat";
@@ -188,25 +188,13 @@ export async function createTask(data: FormValues) {
       // Directly throw the error message you want on the toast
       throw new Error("Authentication error. Please sign in again.");
     }
-    // create a schedule for the task
-    const commandInput = generateCreateScheduleCommand(data, user);
 
-    const response = await createSchedule(commandInput);
-    if (response.$metadata.httpStatusCode !== 200) {
-      // Log the detailed AWS error response
-      log.error("Error creating AWS schedule", { 
-        statusCode: response.$metadata.httpStatusCode, 
-        requestId: response.$metadata.requestId,
-        errorDetails: response // Include the full response for more context if needed
-      });
-      // Directly throw the error message you want on the toast
-      throw new Error("Failed to set up the task schedule. Please try again later or contact support.");
-    }
     // create a new task in the database
+    const scheduleName = createScheduleName(user.id);
     const newTask: NewTask = {
-      scheduleName: commandInput.name,
+      scheduleName,
       formValues: data,
-      userId: user.id as string,
+      userId: user.id,
     }
     const result = await db.insert(UserTasksTable).values(newTask).returning({
       id: UserTasksTable.id,
@@ -217,6 +205,22 @@ export async function createTask(data: FormValues) {
       throw new Error("Failed to save task details. Please try again later or contact support.");
     }
     const returnedTaskId = result[0].id;
+    // create a schedule for the task
+    const commandInput = generateCreateScheduleCommand(data, user, returnedTaskId, scheduleName);
+
+    const response = await createSchedule(commandInput);
+    if (response.$metadata.httpStatusCode !== 200) {
+      // Log the detailed AWS error response
+      log.error("Error creating AWS schedule", { 
+        statusCode: response.$metadata.httpStatusCode, 
+        requestId: response.$metadata.requestId,
+        errorDetails: response // Include the full response for more context if needed
+      });
+      // delete the task from the database
+      await db.delete(UserTasksTable).where(eq(UserTasksTable.id, returnedTaskId));
+      // Directly throw the error message you want on the toast
+      throw new Error("Failed to set up the task schedule. Please try again later or contact support.");
+    }
     revalidatePath("/");
     return returnedTaskId;
   } catch (error: any) {
@@ -260,7 +264,7 @@ export async function updateTask(data: FormValues, taskId: string) {
       log.warn("Task not found for updateTask", { taskId });
       throw new Error("Task not found. It might have been deleted.");
     }
-    const commandInput = generateUpdateScheduleCommand(data, user, task.scheduleName);
+    const commandInput = generateUpdateScheduleCommand(data, user, task.id, task.scheduleName);
     const response = await updateSchedule(commandInput);
     if (response.$metadata.httpStatusCode !== 200) {
       log.error("Error updating AWS schedule for updateTask", {
