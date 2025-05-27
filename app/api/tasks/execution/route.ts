@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/models/db";
 import { UserTable, UserTasksTable } from "@/models/schema";
 import log from "@/utils/log";
-import { calculateNextExecutionDatetime, convertDateStringToDate, convertDateTimeObjectToDate, isStringDateFormat } from "@/utils/date";
+import { calculateNextExecutionDatetime, convertDateTimeObjectToDate, isStringDateFormat } from "@/utils/date";
 
 export async function POST(request: NextRequest) {
   const apiKey = request.headers.get("x-api-key");
