@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       accessTokenUpdatedAt
     } = await request.json();
   
-    if (!userId || !taskId || !isSuccessful || !emailsDeleted || !lastExecutedAt || !accessToken || !accessTokenUpdatedAt) {
+    if (!userId || !taskId || isSuccessful === undefined || isSuccessful === null || !emailsDeleted || !lastExecutedAt || !accessToken || !accessTokenUpdatedAt) {
       log.error("Missing required fields", { userId, taskId, isSuccessful, emailsDeleted, lastExecutedAt, accessToken, accessTokenUpdatedAt });
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
@@ -33,6 +33,11 @@ export async function POST(request: NextRequest) {
     if (!isStringDateFormat(lastExecutedAt)) {
       log.error("Invalid lastExecutedAt format", { lastExecutedAt });
       return NextResponse.json({ error: "Invalid lastExecutedAt" }, { status: 400 });
+    }
+
+    if (!isStringDateFormat(accessTokenUpdatedAt)) {
+      log.error("Invalid accessTokenUpdatedAt format", { accessTokenUpdatedAt });
+      return NextResponse.json({ error: "Invalid accessTokenUpdatedAt" }, { status: 400 });
     }
 
     const user = await db.query.UserTable.findFirst({
@@ -55,7 +60,8 @@ export async function POST(request: NextRequest) {
 
     const { formValues } = task;
     const { occurrence } = formValues;
-    const lastExecutedAtDate = convertDateStringToDate(lastExecutedAt);
+    const lastExecutedAtDate = new Date(lastExecutedAt);
+    const accessTokenUpdatedAtDate = new Date(accessTokenUpdatedAt);
 
     let newStatus: "active" | "completed" | "paused";
     let nextExecutedAt: Date | null = null;
@@ -74,7 +80,7 @@ export async function POST(request: NextRequest) {
     // update user
     await db.update(UserTable).set({
       accessToken,
-      accessTokenUpdatedAt,
+      accessTokenUpdatedAt: accessTokenUpdatedAtDate,
     }).where(eq(UserTable.id, userId));
 
     // update task
