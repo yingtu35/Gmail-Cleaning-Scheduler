@@ -1,7 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import { NewUser, UserInfoFromGoogle } from "@/types/user";
-import { epochToDate } from "@/utils/date";
 import { createUserOnSignIn, getUserInfoByEmail, updateUserOnSignIn, subscribeEmailNotification } from "@/libs/actions";
 import log from "@/utils/log";
 import { hasChangedUserInfo } from "@/utils/database";
@@ -45,16 +44,8 @@ export const autoConfig = {
             return { ...token, error: "UserIDMissingError" }; 
           }
         }
-        // TODO: Implement token refresh logic here in the future.
-        // This will involve checking if `token.accessToken` is expired using `token.expiresAt`,
-        // and if so, using a refresh token (fetched from DB using `token.userId`) 
-        // to get a new access token from Google.
         return token;
       }
-
-      // For subsequent calls, return existing token (which might be expired if not refreshed)
-      // Or if refresh logic was here, it would have already updated it.
-      // log.debug("JWT callback: Subsequent call", { userId: token.userId, expiresAt: token.expiresAt });
       return token;
     },
     async session({ session, token }) {
@@ -104,7 +95,7 @@ export const autoConfig = {
         const newUser: NewUser = {
           ...userInfo,
           accessToken: account.access_token,
-          accessTokenUpdatedAt: epochToDate(account.expires_at),
+          accessTokenUpdatedAt: new Date(),
           refreshToken: account.refresh_token,
         }
         log.debug("signIn: User does not exist, creating user", { newUser });

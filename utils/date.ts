@@ -9,13 +9,6 @@ const timezonesMap = timezones.reduce((acc, tz) => {
   return acc;
 }, {} as Record<string, { label: string; value: string }>);
 
-export const epochToDate = (epoch: number | undefined) => {
-  if (!epoch) {
-    return new Date();
-  }
-  return new Date(epoch * 1000);
-}
-
 export const getUserDateTimePrompt = (): UserDateTimePromptType => {
   const date = new Date();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
