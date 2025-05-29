@@ -10,7 +10,7 @@ export default async function Overview() {
       <div className="flex flex-col my-4 px-4 lg:px-6">
         <h1 className="text-2xl font-bold">Welcome back {name}!</h1>
         <p className="text-muted-foreground text-md">
-          Here is a summary of your Gmail cleaning tasks (mock data)
+          Here is a summary of your Gmail cleaning tasks
         </p>
       </div>
       <SectionCards />
