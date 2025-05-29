@@ -54,6 +54,7 @@
     "next-auth": "^5.0.0-beta.18",
     "next-themes": "^0.4.6",
     "openai": "^4.52.0",
+    "pretty-time": "^1.1.0",
     "react": "^18.3.1",
     "react-day-picker": "8.10.1",
     "react-dom": "^18.3.1",
@@ -70,6 +71,7 @@
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",
     "@types/node": "^20.12.12",
+    "@types/pretty-time": "^1.1.5",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.3.0",
     "drizzle-kit": "^0.21.2",
