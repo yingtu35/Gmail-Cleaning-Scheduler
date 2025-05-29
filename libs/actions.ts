@@ -557,8 +557,8 @@ export async function getTaskCountsStats(): Promise<TaskCountsStats | null> {
     return null;
   }
   const taskCountsStats: TaskCountsStats = {
-    successCounts: returnedTaskCountsStats[0].successCounts ? parseInt(returnedTaskCountsStats[0].successCounts) : 0,
-    errorCounts: returnedTaskCountsStats[0].errorCounts ? parseInt(returnedTaskCountsStats[0].errorCounts) : 0,
+    successCounts: Number(returnedTaskCountsStats[0]?.successCounts ?? 0),
+    errorCounts: Number(returnedTaskCountsStats[0]?.errorCounts ?? 0),
   }
   return taskCountsStats;
 }
