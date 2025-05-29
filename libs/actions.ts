@@ -163,6 +163,9 @@ export async function getTasksCount(userId: string): Promise<number> {
     })
     .from(UserTasksTable)
     .where(eq(UserTasksTable.userId, userId))
+  if (!numOfTasks || numOfTasks.length === 0) {
+    return 0;
+  }
   return numOfTasks[0].value;
 }
 
@@ -547,6 +550,22 @@ export async function subscribeEmailNotification(email: string) {
     throw new Error("Error subscribing");
   }
   return;
+}
+
+export async function getActiveTasksCount(): Promise<number> {
+  const sessionUser = await getSessionUser();
+  if (!sessionUser) {
+    return 0;
+  }
+  const tasksCount = await db.select({
+    value: count(),
+  })
+  .from(UserTasksTable)
+  .where(and(eq(UserTasksTable.userId, sessionUser.id), eq(UserTasksTable.status, "active")));
+  if (!tasksCount || tasksCount.length === 0) {
+    return 0;
+  }
+  return tasksCount[0].value;
 }
 
 export async function generateScheduleByPrompt(userDateTimePrompt: UserDateTimePromptType, prompt: AIPromptType): Promise<FormValues | string>{

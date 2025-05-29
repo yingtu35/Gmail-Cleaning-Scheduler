@@ -1,4 +1,5 @@
-import { Badge } from "@/components/ui/badge"
+import { ListTodoIcon } from "lucide-react"
+
 import {
   Card,
   CardDescription,
@@ -6,34 +7,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { TrendingUpIcon, ListTodoIcon } from "lucide-react"
+import { getActiveTasksCount } from "@/libs/actions";
 
 // In the future, this function would fetch data from the database
 async function getActiveTasksStats() {
-  // Mock data - simulate database fetch
-  await new Promise(resolve => setTimeout(resolve, 900))
-  return {
-    activeCount: 7,
-    change: 2
-  }
+  const tasksCount = await getActiveTasksCount();
+  return tasksCount;
 }
 
 export async function ActiveTasksCard() {
-  const stats = await getActiveTasksStats()
+  const tasksCount = await getActiveTasksStats()
   
   return (
     <Card className="@container/card">
       <CardHeader className="relative">
         <CardDescription>Active Tasks</CardDescription>
         <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
-          {stats.activeCount}
+          {tasksCount}
         </CardTitle>
-        <div className="absolute right-4 top-4">
-          <Badge variant="outline" className="flex gap-1 rounded-lg text-xs">
-            <TrendingUpIcon className="size-3" />
-            +{stats.change}
-          </Badge>
-        </div>
       </CardHeader>
       <CardFooter className="flex-col items-start gap-1 text-sm">
         <div className="line-clamp-1 flex gap-2 font-medium">
