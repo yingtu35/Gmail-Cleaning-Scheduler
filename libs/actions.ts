@@ -1,6 +1,6 @@
 'use server'
 
-import { eq, and, count, desc } from "drizzle-orm";
+import { eq, and, count, desc, sum } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/models/db";
@@ -499,6 +499,27 @@ export async function resumeTask(taskId: string): Promise<void> {
     error.cause = { nextNoDigest: true, originalCause: error.cause };
     throw new Error("An unexpected error occurred while resuming your task. Our team has been notified. Please try again later.");
   }
+}
+
+export async function getTotalEmailsDeleted(): Promise<number> {
+  const sessionUser = await getSessionUser();
+  if (!sessionUser) {
+    return 0;
+  }
+  const totalEmailsDeleted = await db.select({
+    value: sum(UserTasksTable.emailsDeleted),
+  })
+  .from(UserTasksTable)
+  .where(eq(UserTasksTable.userId, sessionUser.id))
+  log.debug("Total emails deleted", { totalEmailsDeleted });
+  if (!totalEmailsDeleted || totalEmailsDeleted.length === 0) {
+    return 0;
+  }
+  const total = totalEmailsDeleted[0].value;
+  if (!total) {
+    return 0;
+  }
+  return parseInt(total);
 }
 
 export async function subscribeEmailNotification(email: string) {
