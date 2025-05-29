@@ -2,6 +2,7 @@ import timezones from "timezones-list";
 import prettyTime from "pretty-time";
 
 import { UserDateTimePromptType } from "@/types/user";
+import { FormValues } from "@/types/task";
 
 const timezonesMap = timezones.reduce((acc, tz) => {
   acc[tz.tzCode] = {
@@ -11,10 +12,32 @@ const timezonesMap = timezones.reduce((acc, tz) => {
   return acc;
 }, {} as Record<string, { label: string; value: string }>);
 
+/**
+ * Function to get the time until a given date
+ * If the next execution date is in the past, it will return "0s"
+ * @param nextExecutedAt - The date to get the time until
+ * @param currentDate - The current date
+ * @returns - A string in the format of "X days, Y hours, Z minutes"
+ */
 export const getTimeUntil = (nextExecutedAt: Date, currentDate: Date): string => {
   const timeUntilMs = nextExecutedAt.getTime() - currentDate.getTime();
+  if (timeUntilMs <= 0) {
+    return "0s";
+  }
   const timeUntilNs = timeUntilMs * 1000000;
   return prettyTime(timeUntilNs);
+}
+
+/**
+ * Function to derive the next execution datetime of a task
+ * @param data - The form values of the task
+ * @returns - The next execution datetime
+ */
+export const deriveNextExecutionDatetime = (data: FormValues) => {
+  const { occurrence } = data;
+  const startDateAndTime = occurrence.Occurrence === "One-time" ? occurrence.Schedule : occurrence.Schedule.startDateAndTime
+  const nextExecutedAt = convertDateTimeObjectToDate(startDateAndTime);
+  return nextExecutedAt;
 }
 
 export const getUserDateTimePrompt = (): UserDateTimePromptType => {

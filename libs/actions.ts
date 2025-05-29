@@ -13,12 +13,12 @@ import { User, NewUser, UserInfo, UserDateTimePromptType, SessionUser, UserInfoF
 import { Task, FormValues, AIPromptType, NewTask, NextScheduledTask } from "@/types/task";
 import { createScheduleName, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
+import { deriveNextExecutionDatetime } from "@/utils/date";
 
 import { getScheduleByPrompt } from "@/libs/openai/chat";
 
 import log from "../utils/log";
 import { parseTask } from "../utils/task";
-import { convertDateTimeObjectToDate } from "@/utils/date";
 
 export async function authenticate() {
   await signIn('google', { callbackUrl: '/' });
@@ -192,9 +192,7 @@ export async function createTask(data: FormValues) {
 
     // create a new task in the database
     const scheduleName = createScheduleName(user.id);
-    const occurrence = data.occurrence;
-    const startDateAndTime = occurrence.Occurrence === "One-time" ? occurrence.Schedule : occurrence.Schedule.startDateAndTime
-    const nextExecutedAt = convertDateTimeObjectToDate(startDateAndTime); 
+    const nextExecutedAt = deriveNextExecutionDatetime(data);
     const newTask: NewTask = {
       scheduleName,
       formValues: data,
@@ -281,9 +279,7 @@ export async function updateTask(data: FormValues, taskId: string) {
       throw new Error("Failed to update the task schedule. Please try again later or contact support.");
     }
     // update the task in the database
-    const occurrence = data.occurrence;
-    const startDateAndTime = occurrence.Occurrence === "One-time" ? occurrence.Schedule : occurrence.Schedule.startDateAndTime
-    const nextExecutedAt = convertDateTimeObjectToDate(startDateAndTime); 
+    const nextExecutedAt = deriveNextExecutionDatetime(data);
     await db.update(UserTasksTable)
       .set({
         updatedAt: new Date(),
