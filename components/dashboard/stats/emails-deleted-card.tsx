@@ -31,7 +31,7 @@ export async function EmailsDeletedCard() {
         <div className="line-clamp-1 flex gap-2 font-medium">
           {total === 0 ? (
             <>
-              <Trash className="size-4" /> Let's start deleting emails!
+              <Trash className="size-4" /> Let&apos;s start deleting emails!
             </>
           ) : (
             <>
