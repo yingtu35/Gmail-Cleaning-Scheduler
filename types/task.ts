@@ -11,6 +11,11 @@ export type TaskStatus = (typeof taskStatusEnum)[keyof typeof taskStatusEnum] | 
 
 export type NextScheduledTask = Pick<Task, "id" | "nextExecutedAt" | "formValues">;
 
+export type TaskCountsStats = {
+  successCounts: number;
+  errorCounts: number;
+}
+
 export type FormValues = z.infer<typeof formValuesSchema>;
 
 export type AIPromptType = z.infer<typeof PromptSchema>;

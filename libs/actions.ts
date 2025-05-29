@@ -10,7 +10,7 @@ import { createSchedule, updateSchedule, deleteSchedule, pauseSchedule, resumeSc
 import { subscribe } from "@/libs/aws/sns";
 
 import { User, NewUser, UserInfo, UserDateTimePromptType, SessionUser, UserInfoFromGoogle } from "@/types/user";
-import { Task, FormValues, AIPromptType, NewTask, NextScheduledTask } from "@/types/task";
+import { Task, FormValues, AIPromptType, NewTask, NextScheduledTask, TaskCountsStats } from "@/types/task";
 import { createScheduleName, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
 import { deriveNextExecutionDatetime } from "@/utils/date";
@@ -540,6 +540,27 @@ export async function getNextScheduledTask(): Promise<NextScheduledTask | null> 
     return null;
   }
   return task;
+}
+
+export async function getTaskCountsStats(): Promise<TaskCountsStats | null> {
+  const sessionUser = await getSessionUser();
+  if (!sessionUser) {
+    return null;
+  }
+  const returnedTaskCountsStats = await db.select({
+    successCounts: sum(UserTasksTable.successCounts),
+    errorCounts: sum(UserTasksTable.errorCounts),
+  })
+  .from(UserTasksTable)
+  .where(eq(UserTasksTable.userId, sessionUser.id))
+  if (!returnedTaskCountsStats || returnedTaskCountsStats.length === 0) {
+    return null;
+  }
+  const taskCountsStats: TaskCountsStats = {
+    successCounts: Number(returnedTaskCountsStats[0]?.successCounts ?? 0),
+    errorCounts: Number(returnedTaskCountsStats[0]?.errorCounts ?? 0),
+  }
+  return taskCountsStats;
 }
 
 export async function subscribeEmailNotification(email: string) {
