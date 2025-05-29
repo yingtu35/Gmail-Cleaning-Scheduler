@@ -7,13 +7,15 @@ export type Task = typeof UserTasksTable.$inferSelect;
 
 export type NewTask = typeof UserTasksTable.$inferInsert;
 
-export type TaskStatus = (typeof taskStatusEnum)[keyof typeof taskStatusEnum] | null
+export type TaskStatus = (typeof taskStatusEnum)[keyof typeof taskStatusEnum] | null;
 
-export type FormValues = z.infer<typeof formValuesSchema>
+export type NextScheduledTask = Pick<Task, "id" | "nextExecutedAt" | "formValues">;
+
+export type FormValues = z.infer<typeof formValuesSchema>;
 
 export type AIPromptType = z.infer<typeof PromptSchema>;
 
-export type AIFormValues = z.infer<typeof AIFormValuesSchema>
+export type AIFormValues = z.infer<typeof AIFormValuesSchema>;
 
 export type TimeValue = {
   comparison: "after" | "before";
