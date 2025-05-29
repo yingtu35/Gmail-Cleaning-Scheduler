@@ -9,6 +9,11 @@ export type NewTask = typeof UserTasksTable.$inferInsert;
 
 export type TaskStatus = (typeof taskStatusEnum)[keyof typeof taskStatusEnum] | null
 
+export type TaskCountsStats = {
+  successCounts: number;
+  errorCounts: number;
+}
+
 export type FormValues = z.infer<typeof formValuesSchema>
 
 export type AIPromptType = z.infer<typeof PromptSchema>;

@@ -1,6 +1,6 @@
 'use server'
 
-import { eq, and, count, desc } from "drizzle-orm";
+import { eq, and, count, desc, sum } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/models/db";
@@ -10,7 +10,7 @@ import { createSchedule, updateSchedule, deleteSchedule, pauseSchedule, resumeSc
 import { subscribe } from "@/libs/aws/sns";
 
 import { User, NewUser, UserInfo, UserDateTimePromptType, SessionUser, UserInfoFromGoogle } from "@/types/user";
-import { Task, FormValues, AIPromptType, NewTask } from "@/types/task";
+import { Task, FormValues, AIPromptType, NewTask, TaskCountsStats } from "@/types/task";
 import { createScheduleName, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
 
@@ -499,6 +499,27 @@ export async function resumeTask(taskId: string): Promise<void> {
     error.cause = { nextNoDigest: true, originalCause: error.cause };
     throw new Error("An unexpected error occurred while resuming your task. Our team has been notified. Please try again later.");
   }
+}
+
+export async function getTaskCountsStats(): Promise<TaskCountsStats | null> {
+  const sessionUser = await getSessionUser();
+  if (!sessionUser) {
+    return null;
+  }
+  const returnedTaskCountsStats = await db.select({
+    successCounts: sum(UserTasksTable.successCounts),
+    errorCounts: sum(UserTasksTable.errorCounts),
+  })
+  .from(UserTasksTable)
+  .where(eq(UserTasksTable.userId, sessionUser.id))
+  if (!returnedTaskCountsStats || returnedTaskCountsStats.length === 0) {
+    return null;
+  }
+  const taskCountsStats: TaskCountsStats = {
+    successCounts: returnedTaskCountsStats[0].successCounts ? parseInt(returnedTaskCountsStats[0].successCounts) : 0,
+    errorCounts: returnedTaskCountsStats[0].errorCounts ? parseInt(returnedTaskCountsStats[0].errorCounts) : 0,
+  }
+  return taskCountsStats;
 }
 
 export async function subscribeEmailNotification(email: string) {
