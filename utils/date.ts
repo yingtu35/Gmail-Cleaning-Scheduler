@@ -1,5 +1,7 @@
-import { UserDateTimePromptType } from "@/types/user";
 import timezones from "timezones-list";
+import prettyTime from "pretty-time";
+
+import { UserDateTimePromptType } from "@/types/user";
 
 const timezonesMap = timezones.reduce((acc, tz) => {
   acc[tz.tzCode] = {
@@ -8,6 +10,12 @@ const timezonesMap = timezones.reduce((acc, tz) => {
   };
   return acc;
 }, {} as Record<string, { label: string; value: string }>);
+
+export const getTimeUntil = (nextExecutedAt: Date, currentDate: Date): string => {
+  const timeUntilMs = nextExecutedAt.getTime() - currentDate.getTime();
+  const timeUntilNs = timeUntilMs * 1000000;
+  return prettyTime(timeUntilNs);
+}
 
 export const getUserDateTimePrompt = (): UserDateTimePromptType => {
   const date = new Date();
