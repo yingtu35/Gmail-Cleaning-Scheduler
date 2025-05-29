@@ -1,6 +1,6 @@
 'use server'
 
-import { eq, and, count, desc, sum } from "drizzle-orm";
+import { eq, and, count, desc, sum, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/models/db";
@@ -10,9 +10,10 @@ import { createSchedule, updateSchedule, deleteSchedule, pauseSchedule, resumeSc
 import { subscribe } from "@/libs/aws/sns";
 
 import { User, NewUser, UserInfo, UserDateTimePromptType, SessionUser, UserInfoFromGoogle } from "@/types/user";
-import { Task, FormValues, AIPromptType, NewTask } from "@/types/task";
+import { Task, FormValues, AIPromptType, NewTask, NextScheduledTask } from "@/types/task";
 import { createScheduleName, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
+import { deriveNextExecutionDatetime } from "@/utils/date";
 
 import { getScheduleByPrompt } from "@/libs/openai/chat";
 
@@ -191,9 +192,11 @@ export async function createTask(data: FormValues) {
 
     // create a new task in the database
     const scheduleName = createScheduleName(user.id);
+    const nextExecutedAt = deriveNextExecutionDatetime(data);
     const newTask: NewTask = {
       scheduleName,
       formValues: data,
+      nextExecutedAt,
       userId: user.id,
     }
     const result = await db.insert(UserTasksTable).values(newTask).returning({
@@ -276,10 +279,12 @@ export async function updateTask(data: FormValues, taskId: string) {
       throw new Error("Failed to update the task schedule. Please try again later or contact support.");
     }
     // update the task in the database
+    const nextExecutedAt = deriveNextExecutionDatetime(data);
     await db.update(UserTasksTable)
       .set({
         updatedAt: new Date(),
         formValues: data,
+        nextExecutedAt,
       })
       .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
     
@@ -512,6 +517,26 @@ export async function getTotalEmailsDeleted(): Promise<number> {
   .from(UserTasksTable)
   .where(eq(UserTasksTable.userId, sessionUser.id))
   return  Number(totalEmailsDeleted[0]?.value ?? 0);
+}
+
+export async function getNextScheduledTask(): Promise<NextScheduledTask | null> {
+  const sessionUser = await getSessionUser();
+  if (!sessionUser) {
+    return null;
+  }
+  const task = await db.query.UserTasksTable.findFirst({
+    where: and(eq(UserTasksTable.userId, sessionUser.id), eq(UserTasksTable.status, "active")),
+    orderBy: [asc(UserTasksTable.nextExecutedAt)],
+    columns: {
+      id: true,
+      formValues: true,
+      nextExecutedAt: true,
+    }
+  })
+  if (!task) {
+    return null;
+  }
+  return task;
 }
 
 export async function subscribeEmailNotification(email: string) {
