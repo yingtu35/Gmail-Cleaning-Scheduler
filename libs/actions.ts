@@ -511,15 +511,7 @@ export async function getTotalEmailsDeleted(): Promise<number> {
   })
   .from(UserTasksTable)
   .where(eq(UserTasksTable.userId, sessionUser.id))
-  log.debug("Total emails deleted", { totalEmailsDeleted });
-  if (!totalEmailsDeleted || totalEmailsDeleted.length === 0) {
-    return 0;
-  }
-  const total = totalEmailsDeleted[0].value;
-  if (!total) {
-    return 0;
-  }
-  return parseInt(total);
+  return  Number(totalEmailsDeleted[0]?.value ?? 0);
 }
 
 export async function subscribeEmailNotification(email: string) {
