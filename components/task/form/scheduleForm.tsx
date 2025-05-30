@@ -232,7 +232,6 @@ export function ScheduleForm({
                     disabled={(date) =>
                       date < new Date() || date > DATE_THREE_YEARS_FROM_NOW
                     }
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -377,7 +376,6 @@ export function ScheduleForm({
                         disabled={(date) =>
                           date < new Date() || date > DATE_THREE_YEARS_FROM_NOW
                         }
-                        initialFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -440,7 +438,6 @@ export function ScheduleForm({
                         disabled={(date) =>
                           date < new Date() || date > DATE_THREE_YEARS_FROM_NOW
                         }
-                        initialFocus
                       />
                     </PopoverContent>
                   </Popover>
