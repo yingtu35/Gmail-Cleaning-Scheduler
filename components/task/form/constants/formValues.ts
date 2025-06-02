@@ -1,3 +1,4 @@
+import { TZDate } from 'react-day-picker';
 import {
   FormValues,
 } from '@/types/task';
@@ -10,18 +11,23 @@ import {
 import { capitalizeFirstLetter } from '@/utils/strings';
 
 const DEFAULT_TIME_ZONE = '(UTC-08:00) America/Los_Angeles';
+const TIMEZONE_UTC = 'UTC';
 
-const DATE_NOW = new Date();
-const DATE_ONE_DAY_FROM_NOW = new Date(Date.now() + 24 * 60 * 60 * 1000);
-const DATE_THREE_MONTHS_FROM_NOW = new Date(Date.now() + 3 * 30 * 24 * 60 * 60 * 1000);
-const DATE_THREE_MONTHS_BEFORE_NOW = new Date(Date.now() - 3 * 30 * 24 * 60 * 60 * 1000);
-const DATE_FIRST_DAY_OF_YEAR = new Date(DATE_NOW.getFullYear(), 0, 1);
-export const DATE_THREE_YEARS_FROM_NOW = new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000);
+const _date = new Date();
+const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
-const CURRENT_TIME = DATE_NOW.toTimeString().slice(0, 5);
+const DATE_NOW = new TZDate(_date.getUTCFullYear(), _date.getUTCMonth(), _date.getUTCDate(), 0, 0, 0, 0, TIMEZONE_UTC); // Aligned to 00:00 UTC
+
+export const DATE_TWO_DAYS_FROM_NOW = new TZDate(DATE_NOW.getTime() + 2 *DAY_IN_MS, TIMEZONE_UTC);
+const DATE_THREE_MONTHS_FROM_NOW = new TZDate(DATE_NOW.getTime() + 3 * 30 * DAY_IN_MS, TIMEZONE_UTC);
+const DATE_THREE_MONTHS_BEFORE_NOW = new TZDate(DATE_NOW.getTime() - 3 * 30 * DAY_IN_MS, TIMEZONE_UTC);
+const DATE_FIRST_DAY_OF_YEAR = new TZDate(DATE_NOW.getFullYear(), 0, 1, TIMEZONE_UTC);
+export const DATE_THREE_YEARS_FROM_NOW = new TZDate(DATE_NOW.getTime() + 3 * 365 * DAY_IN_MS, TIMEZONE_UTC);
+
+const CURRENT_TIME = "00:00";
 
 const DEFAULT_ONE_TIME_SCHEDULE = {
-  date: DATE_ONE_DAY_FROM_NOW,
+  date: DATE_TWO_DAYS_FROM_NOW,
   time: CURRENT_TIME,
 }
 
@@ -31,7 +37,7 @@ const DEFAULT_RECURRING_SCHEDULE = {
     unit: 'days'
   },
   startDateAndTime: {
-    date: DATE_ONE_DAY_FROM_NOW,
+    date: DATE_TWO_DAYS_FROM_NOW,
     time: CURRENT_TIME,
   },
   endDateAndTime: {
@@ -70,7 +76,7 @@ const QUERY_EMPTY: FormValues = {
     Occurrence: 'One-time',
     TimeZone: DEFAULT_TIME_ZONE,
     Schedule: {
-      date: DATE_ONE_DAY_FROM_NOW,
+      date: DATE_TWO_DAYS_FROM_NOW,
       time: CURRENT_TIME,
     },
   },
@@ -147,7 +153,7 @@ const QUERY_OLD_UNREAD: FormValues = {
         unit: 'days'
       },
       startDateAndTime: {
-        date: DATE_ONE_DAY_FROM_NOW,
+        date: DATE_TWO_DAYS_FROM_NOW,
         time: CURRENT_TIME,
       },
       endDateAndTime: {
@@ -224,7 +230,7 @@ const QUERY_LARGE_READ: FormValues = {
     Occurrence: 'One-time',
     TimeZone: DEFAULT_TIME_ZONE,
     Schedule: {
-      date: DATE_ONE_DAY_FROM_NOW,
+      date: DATE_TWO_DAYS_FROM_NOW,
       time: CURRENT_TIME,
     },
   },
@@ -296,7 +302,7 @@ const QUERY_LAST_YEAR: FormValues = {
     Occurrence: 'One-time',
     TimeZone: DEFAULT_TIME_ZONE,
     Schedule: {
-      date: DATE_ONE_DAY_FROM_NOW,
+      date: DATE_TWO_DAYS_FROM_NOW,
       time: CURRENT_TIME,
     },
   },
@@ -369,7 +375,7 @@ const QUERY_DRAFTS: FormValues = {
     Occurrence: 'One-time',
     TimeZone: DEFAULT_TIME_ZONE,
     Schedule: {
-      date: DATE_ONE_DAY_FROM_NOW,
+      date: DATE_TWO_DAYS_FROM_NOW,
       time: CURRENT_TIME,
     },
   },
@@ -442,7 +448,7 @@ const QUERY_NOT_PRIMARY: FormValues = {
     Occurrence: 'One-time',
     TimeZone: DEFAULT_TIME_ZONE,
     Schedule: {
-      date: DATE_ONE_DAY_FROM_NOW,
+      date: DATE_TWO_DAYS_FROM_NOW,
       time: CURRENT_TIME,
     },
   },
@@ -514,7 +520,7 @@ const QUERY_AI_TEMPLATE: FormValues = {
   occurrence: {
     Occurrence: 'One-time',
     TimeZone: DEFAULT_TIME_ZONE,
-    Schedule: { date: DATE_ONE_DAY_FROM_NOW, time: CURRENT_TIME },
+    Schedule: { date: DATE_TWO_DAYS_FROM_NOW, time: CURRENT_TIME },
   },
   from: { enabled: false, from: [] },
   to: { enabled: false, to: [] },
@@ -526,7 +532,7 @@ const QUERY_AI_TEMPLATE: FormValues = {
   category: { enabled: false, category: [] },
   size: { enabled: false, size: { comparison: 'greater than', value: 0, unit: 'MB' } },
   age: { enabled: false, age: { comparison: 'older than', value: 0, unit: 'days' } },
-  time: { enabled: false, time: { comparison: 'before', value: new Date() } },
+  time: { enabled: false, time: { comparison: 'before', value: DATE_FIRST_DAY_OF_YEAR } },
   emailIn: { enabled: true, emailIn: ["inbox"] },
 };
 
