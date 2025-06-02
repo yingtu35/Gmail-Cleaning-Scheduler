@@ -28,43 +28,48 @@ const CategoryEnum   = z.enum(CATEGORY_ENUM);
 const EmailInEnum    = z.enum(EMAIL_IN_ENUM);
 
 // schedule schemas
-const OneTimeScheduleSchema = z.object({ date: z.date(), time: z.string() }).required();
+const _timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+const OneTimeScheduleSchema = z.object({ date: z.date(), time: z.string().regex(_timeRegex) }).required();
 const RecurringScheduleSchema = z.object({
   rate: z.object({ value: z.coerce.number().min(1).max(365), unit: RateUnit }).required(),
-  startDateAndTime: z.object({ date: z.date(), time: z.string() }),
-  endDateAndTime: z.object({ date: z.date(), time: z.string() }),
+  startDateAndTime: z.object({ date: z.date(), time: z.string().regex(_timeRegex) }).required(),
+  endDateAndTime: z.object({ date: z.date(), time: z.string().regex(_timeRegex) }).required(),
 }).superRefine((obj, ctx) => {
   const { startDateAndTime, endDateAndTime } = obj; 
   const { date: startDate, time: startTime } = startDateAndTime;
   const { date: endDate, time: endTime } = endDateAndTime;
   const [sh, sm] = startTime.split(':').map(Number);
   const [eh, em] = endTime.split(':').map(Number);
-  const startTs = new Date(
-    startDate.getFullYear(),
-    startDate.getMonth(),
-    startDate.getDate(),
+  const startTs = Date.UTC(
+    startDate.getUTCFullYear(),
+    startDate.getUTCMonth(),
+    startDate.getUTCDate(),
     sh,
     sm
-  ).getTime();
-  const endTs = new Date(
-    endDate.getFullYear(),
-    endDate.getMonth(),
-    endDate.getDate(),
+  );
+  const endTs = Date.UTC(
+    endDate.getUTCFullYear(),
+    endDate.getUTCMonth(),
+    endDate.getUTCDate(),
     eh,
     em
-  ).getTime();
+  );
+
   if (endTs <= startTs) {
-    if (endDate.getTime() < startDate.getTime()) {
+    const startDateOnly = Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
+    const endDateOnly = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate());
+
+    if (endDateOnly < startDateOnly) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ['endDate'],
-        message: 'End date must be after start date',
+        path: ['endDateAndTime', 'date'],
+        message: 'End date must be after start date.',
       });
     } else {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ['endTime'],
-        message: 'End time must be after start time',
+        path: ['endDateAndTime', 'time'],
+        message: 'End time must be after start time when on the same day.',
       });
     }
   }

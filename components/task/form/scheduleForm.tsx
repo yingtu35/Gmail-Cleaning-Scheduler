@@ -30,7 +30,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
-import { DEFAULT_SCHEDULE, DATE_THREE_YEARS_FROM_NOW } from "@/components/task/form/constants/formValues";
+import { DEFAULT_SCHEDULE, DATE_TWO_DAYS_FROM_NOW } from "@/components/task/form/constants/formValues";
 import { FormValues } from "@/types/task";
 
 import { SectionWrapper } from "./wrapper/sectionWrapper";
@@ -227,12 +227,12 @@ export function ScheduleForm({
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
+                    timeZone="UTC"
                     selected={field.value}
                     onSelect={field.onChange}
                     disabled={(date) =>
-                      date < new Date() || date > DATE_THREE_YEARS_FROM_NOW
+                      date < DATE_TWO_DAYS_FROM_NOW
                     }
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -372,12 +372,12 @@ export function ScheduleForm({
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
+                        timeZone="UTC"
                         selected={field.value}
                         onSelect={field.onChange}
                         disabled={(date) =>
-                          date < new Date() || date > DATE_THREE_YEARS_FROM_NOW
+                          date < DATE_TWO_DAYS_FROM_NOW
                         }
-                        initialFocus
                       />
                     </PopoverContent>
                   </Popover>
@@ -435,12 +435,12 @@ export function ScheduleForm({
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
+                        timeZone="UTC"
                         selected={field.value}
                         onSelect={field.onChange}
                         disabled={(date) =>
-                          date < new Date() || date > DATE_THREE_YEARS_FROM_NOW
+                          date < DATE_TWO_DAYS_FROM_NOW
                         }
-                        initialFocus
                       />
                     </PopoverContent>
                   </Popover>
