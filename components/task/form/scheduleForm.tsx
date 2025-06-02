@@ -30,7 +30,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
-import { DEFAULT_SCHEDULE, DATE_TWO_DAYS_FROM_NOW, DATE_THREE_YEARS_FROM_NOW } from "@/components/task/form/constants/formValues";
+import { DEFAULT_SCHEDULE, DATE_TWO_DAYS_FROM_NOW } from "@/components/task/form/constants/formValues";
 import { FormValues } from "@/types/task";
 
 import { SectionWrapper } from "./wrapper/sectionWrapper";
@@ -231,7 +231,7 @@ export function ScheduleForm({
                     selected={field.value}
                     onSelect={field.onChange}
                     disabled={(date) =>
-                      date < DATE_TWO_DAYS_FROM_NOW || date > DATE_THREE_YEARS_FROM_NOW
+                      date < DATE_TWO_DAYS_FROM_NOW
                     }
                   />
                 </PopoverContent>
@@ -376,7 +376,7 @@ export function ScheduleForm({
                         selected={field.value}
                         onSelect={field.onChange}
                         disabled={(date) =>
-                          date < DATE_TWO_DAYS_FROM_NOW || date > DATE_THREE_YEARS_FROM_NOW
+                          date < DATE_TWO_DAYS_FROM_NOW
                         }
                       />
                     </PopoverContent>
@@ -439,7 +439,7 @@ export function ScheduleForm({
                         selected={field.value}
                         onSelect={field.onChange}
                         disabled={(date) =>
-                          date < DATE_TWO_DAYS_FROM_NOW || date > DATE_THREE_YEARS_FROM_NOW
+                          date < DATE_TWO_DAYS_FROM_NOW
                         }
                       />
                     </PopoverContent>
