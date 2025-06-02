@@ -21,7 +21,7 @@ const DATE_NOW = new TZDate(_date.getUTCFullYear(), _date.getUTCMonth(), _date.g
 export const DATE_TWO_DAYS_FROM_NOW = new TZDate(DATE_NOW.getTime() + 2 *DAY_IN_MS, TIMEZONE_UTC);
 const DATE_THREE_MONTHS_FROM_NOW = new TZDate(DATE_NOW.getTime() + 3 * 30 * DAY_IN_MS, TIMEZONE_UTC);
 const DATE_THREE_MONTHS_BEFORE_NOW = new TZDate(DATE_NOW.getTime() - 3 * 30 * DAY_IN_MS, TIMEZONE_UTC);
-const DATE_FIRST_DAY_OF_YEAR = new TZDate(DATE_NOW.getFullYear(), 0, 1, TIMEZONE_UTC);
+const DATE_FIRST_DAY_OF_YEAR = new TZDate(DATE_NOW.getFullYear(), 0, 1, 0, 0, 0, 0, TIMEZONE_UTC);
 
 const CURRENT_TIME = "00:00";
 

@@ -28,35 +28,36 @@ const CategoryEnum   = z.enum(CATEGORY_ENUM);
 const EmailInEnum    = z.enum(EMAIL_IN_ENUM);
 
 // schedule schemas
-const OneTimeScheduleSchema = z.object({ date: z.date(), time: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/) }).required();
+const _timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+const OneTimeScheduleSchema = z.object({ date: z.date(), time: z.string().regex(_timeRegex) }).required();
 const RecurringScheduleSchema = z.object({
   rate: z.object({ value: z.coerce.number().min(1).max(365), unit: RateUnit }).required(),
-  startDateAndTime: z.object({ date: z.date(), time: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/) }).required(),
-  endDateAndTime: z.object({ date: z.date(), time: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/) }).required(),
+  startDateAndTime: z.object({ date: z.date(), time: z.string().regex(_timeRegex) }).required(),
+  endDateAndTime: z.object({ date: z.date(), time: z.string().regex(_timeRegex) }).required(),
 }).superRefine((obj, ctx) => {
   const { startDateAndTime, endDateAndTime } = obj; 
   const { date: startDate, time: startTime } = startDateAndTime;
   const { date: endDate, time: endTime } = endDateAndTime;
   const [sh, sm] = startTime.split(':').map(Number);
   const [eh, em] = endTime.split(':').map(Number);
-  const startTs = new Date(
+  const startTs = Date.UTC(
     startDate.getUTCFullYear(),
     startDate.getUTCMonth(),
     startDate.getUTCDate(),
     sh,
     sm
-  ).getTime();
-  const endTs = new Date(
+  );
+  const endTs = Date.UTC(
     endDate.getUTCFullYear(),
     endDate.getUTCMonth(),
     endDate.getUTCDate(),
     eh,
     em
-  ).getTime();
+  );
 
   if (endTs <= startTs) {
-    const startDateOnly = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate())).getTime();
-    const endDateOnly = new Date(Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate())).getTime();
+    const startDateOnly = Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate());
+    const endDateOnly = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate());
 
     if (endDateOnly < startDateOnly) {
       ctx.addIssue({
