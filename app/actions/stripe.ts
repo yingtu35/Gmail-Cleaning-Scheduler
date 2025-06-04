@@ -3,16 +3,33 @@
 import { headers } from 'next/headers'
 
 import { stripe } from '@/libs/stripe/client'
-import log from '@/utils/log'
+import { getSessionUser } from '@/libs/actions'
 
 export async function fetchClientSecret(): Promise<string> {
   const origin = (await headers()).get('origin')
 
+  if (!origin) {
+    throw new Error('No origin')
+  }
+
+  const sessionUser = await getSessionUser()
+
+  if (!sessionUser) {
+    throw new Error('No session user')
+  }
+
+  const { email: customerEmail } = sessionUser
+
+  if (!customerEmail) {
+    throw new Error('No customer email')
+  }
+
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded',
+    customer_email: customerEmail,
     line_items: [
       {
-        price: 'price_1RVq8HP7Yi2pE4hDkctogshj',
+        price: process.env.STRIPE_PRO_PRICE_ID,
         quantity: 1,
       },
     ],
