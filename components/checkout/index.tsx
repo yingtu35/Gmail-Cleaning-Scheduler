@@ -4,11 +4,11 @@ import {
   EmbeddedCheckout,
   EmbeddedCheckoutProvider,
 } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
 
 import { fetchClientSecret } from '@/app/actions/stripe'
+import { getStripe } from '@/utils/get-stripejs'
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePromise = getStripe()
 
 export default function Checkout() {
   return (
