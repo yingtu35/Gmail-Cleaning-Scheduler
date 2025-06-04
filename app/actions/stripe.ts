@@ -1,5 +1,6 @@
 'use server'
 
+import Stripe from 'stripe'
 import { headers } from 'next/headers'
 
 import { stripe } from '@/libs/stripe/client'
@@ -24,8 +25,9 @@ export async function fetchClientSecret(): Promise<string> {
     throw new Error('No customer email')
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const params: Stripe.Checkout.SessionCreateParams = {
     ui_mode: 'embedded',
+    payment_method_types: ['card'],
     customer_email: customerEmail,
     line_items: [
       {
@@ -35,7 +37,9 @@ export async function fetchClientSecret(): Promise<string> {
     ],
     mode: 'subscription',
     return_url: `${origin}/return?session_id={CHECKOUT_SESSION_ID}`
-  })
+  }
+
+  const session = await stripe.checkout.sessions.create(params)
 
   if (!session.client_secret) {
     throw new Error('No client secret')
