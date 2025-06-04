@@ -30,7 +30,7 @@ async function handleCompletedCheckoutSession(event: Stripe.CheckoutSessionCompl
       return false
     }
 
-    if (payment_status == 'unpaid') {
+    if (payment_status === 'unpaid') {
       log.error('Checkout session is unpaid', checkoutSession)
       return false
     }

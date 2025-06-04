@@ -26,7 +26,9 @@ const Pricing = ({ customerEmail }: PricingProps) => {
      
      // Cleanup function
      return () => {
-     document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
    };
    }, []); // Empty dependency array means this runs once on mount
   return (
