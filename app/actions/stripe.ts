@@ -16,13 +16,13 @@ export async function fetchClientSecret(): Promise<string> {
   const sessionUser = await getSessionUser()
 
   if (!sessionUser) {
-    throw new Error('No session user')
+    throw new Error('No session user found. Expected a valid user object.')
   }
 
   const { email: customerEmail } = sessionUser
 
   if (!customerEmail) {
-    throw new Error('No customer email')
+    throw new Error('No customer email found. Expected a valid email address.')
   }
 
   const params: Stripe.Checkout.SessionCreateParams = {
@@ -42,7 +42,7 @@ export async function fetchClientSecret(): Promise<string> {
   const session = await stripe.checkout.sessions.create(params)
 
   if (!session.client_secret) {
-    throw new Error('No client secret')
+    throw new Error('No client secret found. Expected a valid client secret string.')
   }
 
   return session.client_secret

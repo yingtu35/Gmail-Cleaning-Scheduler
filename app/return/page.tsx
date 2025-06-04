@@ -9,7 +9,7 @@ export default async function Page({
 }) {
   const { session_id } = searchParams
   if (!session_id) {
-    throw new Error('No session_id')
+    throw new Error('Missing session ids. Expected a valid session idstring.')
   }
 
   const sessionId = Array.isArray(session_id) ? session_id[0] : session_id
