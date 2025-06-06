@@ -6,11 +6,11 @@ import { NewSubscription, SubscriptionStatus } from "@/types/subscription";
 import { createSubscription, getMembershipTierByPriceId, getUserInfoByEmail } from "@/libs/actions";
 
 async function fullfillCheckoutOrder(lineItem: Stripe.LineItem, checkoutSession: Stripe.Checkout.Session) {
-  const { description: membershipTierName, price } = lineItem
+  const { price } = lineItem
   const { 
     customer_email, 
     subscription: subscriptionId,
-    created: createdAt,
+    created: createdAtInSeconds,
   } = checkoutSession
   if (!customer_email) {
     log.error('No customer email found in checkout session', checkoutSession)
@@ -23,10 +23,6 @@ async function fullfillCheckoutOrder(lineItem: Stripe.LineItem, checkoutSession:
   }
   if (typeof subscriptionId !== 'string') {
     log.error('Subscription id is not a string', subscriptionId)
-    return false
-  }
-  if (!membershipTierName) {
-    log.error('No membership tier name found in line item', lineItem)
     return false
   }
   if (!price) {
@@ -56,8 +52,8 @@ async function fullfillCheckoutOrder(lineItem: Stripe.LineItem, checkoutSession:
     status: SubscriptionStatus.ACTIVE,
     cancelAt: null,
     canceledAt: null,
-    createdAt: new Date(createdAt),
-    updatedAt: new Date(createdAt),
+    createdAt: new Date(createdAtInSeconds * 1000),
+    updatedAt: new Date(createdAtInSeconds * 1000),
   }
   
   const subscription = await createSubscription(newSubscription)
