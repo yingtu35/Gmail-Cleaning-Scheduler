@@ -1,0 +1,2 @@
+ALTER TABLE "subscriptions" ALTER COLUMN "cancel_at" SET DATA TYPE timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "subscriptions" ALTER COLUMN "canceled_at" SET DATA TYPE timestamp with time zone;
