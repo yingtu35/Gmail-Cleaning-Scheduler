@@ -23,20 +23,26 @@ async function fetchActivePrices() {
   let hasMore = true;
   let startingAfter: string | undefined = undefined;
 
-  while (hasMore) {
-    const response: Stripe.ApiList<Stripe.Price> = await stripe.prices.list({
-      limit: 100,
-      active: true,
-      expand: ['data.product'], // expand product to get its name
-      starting_after: startingAfter,
+  try {
+    while (hasMore) {
+      const response: Stripe.ApiList<Stripe.Price> = await stripe.prices.list({
+        limit: 100,
+        active: true,
+        expand: ['data.product'], // expand product to get its name
+        starting_after: startingAfter,
     });
     prices.push(...response.data);
     hasMore = response.has_more;
     if (hasMore) {
-      startingAfter = response.data[response.data.length - 1].id;
+        startingAfter = response.data[response.data.length - 1].id;
+      }
     }
+    return prices;
+  } catch (error) {
+    console.error('Error fetching active prices:', error);
+    // throw error to be caught by the caller
+    throw error;
   }
-  return prices;
 }
 
 // 3. Transform and upsert into MembershipTiers
@@ -45,6 +51,7 @@ async function syncMembershipTiers() {
   const membershipTiersNames = Object.values(MembershipTierName);
   const billingIntervals = Object.values(BillingInterval);
 
+  // TODO: Use a transaction to ensure atomicity
   for (const price of prices) {
     if (!price.active || !price.product || price.unit_amount == null) {
       continue;
