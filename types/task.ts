@@ -1,20 +1,21 @@
 import { z } from 'zod';
 
-import { UserTasksTable, taskStatusEnum } from '@/models/schema';
+import { UserTasksTable } from '@/models/schema';
 import { formValuesSchema, PromptSchema, AIFormValuesSchema } from '@/validations/form';
+
+export enum TaskStatus {
+  ACTIVE = 'active',
+  PAUSED = 'paused',
+  COMPLETED = 'completed',
+}
 
 export type Task = typeof UserTasksTable.$inferSelect;
 
 export type NewTask = typeof UserTasksTable.$inferInsert;
 
-export type TaskStatus = (typeof taskStatusEnum)[keyof typeof taskStatusEnum] | null;
-
 export type NextScheduledTask = Pick<Task, "id" | "nextExecutedAt" | "formValues">;
 
-export type TaskCountsStats = {
-  successCounts: number;
-  errorCounts: number;
-}
+export type TaskCountsStats = Pick<Task, "successCounts" | "errorCounts">;
 
 export type FormValues = z.infer<typeof formValuesSchema>;
 

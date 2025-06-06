@@ -1,8 +1,10 @@
 import { pgEnum, pgTable, uuid, integer, varchar, timestamp, index, uniqueIndex, json, serial } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
-import { type FormValues } from '@/types/task';
+import { type FormValues, TaskStatus } from '@/types/task';
 import { SubscriptionStatus } from '@/types/subscription';
+import { BillingInterval, MembershipTierName } from '@/types/membershipTier';
+
 const timestamps = {
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' }).defaultNow(),
@@ -30,12 +32,12 @@ export const UserTable = pgTable('user', {
   }
 });
 
-export const taskStatusEnum = pgEnum('status', ['active', 'paused', 'completed']);
+export const taskStatusEnum = pgEnum('status', enumToPgEnum(TaskStatus));
 
 export const UserTasksTable = pgTable('task', {
   id: uuid('id').primaryKey().defaultRandom(),
   scheduleName: varchar('schedule_name', { length: 61 }).notNull().unique(),
-  status: taskStatusEnum('status').notNull().default('active'),
+  status: taskStatusEnum('status').notNull().default(TaskStatus.ACTIVE),
   emailsDeleted: integer('emails_deleted').notNull().default(0),
   successCounts: integer('success_counts').notNull().default(0),
   errorCounts: integer('error_counts').notNull().default(0),
@@ -46,14 +48,20 @@ export const UserTasksTable = pgTable('task', {
     .references(() => UserTable.id)
     .notNull(),
   ...timestamps,
+}, (table) => {
+  return {
+    userStatusNextExecutedAtIndex: index('user_status_next_executed_at_index')
+      .on(table.userId, table.status, table.nextExecutedAt),
+  };
 });
 
-export const billingIntervalEnum = pgEnum("billing_interval", ["month", "year"]);
+export const membershipTierNameEnum = pgEnum("membership_tier_name", enumToPgEnum(MembershipTierName));
+export const billingIntervalEnum = pgEnum("billing_interval", enumToPgEnum(BillingInterval));
 
 export const MembershipTiersTable = pgTable("membership_tier", {
   id: serial("id").primaryKey(),
   priceId: varchar("price_id", { length: 20 }).notNull().unique(),
-  name: varchar("name", { length: 20 }).notNull(),
+  name: membershipTierNameEnum("name").notNull(),
   priceCents: integer("price_cents").notNull(),
   billingInterval: billingIntervalEnum("billing_interval").notNull(),
   maxActiveJobs: integer("max_active_jobs").notNull(),
