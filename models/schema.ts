@@ -60,7 +60,7 @@ export const billingIntervalEnum = pgEnum("billing_interval", enumToPgEnum(Billi
 
 export const MembershipTiersTable = pgTable("membership_tier", {
   id: serial("id").primaryKey(),
-  priceId: varchar("price_id", { length: 64 }).notNull().unique(),
+  priceId: varchar("price_id", { length: 64 }).notNull().unique(), // PostgreSQL automatically create a unique B-tree index on the column
   name: membershipTierNameEnum("name").notNull(),
   priceCents: integer("price_cents").notNull(),
   billingInterval: billingIntervalEnum("billing_interval").notNull(),
@@ -69,10 +69,6 @@ export const MembershipTiersTable = pgTable("membership_tier", {
   maxEmailsPerExec: integer("max_emails_per_exec").notNull(),
   maxWindowInMinutes: integer("max_window_in_minutes").notNull(),
   ...timestamps,
-}, table => {
-  return {
-    priceIdIndex: index('price_id_index').on(table.priceId),
-  }
 });
 
 export const subscriptionStatusEnum = pgEnum("subscription_status", enumToPgEnum(SubscriptionStatus));
@@ -91,10 +87,6 @@ export const SubscriptionsTable = pgTable("subscriptions", {
   cancelAt: timestamp("cancel_at", { withTimezone: true, mode: 'date' }),
   canceledAt: timestamp("canceled_at", { withTimezone: true, mode: 'date' }),
   ...timestamps,
-}, table => {
-  return {
-    subscriptionIdIndex: index('subscription_id_index').on(table.subscriptionId),
-  }
 });
 
 /* Define relations between user table and other tables */
