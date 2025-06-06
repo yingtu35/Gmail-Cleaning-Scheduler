@@ -50,7 +50,13 @@ async function syncMembershipTiers() {
       continue;
     }
 
-    const tierName = (price.product as Stripe.Product).name.toLowerCase();
+    const product = price.product as Stripe.Product;
+    if (typeof product !== 'object' || product === null || typeof product.name !== 'string') {
+      console.warn(`Price ${price.id} has invalid or missing product name. Product data: ${JSON.stringify(price.product)}. Skipping.`);
+      continue;
+    }
+
+    const tierName = product.name.toLowerCase();
     if (!membershipTiersNames.includes(tierName as MembershipTierName)) {
       console.error(`Tier name ${tierName} is not a valid membership tier name`);
       continue;
