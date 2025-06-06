@@ -60,7 +60,7 @@ export const billingIntervalEnum = pgEnum("billing_interval", enumToPgEnum(Billi
 
 export const MembershipTiersTable = pgTable("membership_tier", {
   id: serial("id").primaryKey(),
-  priceId: varchar("price_id", { length: 20 }).notNull().unique(),
+  priceId: varchar("price_id", { length: 64 }).notNull().unique(),
   name: membershipTierNameEnum("name").notNull(),
   priceCents: integer("price_cents").notNull(),
   billingInterval: billingIntervalEnum("billing_interval").notNull(),
@@ -79,7 +79,7 @@ export const subscriptionStatusEnum = pgEnum("subscription_status", enumToPgEnum
 
 export const SubscriptionsTable = pgTable("subscriptions", {
   id: serial("id").primaryKey(),
-  subscriptionId: varchar("subscription_id", { length: 20 }).notNull().unique(),
+  subscriptionId: varchar("subscription_id", { length: 64 }).notNull().unique(),
   userId: uuid("user_id")
     .notNull()
     .references(() => UserTable.id)
