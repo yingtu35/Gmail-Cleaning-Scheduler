@@ -4,7 +4,7 @@ import "dotenv-flow/config";
 
 import { neon } from "@neondatabase/serverless";
 import { NewUser, User } from "@/types/user";
-import { Task, NewTask } from "@/types/task";
+import { Task, NewTask, TaskStatus } from "@/types/task";
 
 import { UserTable, UserTasksTable } from "./schema";
 import { mockNewUser, mockNewTask } from "./mock-data";
@@ -44,7 +44,7 @@ async function createTask(task: NewTask) {
 async function updateTask(task: Task) {
   await db.update(UserTasksTable)
   .set({
-    status: "completed",
+    status: TaskStatus.COMPLETED,
   })
   .where(eq(UserTasksTable.id, task.id as string));
   console.log("Task updated");

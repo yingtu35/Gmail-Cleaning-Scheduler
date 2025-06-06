@@ -71,6 +71,48 @@
       "when": 1748317000203,
       "tag": "0009_oval_mentor",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1749174276385,
+      "tag": "0010_sudden_bishop",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1749174524452,
+      "tag": "0011_aberrant_smiling_tiger",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1749176401889,
+      "tag": "0012_first_invisible_woman",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1749178440483,
+      "tag": "0013_superb_the_call",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1749181641183,
+      "tag": "0014_oval_union_jack",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "6",
+      "when": 1749182778430,
+      "tag": "0015_petite_dragon_man",
+      "breakpoints": true
     }
   ]
 }

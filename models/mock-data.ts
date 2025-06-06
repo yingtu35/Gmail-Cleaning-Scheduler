@@ -1,5 +1,5 @@
 import { NewUser } from "@/types/user";
-import { NewTask } from "@/types/task";
+import { NewTask, TaskStatus } from "@/types/task";
 
 export const mockNewUser: NewUser = {
   name: "Test User",
@@ -12,7 +12,7 @@ export const mockNewUser: NewUser = {
 
 export const mockNewTask: NewTask = {
   scheduleName: "Test Task",
-  status: "active",
+  status: TaskStatus.ACTIVE,
   emailsDeleted: 0,
   successCounts: 0,
   errorCounts: 0,

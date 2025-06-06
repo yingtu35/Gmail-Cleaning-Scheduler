@@ -10,7 +10,7 @@ import { createSchedule, updateSchedule, deleteSchedule, pauseSchedule, resumeSc
 import { subscribe } from "@/libs/aws/sns";
 
 import { User, NewUser, UserInfo, UserDateTimePromptType, SessionUser, UserInfoFromGoogle } from "@/types/user";
-import { Task, FormValues, AIPromptType, NewTask, NextScheduledTask, TaskCountsStats } from "@/types/task";
+import { Task, FormValues, AIPromptType, NewTask, NextScheduledTask, TaskCountsStats, TaskStatus } from "@/types/task";
 import { createScheduleName, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
 import { deriveNextExecutionDatetime } from "@/utils/date";
@@ -422,7 +422,7 @@ export async function pauseTask(taskId: string): Promise<void> {
     // update the task in the database
     await db.update(UserTasksTable)
       .set({
-        status: "paused",
+        status: TaskStatus.PAUSED,
       })
       .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, sessionUser.id)))
     
@@ -480,7 +480,7 @@ export async function resumeTask(taskId: string): Promise<void> {
     // update the task in the database
     await db.update(UserTasksTable)
       .set({
-        status: "active",
+        status: TaskStatus.ACTIVE,
       })
       .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, sessionUser.id)))
     
@@ -528,7 +528,7 @@ export async function getNextScheduledTask(): Promise<NextScheduledTask | null> 
     return null;
   }
   const task = await db.query.UserTasksTable.findFirst({
-    where: and(eq(UserTasksTable.userId, sessionUser.id), eq(UserTasksTable.status, "active")),
+    where: and(eq(UserTasksTable.userId, sessionUser.id), eq(UserTasksTable.status, TaskStatus.ACTIVE)),
     orderBy: [asc(UserTasksTable.nextExecutedAt)],
     columns: {
       id: true,
@@ -582,7 +582,7 @@ export async function getActiveTasksCount(): Promise<number> {
     value: count(),
   })
   .from(UserTasksTable)
-  .where(and(eq(UserTasksTable.userId, sessionUser.id), eq(UserTasksTable.status, "active")));
+  .where(and(eq(UserTasksTable.userId, sessionUser.id), eq(UserTasksTable.status, TaskStatus.ACTIVE)));
   if (!tasksCount || tasksCount.length === 0) {
     return 0;
   }
