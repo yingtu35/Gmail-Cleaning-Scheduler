@@ -6,6 +6,7 @@ import { UserTable, UserTasksTable } from "@/models/schema";
 import log from "@/utils/log";
 import { calculateNextExecutionDatetime, convertDateTimeObjectToDate, isStringDateFormat } from "@/utils/date";
 import { parseJsonToFormValues } from "@/utils/schedule";
+import { TaskStatus } from "@/types/task";
 
 export async function POST(request: NextRequest) {
   const apiKey = request.headers.get("x-api-key");
@@ -64,17 +65,17 @@ export async function POST(request: NextRequest) {
     const lastExecutedAtDate = new Date(lastExecutedAt);
     const accessTokenUpdatedAtDate = new Date(accessTokenUpdatedAt);
 
-    let newStatus: "active" | "completed" | "paused";
+    let newStatus: TaskStatus;
     let nextExecutedAt: Date | null = null;
     if (occurrence.Occurrence === "One-time") {
-      newStatus = "completed";
+      newStatus = TaskStatus.COMPLETED;
     } else {
       const { rate, endDateAndTime } = occurrence.Schedule;
       nextExecutedAt = calculateNextExecutionDatetime(lastExecutedAtDate, rate);
       if (nextExecutedAt > convertDateTimeObjectToDate(endDateAndTime)) {
-        newStatus = "completed";
+        newStatus = TaskStatus.COMPLETED;
       } else {
-        newStatus = "active";
+        newStatus = TaskStatus.ACTIVE;
       }
     }
 
