@@ -1,11 +1,11 @@
 DO $$ BEGIN
- CREATE TYPE "public"."billing_interval" AS ENUM('month', 'year');
+ CREATE TYPE "public"."billing_interval" AS ENUM('month', 'year'); -- Billing interval of subscription
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "public"."subscription_status" AS ENUM('active', 'past_due', 'unpaid', 'canceled');
+ CREATE TYPE "public"."subscription_status" AS ENUM('active', 'past_due', 'unpaid', 'canceled'); -- Status of subscription
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

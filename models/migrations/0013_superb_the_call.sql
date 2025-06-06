@@ -1,5 +1,5 @@
 DO $$ BEGIN
- CREATE TYPE "public"."membership_tier_name" AS ENUM('basic', 'pro', 'enterprise');
+ CREATE TYPE "public"."membership_tier_name" AS ENUM('basic', 'pro', 'enterprise'); -- Names of membership tiers
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
