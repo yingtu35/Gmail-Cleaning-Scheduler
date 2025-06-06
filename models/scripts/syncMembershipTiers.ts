@@ -6,8 +6,14 @@ import { NewMembershipTier, MembershipTierName, BillingInterval } from '@/types/
 import { db } from '../db'
 import { MembershipTiersTable } from '../schema';
 
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;  
+if (!stripeSecretKey) {  
+  console.error("FATAL: STRIPE_SECRET_KEY environment variable is not set. Please ensure it is defined in your .env file or environment.");  
+  process.exit(1);  
+} 
+
 // 1. Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2025-05-28.basil',
 });
 
@@ -18,7 +24,7 @@ async function fetchActivePrices() {
   let startingAfter: string | undefined = undefined;
 
   while (hasMore) {
-    const response: any = await stripe.prices.list({
+    const response: Stripe.ApiList<Stripe.Price> = await stripe.prices.list({
       limit: 100,
       active: true,
       expand: ['data.product'], // expand product to get its name
@@ -71,6 +77,11 @@ async function syncMembershipTiers() {
     const maxTotalJobsInt = parseInt(maxTotalJobs);
     const maxEmailsPerExecInt = parseInt(maxEmailsPerExec);
     const maxWindowInMinutesInt = parseInt(maxWindowInMinutes);
+
+    if (isNaN(maxActiveJobsInt) || isNaN(maxTotalJobsInt) || isNaN(maxEmailsPerExecInt) || isNaN(maxWindowInMinutesInt)) {  
+      console.error(`Price ${price.id} has invalid non-numeric metadata. Values: maxActiveJobs=${maxActiveJobs}, maxTotalJobs=${maxTotalJobs}, maxEmailsPerExec=${maxEmailsPerExec}, maxWindowInMinutes=${maxWindowInMinutes}`);  
+      continue;  
+    }
 
     const newTier: NewMembershipTier = {
       name: tierName as MembershipTierName,
