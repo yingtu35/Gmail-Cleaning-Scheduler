@@ -4,13 +4,15 @@ import { eq, and, count, desc, sum, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/models/db";
-import { UserTable, UserTasksTable } from "@/models/schema";
+import { MembershipTiersTable, SubscriptionsTable, UserTable, UserTasksTable } from "@/models/schema";
 import { auth, signIn, signOut } from "@/auth";
 import { createSchedule, updateSchedule, deleteSchedule, pauseSchedule, resumeSchedule } from "@/libs/aws/scheduler";
 import { subscribe } from "@/libs/aws/sns";
 
 import { User, NewUser, UserInfo, UserDateTimePromptType, SessionUser, UserInfoFromGoogle } from "@/types/user";
 import { Task, FormValues, AIPromptType, NewTask, NextScheduledTask, TaskCountsStats, TaskStatus } from "@/types/task";
+import { MembershipTier } from "@/types/membershipTier";
+
 import { createScheduleName, generateCreateScheduleCommand, generateUpdateScheduleCommand, parseJsonToFormValues } from "@/utils/schedule";
 import { isValidUser, isValidUUID, hasReachedTaskLimit } from "@/utils/database";
 import { deriveNextExecutionDatetime } from "@/utils/date";
@@ -19,6 +21,7 @@ import { getScheduleByPrompt } from "@/libs/openai/chat";
 
 import log from "../utils/log";
 import { parseTask } from "../utils/task";
+import { NewSubscription, Subscription } from "@/types/subscription";
 
 export async function authenticate() {
   await signIn('google', { callbackUrl: '/' });
@@ -596,4 +599,22 @@ export async function generateScheduleByPrompt(userDateTimePrompt: UserDateTimeP
   }
   const formValues = parseJsonToFormValues(result);
   return formValues;
+}
+
+export async function getMembershipTierByPriceId(priceId: string): Promise<MembershipTier | null> {
+  const membershipTier = await db.query.MembershipTiersTable.findFirst({
+    where: eq(MembershipTiersTable.priceId, priceId),
+  })
+  if (!membershipTier) {
+    return null;
+  }
+  return membershipTier as MembershipTier;
+}
+
+export async function createSubscription(subscription: NewSubscription): Promise<Subscription | null> {
+  const result = await db.insert(SubscriptionsTable).values(subscription).returning();
+  if (!result || result.length === 0) {
+    return null;
+  }
+  return result[0] as Subscription;
 }
