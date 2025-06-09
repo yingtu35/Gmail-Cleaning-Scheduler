@@ -21,7 +21,7 @@ import { getScheduleByPrompt } from "@/libs/openai/chat";
 
 import log from "../utils/log";
 import { parseTask } from "../utils/task";
-import { NewSubscription, Subscription } from "@/types/subscription";
+import { NewSubscription, Subscription, UpdatedSubscription } from "@/types/subscription";
 
 export async function authenticate() {
   await signIn('google', { callbackUrl: '/' });
@@ -611,10 +611,43 @@ export async function getMembershipTierByPriceId(priceId: string): Promise<Membe
   return membershipTier as MembershipTier;
 }
 
+export async function getSubscriptionById(subscriptionId: string): Promise<Subscription | null> {
+  const subscription = await db.query.SubscriptionsTable.findFirst({
+    where: eq(SubscriptionsTable.subscriptionId, subscriptionId),
+  })
+  if (!subscription) {
+    return null;
+  }
+  return subscription as Subscription;
+}
+
 export async function createSubscription(subscription: NewSubscription): Promise<Subscription | null> {
   const result = await db.insert(SubscriptionsTable).values(subscription).returning();
   if (!result || result.length === 0) {
     return null;
   }
   return result[0] as Subscription;
+}
+
+export async function updateSubscription(subscriptionId: string, subscription: UpdatedSubscription): Promise<Subscription | null> {
+  const result = await db.update(SubscriptionsTable)
+    .set(subscription)
+    .where(eq(SubscriptionsTable.subscriptionId, subscriptionId))
+    .returning();
+  if (!result || result.length === 0) {
+    return null;
+  }
+  return result[0] as Subscription;
+}
+
+export async function deleteSubscription(subscriptionId: string): Promise<boolean> {
+  const result = await db.delete(SubscriptionsTable)
+    .where(eq(SubscriptionsTable.subscriptionId, subscriptionId))
+    .returning({
+      id: SubscriptionsTable.id,
+    });
+  if (!result || result.length === 0) {
+    return false;
+  }
+  return true;
 }
