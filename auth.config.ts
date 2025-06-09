@@ -6,7 +6,8 @@ import log from "@/utils/log";
 import { hasChangedUserInfo } from "@/utils/database";
 import { NextResponse } from "next/server";
 
-const publicPaths = ['/'];
+const SIGN_IN_PATH = "/";
+const publicPaths = [SIGN_IN_PATH];
 
 export const autoConfig = {
   providers: [
@@ -24,7 +25,7 @@ export const autoConfig = {
     }),
   ],
   pages: {
-    signIn: "/", // ? Redirect to home page
+    signIn: SIGN_IN_PATH, // Specify the sign-in page when redirecting to it
   },
   callbacks: {
     async jwt({ token, user, account }) {
