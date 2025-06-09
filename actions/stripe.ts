@@ -115,13 +115,13 @@ export async function handleCompletedCheckoutSession(event: Stripe.CheckoutSessi
 
 async function fulfillUpdatedSubscription(
   session: Stripe.Subscription, 
-  status: SubscriptionStatus.ACTIVE
+  status: SubscriptionStatus.ACTIVE,
+  eventCreatedAt: number
 ): Promise<boolean> {
   const { 
     id: subscriptionId,
     cancel_at: cancelAtInSeconds, // timestamp when the subscription will be canceled
     canceled_at: canceledAtInSeconds, // timestamp when user cancels the subscription
-    created: updatedAtInSeconds,
     items
   } = session
   const item = items.data[0]
@@ -144,7 +144,7 @@ async function fulfillUpdatedSubscription(
     membershipTierId: membershipTier.id,
     cancelAt: cancelAtInSeconds ? new Date(cancelAtInSeconds * 1000) : null,
     canceledAt: canceledAtInSeconds ? new Date(canceledAtInSeconds * 1000) : null,
-    updatedAt: new Date(updatedAtInSeconds * 1000)
+    updatedAt: new Date(eventCreatedAt * 1000)
   }
 
   const isUpdated = await updateSubscription(subscriptionId,updatedSubscription)
@@ -177,11 +177,11 @@ async function fulfillCanceledSubscription(
 
 async function fulfillPastDueSubscription(
   session: Stripe.Subscription, 
-  status: SubscriptionStatus.PAST_DUE
+  status: SubscriptionStatus.PAST_DUE,
+  eventCreatedAt: number
 ): Promise<boolean> {
   const { 
     id: subscriptionId,
-    created: updatedAtInSeconds,
   } = session
 
   const subscription = await getSubscriptionById(subscriptionId)
@@ -192,7 +192,7 @@ async function fulfillPastDueSubscription(
 
   const pastDueSubscription: UpdatedSubscription = {
     status: status,
-    updatedAt: new Date(updatedAtInSeconds * 1000)
+    updatedAt: new Date(eventCreatedAt * 1000)
   }
 
   const isUpdated = await updateSubscription(subscriptionId, pastDueSubscription)
@@ -205,6 +205,7 @@ async function fulfillPastDueSubscription(
 }
 
 export async function handleUpdatedSubscription(event: Stripe.CustomerSubscriptionUpdatedEvent) {
+  const { created: eventCreatedAt } = event
   const session: Stripe.Subscription = event.data.object
   log.debug('Updated subscription', session)
 
@@ -213,10 +214,10 @@ export async function handleUpdatedSubscription(event: Stripe.CustomerSubscripti
   let isFulfilled = false
   switch (status) {
     case SubscriptionStatus.ACTIVE:
-      isFulfilled = await fulfillUpdatedSubscription(session, SubscriptionStatus.ACTIVE)
+      isFulfilled = await fulfillUpdatedSubscription(session, SubscriptionStatus.ACTIVE, eventCreatedAt)
       break
     case SubscriptionStatus.PAST_DUE:
-      isFulfilled = await fulfillPastDueSubscription(session, SubscriptionStatus.PAST_DUE)
+      isFulfilled = await fulfillPastDueSubscription(session, SubscriptionStatus.PAST_DUE, eventCreatedAt)
       break
     // TODO: Handle other statuses, like incomplete, incomplete_expired, paused, unpaid, etc.
     default:
