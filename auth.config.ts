@@ -121,7 +121,7 @@ export const autoConfig = {
 
       const isAuthenticated = !!auth;
       if (!isAuthenticated) {
-        return NextResponse.redirect(new URL('/', request.url));
+        return NextResponse.redirect(new URL(SIGN_IN_PATH, request.url));
       }
       return true;
     },
