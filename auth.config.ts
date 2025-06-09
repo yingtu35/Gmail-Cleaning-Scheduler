@@ -4,6 +4,9 @@ import { NewUser, UserInfoFromGoogle } from "@/types/user";
 import { createUserOnSignIn, getUserInfoByEmail, updateUserOnSignIn, subscribeEmailNotification } from "@/libs/actions";
 import log from "@/utils/log";
 import { hasChangedUserInfo } from "@/utils/database";
+import { NextResponse } from "next/server";
+
+const publicPaths = ['/'];
 
 export const autoConfig = {
   providers: [
@@ -20,9 +23,9 @@ export const autoConfig = {
       }
     }),
   ],
-  // pages: {
-  //   signIn: "/", // ? Redirect to home page
-  // },
+  pages: {
+    signIn: "/", // ? Redirect to home page
+  },
   callbacks: {
     async jwt({ token, user, account }) {
       // Initial sign-in
@@ -110,8 +113,16 @@ export const autoConfig = {
 
     authorized({ request, auth }) {
       const { pathname } = request.nextUrl
-      if (pathname === "/middleware-example") return !!auth
-      return true
+      const isPublicPath = publicPaths.includes(pathname);
+      if (isPublicPath) {
+        return true;
+      }
+
+      const isAuthenticated = !!auth;
+      if (!isAuthenticated) {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+      return true;
     },
   },
 } satisfies NextAuthConfig;
