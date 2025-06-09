@@ -88,7 +88,7 @@ export async function handleCompletedCheckoutSession(event: Stripe.CheckoutSessi
 
     const { payment_status, line_items } = checkoutSession
 
-    if (!line_items) {
+    if (!line_items || !line_items.data || line_items.data.length === 0) {
       log.error('No line items found in checkout session', checkoutSession)
       return false
     }
@@ -124,6 +124,12 @@ async function fulfillUpdatedSubscription(
     canceled_at: canceledAtInSeconds, // timestamp when user cancels the subscription
     items
   } = session
+
+  if (!items || !items.data || items.data.length === 0) {
+    log.error('No items found in subscription', session)
+    return false
+  }
+
   const item = items.data[0]
   const { price } = item
   const { id: priceId } = price
