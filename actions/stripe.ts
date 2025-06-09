@@ -2,8 +2,19 @@ import Stripe from "stripe";
 
 import { stripe } from "@/libs/stripe/client";
 import log from "@/utils/log";
-import { NewSubscription, SubscriptionStatus } from "@/types/subscription";
-import { createSubscription, getMembershipTierByPriceId, getUserInfoByEmail } from "@/libs/actions";
+import { 
+  NewSubscription, 
+  UpdatedSubscription, 
+  SubscriptionStatus 
+} from "@/types/subscription";
+import { 
+  createSubscription, 
+  deleteSubscription, 
+  getMembershipTierByPriceId, 
+  getSubscriptionById, 
+  getUserInfoByEmail,
+  updateSubscription
+} from "@/libs/actions";
 
 async function fullfillCheckoutOrder(lineItem: Stripe.LineItem, checkoutSession: Stripe.Checkout.Session) {
   const { price } = lineItem
@@ -100,4 +111,141 @@ export async function handleCompletedCheckoutSession(event: Stripe.CheckoutSessi
     log.error('Failed to retrieve checkout session', err)
     return false
   }
+}
+
+async function fulfillUpdatedSubscription(
+  session: Stripe.Subscription, 
+  status: SubscriptionStatus.ACTIVE
+): Promise<boolean> {
+  const { 
+    id: subscriptionId,
+    cancel_at: cancelAtInSeconds, // timestamp when the subscription will be canceled
+    canceled_at: canceledAtInSeconds, // timestamp when user cancels the subscription
+    created: updatedAtInSeconds,
+    items
+  } = session
+  const item = items.data[0]
+  const { price } = item
+  const { id: priceId } = price
+
+  const subscription = await getSubscriptionById(subscriptionId)
+  if (!subscription) {
+    log.error('No subscription found in database', subscriptionId)
+    return false
+  }
+  const membershipTier = await getMembershipTierByPriceId(priceId)
+  if (!membershipTier) {
+    log.error('No membership tier found in database', priceId)
+    return false
+  }
+
+  const updatedSubscription: UpdatedSubscription = {
+    status: status,
+    membershipTierId: membershipTier.id,
+    cancelAt: cancelAtInSeconds ? new Date(cancelAtInSeconds * 1000) : null,
+    canceledAt: canceledAtInSeconds ? new Date(canceledAtInSeconds * 1000) : null,
+    updatedAt: new Date(updatedAtInSeconds * 1000)
+  }
+
+  const isUpdated = await updateSubscription(subscriptionId,updatedSubscription)
+  if (!isUpdated) {
+    log.error('Failed to update subscription', updatedSubscription)
+    return false
+  }
+
+  return true  
+}
+
+async function fulfillCanceledSubscription(
+  session: Stripe.Subscription, 
+): Promise<boolean> {
+  const { id: subscriptionId } = session
+  const subscription = await getSubscriptionById(subscriptionId)
+  if (!subscription) {
+    log.error('No subscription found in database', subscriptionId)
+    return false
+  }
+
+  const isDeleted = await deleteSubscription(subscriptionId)
+  if (!isDeleted) {
+    log.error('Failed to delete subscription', subscriptionId)
+    return false
+  }
+
+  return true
+}
+
+async function fulfillPastDueSubscription(
+  session: Stripe.Subscription, 
+  status: SubscriptionStatus.PAST_DUE
+): Promise<boolean> {
+  const { 
+    id: subscriptionId,
+    created: updatedAtInSeconds,
+  } = session
+
+  const subscription = await getSubscriptionById(subscriptionId)
+  if (!subscription) {
+    log.error('No subscription found in database', subscriptionId)
+    return false
+  }
+
+  const pastDueSubscription: UpdatedSubscription = {
+    status: status,
+    updatedAt: new Date(updatedAtInSeconds * 1000)
+  }
+
+  const isUpdated = await updateSubscription(subscriptionId, pastDueSubscription)
+  if (!isUpdated) {
+    log.error('Failed to update subscription', pastDueSubscription)
+    return false
+  }
+
+  return true
+}
+
+export async function handleUpdatedSubscription(event: Stripe.CustomerSubscriptionUpdatedEvent) {
+  const session: Stripe.Subscription = event.data.object
+  log.debug('Updated subscription', session)
+
+  const { status } = session
+
+  let isFulfilled = false
+  switch (status) {
+    case SubscriptionStatus.ACTIVE:
+      isFulfilled = await fulfillUpdatedSubscription(session, SubscriptionStatus.ACTIVE)
+      break
+    case SubscriptionStatus.PAST_DUE:
+      isFulfilled = await fulfillPastDueSubscription(session, SubscriptionStatus.PAST_DUE)
+      break
+    // TODO: Handle other statuses, like incomplete, incomplete_expired, paused, unpaid, etc.
+    default:
+      log.error('Unknown subscription status', status)
+      return false
+  }
+  if (!isFulfilled) {
+    log.error('Failed to fulfill updated subscription', { session })
+    return false
+  }
+
+  return true
+}
+
+export async function handleDeletedSubscription(event: Stripe.CustomerSubscriptionDeletedEvent) {
+  const session: Stripe.Subscription = event.data.object
+  log.debug('Deleted subscription', session)
+
+  const { status } = session
+  if (status !== SubscriptionStatus.CANCELED) {
+    log.error('Subscription is not canceled', session)
+    return false
+  }
+
+  const isFulfilled = await fulfillCanceledSubscription(session)
+  if (!isFulfilled) {
+    log.error('Failed to fulfill canceled subscription', session)
+    return false
+  }
+
+  return true
 }

@@ -3,23 +3,13 @@ import Stripe from "stripe";
 
 import { stripe } from "@/libs/stripe/client";
 import log from "@/utils/log";
-import { handleCompletedCheckoutSession } from "@/actions/stripe";
+import { 
+  handleCompletedCheckoutSession, 
+  handleUpdatedSubscription,
+  handleDeletedSubscription
+} from "@/actions/stripe";
+
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET!
-
-async function handleUpdatedSubscription(event: Stripe.CustomerSubscriptionUpdatedEvent) {
-  // TODO: Implement the logic to update the subscription
-  const session: Stripe.Subscription = event.data.object
-  log.debug('Updated subscription', session)
-
-  return true
-}
-
-async function handleDeletedSubscription(event: Stripe.CustomerSubscriptionDeletedEvent) {
-  // TODO: Implement the logic to delete the subscription
-  const session: Stripe.Subscription = event.data.object
-  log.debug('Deleted subscription', session)
-  return true
-}
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -45,9 +35,6 @@ export async function POST(request: NextRequest) {
         log.error('Failed to handle completed checkout session', event)
         return NextResponse.json({ error: 'Failed to handle completed checkout session' }, { status: 500 })
       }
-      break
-    case 'customer.subscription.created':
-      // log.info('Customer subscription created ', event)
       break
     case 'customer.subscription.updated':
       const updatedSubscription = await handleUpdatedSubscription(event)
