@@ -7,5 +7,5 @@ export async function findMembershipTierByPriceId(priceId: string): Promise<Memb
     const membershipTier = await db.query.MembershipTiersTable.findFirst({
       where: eq(MembershipTiersTable.priceId, priceId),
     });
-    return (membershipTier as MembershipTier) ?? null;
+    return membershipTier ?? null;
 } 

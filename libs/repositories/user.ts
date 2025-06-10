@@ -7,7 +7,7 @@ export async function getUserById(userId: string): Promise<User | null> {
   const user = await db.query.UserTable.findFirst({
     where: eq(UserTable.id, userId),
   });
-  return (user as User) ?? null;
+  return user ?? null;
 }
 
 export async function getUserByEmail(email: string): Promise<UserInfo | null> {
@@ -20,7 +20,7 @@ export async function getUserByEmail(email: string): Promise<UserInfo | null> {
         image: true
       }
     });
-    return (user as UserInfo) ?? null;
+    return user ?? null;
 }
 
 export async function createUser(user: NewUser) {

@@ -7,7 +7,7 @@ export async function findSubscriptionById(subscriptionId: string): Promise<Subs
     const subscription = await db.query.SubscriptionsTable.findFirst({
       where: eq(SubscriptionsTable.subscriptionId, subscriptionId),
     });
-    return (subscription as Subscription) ?? null;
+    return subscription ?? null;
 }
 
 export async function createSubscription(subscription: NewSubscription): Promise<Subscription | null> {
@@ -15,7 +15,7 @@ export async function createSubscription(subscription: NewSubscription): Promise
     if (!result || result.length === 0) {
       return null;
     }
-    return result[0] as Subscription;
+    return result[0];
 }
 
 export async function updateSubscription(subscriptionId: string, subscription: UpdatedSubscription): Promise<Subscription | null> {
@@ -26,12 +26,12 @@ export async function updateSubscription(subscriptionId: string, subscription: U
     if (!result || result.length === 0) {
       return null;
     }
-    return result[0] as Subscription;
+    return result[0];
 }
   
 export async function deleteSubscription(subscriptionId: string): Promise<Subscription | null > {
     const result = await db.delete(SubscriptionsTable)
       .where(eq(SubscriptionsTable.subscriptionId, subscriptionId))
       .returning();
-    return (result[0] as Subscription) ?? null;
+    return result[0] ?? null;
 } 

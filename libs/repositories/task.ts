@@ -50,7 +50,7 @@ export async function deleteTask(taskId: string, userId: string): Promise<Task |
     const result = await db.delete(UserTasksTable)
       .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, userId)))
       .returning();
-    return (result[0] as Task) ?? null;
+    return result[0] ?? null;
 }
 
 export async function restoreTask(task: Task): Promise<void> {
@@ -76,7 +76,7 @@ export async function getNextScheduledTaskByUserId(userId: string): Promise<Next
           nextExecutedAt: true,
         }
     });
-    return (task as NextScheduledTask) ?? null;
+    return task ?? null;
 }
 
 export async function getTaskCountsStatsByUserId(userId: string): Promise<TaskCountsStats | null> {
