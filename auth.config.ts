@@ -7,6 +7,7 @@ import { createUserOnSignIn, getUserInfoByEmail, updateUserOnSignIn } from "@/ac
 import { subscribeEmailNotification } from "@/actions/notification";
 import log from "@/utils/log";
 import { hasChangedUserInfo } from "@/utils/database";
+import { getSubscriptionDetails } from "./actions/subscription";
 
 const SIGN_IN_PATH = "/";
 const publicPaths = [SIGN_IN_PATH];
@@ -45,6 +46,8 @@ export const autoConfig = {
           if (userIdRecord && userIdRecord.id) {
             token.userId = userIdRecord.id;
             log.debug("JWT callback: userId added to token during initial sign-in", { userId: userIdRecord.id });
+            token.subscriptionDetails = await getSubscriptionDetails(token.userId);
+            log.debug("JWT callback: subscription details added to token during initial sign-in", { subscriptionDetails: token.subscriptionDetails });
           } else {
             log.error("JWT callback: Could not find user ID for email during initial sign-in", { email: user.email });
             return { ...token, error: "UserIDMissingError" }; 
@@ -67,12 +70,14 @@ export const autoConfig = {
       if (token.expiresAt) {
         session.expiresAt = token.expiresAt as number;
       }
-      // log.debug("Session callback: updated session", { session });
+      if (token.subscriptionDetails) {
+        session.user.subscriptionDetails = token.subscriptionDetails;
+      }
+      log.debug("Session callback: updated session subscription details", { subscriptionDetails: session.user.subscriptionDetails });
       return session;
     },
     /* Use the signIn() callback to control if a user is allowed to sign in. */
     async signIn({ user, account, profile }) {
-      log.debug("signIn: ", user, account, profile);
       // reject sign in if email is not verified
       if (!account || !profile) {
         log.error("signIn: No account or profile found");

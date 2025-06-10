@@ -10,6 +10,13 @@ export async function findSubscriptionById(subscriptionId: string): Promise<Subs
     return subscription ?? null;
 }
 
+export async function findSubscriptionByUserId(userId: string): Promise<Subscription | null> {
+    const subscription = await db.query.SubscriptionsTable.findFirst({
+      where: eq(SubscriptionsTable.userId, userId),
+    });
+    return subscription ?? null;
+}
+
 export async function createSubscription(subscription: NewSubscription): Promise<Subscription | null> {
     const result = await db.insert(SubscriptionsTable).values(subscription).returning();
     if (!result || result.length === 0) {
