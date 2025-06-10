@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/utils/cn';
-import { createTask } from '@/libs/actions';
+import { createTask } from '@/actions/task';
 import { formValuesSchema }  from '@/validations/form'
 import type { FormValues } from '@/types/task'
 import {

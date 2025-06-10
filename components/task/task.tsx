@@ -9,7 +9,7 @@ import { ChevronDownIcon } from "lucide-react"
 import { Task as TaskType } from "@/types/task"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { deleteTask, pauseTask, resumeTask } from "@/libs/actions"
+import { deleteTask, pauseTask, resumeTask } from "@/actions/task"
 import { ScheduleDetail } from "@/components/task/detail/schedule-detail"
 import { TaskDetail } from "@/components/task/detail/task-detail"
 import {

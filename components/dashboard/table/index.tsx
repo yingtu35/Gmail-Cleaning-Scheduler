@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Task } from "@/types/task";
-import { getTasks } from "@/libs/actions";
+import { getTasks } from "@/actions/task";
 
 import { columns } from './columns';
 import { DataTable } from './data-table';

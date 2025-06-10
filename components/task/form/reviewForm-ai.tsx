@@ -5,7 +5,7 @@ import {
   AIFormValues,
 } from '@/types/task';
 import { Button } from '@/components/ui/button';
-import { generateScheduleByPrompt } from '@/libs/actions';
+import { generateScheduleByPrompt } from '@/actions/ai';
 
 import { ScheduleDetail } from '@/components/task/detail/schedule-detail';
 import { TaskDetail } from '@/components/task/detail/task-detail';

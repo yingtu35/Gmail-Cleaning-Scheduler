@@ -1,4 +1,4 @@
-import { getAuthenticatedUser } from "@/libs/actions"
+import { getAuthenticatedUser } from "@/actions/user"
 import { SectionCards } from "@/components/section-cards"
 
 export default async function Overview() {

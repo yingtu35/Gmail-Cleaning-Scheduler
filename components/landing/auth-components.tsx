@@ -1,9 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { authenticate } from "@/libs/actions";
+import { authenticate } from "@/actions/auth";
 import useLoadingButton from "@/hooks/useLoadingButton";
-import { Loader } from "../loader";
+import { Loader } from "@/components/loader";
 
 export function SignIn({
   provider,

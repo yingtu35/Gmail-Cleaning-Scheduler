@@ -12,9 +12,9 @@ import {
   deleteSubscription, 
   getMembershipTierByPriceId, 
   getSubscriptionById, 
-  getUserInfoByEmail,
   updateSubscription
-} from "@/libs/actions";
+} from "@/actions/subscription";
+import { getUserInfoByEmail } from "@/actions/user";
 
 async function fullfillCheckoutOrder(lineItem: Stripe.LineItem, checkoutSession: Stripe.Checkout.Session) {
   const { price } = lineItem

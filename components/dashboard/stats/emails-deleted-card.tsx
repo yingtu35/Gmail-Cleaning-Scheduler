@@ -1,6 +1,6 @@
 import { Trash, TrashIcon } from "lucide-react"
 
-import { getTotalEmailsDeleted } from "@/libs/actions"
+import { getTotalEmailsDeleted } from "@/actions/task"
 import {
   Card,
   CardDescription,
