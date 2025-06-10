@@ -1,0 +1,1 @@
+ALTER TABLE "membership_tier" ADD COLUMN "allowed_schedule_frequencies" text[] DEFAULT '{}'::text[] NOT NULL;

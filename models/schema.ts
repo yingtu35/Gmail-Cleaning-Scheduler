@@ -1,5 +1,5 @@
-import { pgEnum, pgTable, uuid, integer, varchar, timestamp, index, uniqueIndex, json, serial } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { pgEnum, pgTable, uuid, integer, varchar, timestamp, index, uniqueIndex, json, serial, text } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
 
 import { type FormValues, TaskStatus } from '@/types/task';
 import { SubscriptionStatus } from '@/types/subscription';
@@ -68,6 +68,10 @@ export const MembershipTiersTable = pgTable("membership_tier", {
   maxTotalJobs: integer("max_total_jobs").notNull(),
   maxEmailsPerExec: integer("max_emails_per_exec").notNull(),
   maxWindowInMinutes: integer("max_window_in_minutes").notNull(),
+  allowedScheduleFrequencies: text("allowed_schedule_frequencies")
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
   ...timestamps,
 });
 
