@@ -1,5 +1,5 @@
 import { Task as TaskType } from "@/types/task";
-import { getTaskById } from "@/libs/actions";
+import { getTaskById } from "@/actions/task";
 import Task from "@/components/task/task";
 export default async function Page({
   params

@@ -1,6 +1,6 @@
 import { CalendarIcon } from "lucide-react"
 
-import { getNextScheduledTask } from "@/libs/actions"
+import { getNextScheduledTask } from "@/actions/task"
 import { Badge } from "@/components/ui/badge"
 import {
   Card,

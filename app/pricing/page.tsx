@@ -1,5 +1,5 @@
 import Pricing from '@/components/pricing';
-import { getSessionUser } from '@/libs/actions';
+import { getSessionUser } from '@/actions/user';
 
 export default async function Page() {
   const sessionUser = await getSessionUser()

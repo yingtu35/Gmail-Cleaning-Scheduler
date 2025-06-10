@@ -10,7 +10,7 @@ import { cn } from '@/utils/cn';
 import {
   FormValues,
 } from '@/types/task';
-import { updateTask } from '@/libs/actions';
+import { updateTask } from '@/actions/task';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formValuesSchema }  from '@/validations/form'
 import {

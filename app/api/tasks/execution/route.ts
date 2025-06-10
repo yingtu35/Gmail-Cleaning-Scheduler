@@ -7,6 +7,8 @@ import log from "@/utils/log";
 import { calculateNextExecutionDatetime, convertDateTimeObjectToDate, isStringDateFormat } from "@/utils/date";
 import { parseJsonToFormValues } from "@/utils/schedule";
 import { TaskStatus } from "@/types/task";
+import * as userRepository from '@/libs/repositories/user';
+import * as taskRepository from '@/libs/repositories/task';
 
 export async function POST(request: NextRequest) {
   const apiKey = request.headers.get("x-api-key");
@@ -42,18 +44,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid accessTokenUpdatedAt" }, { status: 400 });
     }
 
-    const user = await db.query.UserTable.findFirst({
-      where: eq(UserTable.id, userId),
-    });
+    const user = await userRepository.getUserById(userId);
 
     if (!user) {
       log.error("User not found", { userId });
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const task = await db.query.UserTasksTable.findFirst({
-      where: and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, userId)),
-    });
+    const task = await taskRepository.findTask(taskId, userId);
 
     if (!task) {
       log.error("Task not found", { userId, taskId });
@@ -80,20 +78,17 @@ export async function POST(request: NextRequest) {
     }
 
     // update user
-    await db.update(UserTable).set({
-      accessToken,
-      accessTokenUpdatedAt: accessTokenUpdatedAtDate,
-    }).where(eq(UserTable.id, userId));
+    await userRepository.updateUserToken(userId, accessToken, accessTokenUpdatedAtDate);
 
     // update task
-    await db.update(UserTasksTable).set({
+    await taskRepository.updateTaskExecutionResult(taskId, {
       status: newStatus,
       emailsDeleted: task.emailsDeleted + emailsDeleted,
       successCounts: task.successCounts + (isSuccessful ? 1 : 0),
       errorCounts: task.errorCounts + (isSuccessful ? 0 : 1),
       lastExecutedAt: lastExecutedAtDate,
       nextExecutedAt: nextExecutedAt,
-    }).where(eq(UserTasksTable.id, taskId));
+    });
   } catch (error) {
     log.error("Error updating user and task", { error });
     return NextResponse.json({ error: "Error updating user and task" }, { status: 500 });

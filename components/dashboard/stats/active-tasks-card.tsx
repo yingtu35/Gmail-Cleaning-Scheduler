@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { getActiveTasksCount } from "@/libs/actions";
+import { getActiveTasksCount } from "@/actions/task";
 
 // In the future, this function would fetch data from the database
 async function getActiveTasksStats() {

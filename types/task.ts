@@ -17,6 +17,15 @@ export type NextScheduledTask = Pick<Task, "id" | "nextExecutedAt" | "formValues
 
 export type TaskCountsStats = Pick<Task, "successCounts" | "errorCounts">;
 
+export type TaskExecutionUpdate = Pick<Task,
+  "status" |
+  "emailsDeleted" |
+  "successCounts" |
+  "errorCounts" |
+  "lastExecutedAt" |
+  "nextExecutedAt"
+>;
+
 export type FormValues = z.infer<typeof formValuesSchema>;
 
 export type AIPromptType = z.infer<typeof PromptSchema>;

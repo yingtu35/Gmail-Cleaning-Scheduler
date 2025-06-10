@@ -23,7 +23,7 @@ import {
   DestructiveAlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { Task } from "@/types/task";
-import { deleteTask } from "@/libs/actions";
+import { deleteTask } from "@/actions/task";
 
 interface TaskActionsCellProps {
   task: Task;

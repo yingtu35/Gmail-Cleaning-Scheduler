@@ -1,10 +1,12 @@
 import type { NextAuthConfig } from "next-auth";
+import { NextResponse } from "next/server";
 import Google from "next-auth/providers/google";
+
 import { NewUser, UserInfoFromGoogle } from "@/types/user";
-import { createUserOnSignIn, getUserInfoByEmail, updateUserOnSignIn, subscribeEmailNotification } from "@/libs/actions";
+import { createUserOnSignIn, getUserInfoByEmail, updateUserOnSignIn } from "@/actions/user";
+import { subscribeEmailNotification } from "@/actions/notification";
 import log from "@/utils/log";
 import { hasChangedUserInfo } from "@/utils/database";
-import { NextResponse } from "next/server";
 
 const SIGN_IN_PATH = "/";
 const publicPaths = [SIGN_IN_PATH];
