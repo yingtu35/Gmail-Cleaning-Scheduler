@@ -22,6 +22,10 @@ import { getScheduleByPrompt } from "@/libs/openai/chat";
 import log from "../utils/log";
 import { parseTask } from "../utils/task";
 import { NewSubscription, Subscription, UpdatedSubscription } from "@/types/subscription";
+import * as userRepository from '@/libs/repositories/user';
+import * as taskRepository from '@/libs/repositories/task';
+import * as subscriptionRepository from '@/libs/repositories/subscription';
+import * as membershipRepository from '@/libs/repositories/membership';
 
 export async function authenticate() {
   await signIn('google', { callbackUrl: '/' });
@@ -92,37 +96,17 @@ export async function getUserInfoByEmail(email: string): Promise<UserInfo | null
 
 // get user by id from the database
 export async function getDatabaseUserById(id: string) {
-  const user = await db.query.UserTable.findFirst({
-    where: eq(UserTable.id, id)
-  });
-  if (!user) {
-    return null;
-  }
-  return user as User;
+  return await userRepository.getUserById(id);
 }
 
 export async function updateUserOnSignIn(user: UserInfoFromGoogle) {
-  await db.update(UserTable).set({
-    name: user.name,
-    image: user.image,
-  })
-  .where(eq(UserTable.email, user.email))
+  await userRepository.updateUserOnSignIn(user);
   return;
 }
 
 // create a new user in the database
 export async function createUserOnSignIn(user: NewUser) {
-  await db.insert(UserTable).values(user)
-  .onConflictDoUpdate({
-    target: UserTable.email,
-    set: {
-      name: user.name,
-      image: user.image,
-      accessToken: user.accessToken,
-      accessTokenUpdatedAt: user.accessTokenUpdatedAt,
-      refreshToken: user.refreshToken,
-    }
-  })
+  await userRepository.createUser(user);
   return;
 }
 
@@ -136,13 +120,11 @@ export async function getTaskById(taskId: string): Promise<Task | null> {
   if (!isValidUUID(taskId)) {
     return null;
   }
-  const task = await db.query.UserTasksTable.findFirst({
-    where: and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, sessionUser.id)),
-  }) as Task | null;
+  const task = await taskRepository.findTask(taskId, sessionUser.id);
   if (!task) {
     return null;
   }
-  return parseTask(task);
+  return task;
 }
 
 export async function getTasks(): Promise<Task[]> {
@@ -151,25 +133,12 @@ export async function getTasks(): Promise<Task[]> {
     return [];
   }
   // get the tasks for the user
-  const tasks = await db.query.UserTasksTable.findMany({
-    where: eq(UserTasksTable.userId, sessionUser.id),
-    orderBy: [desc(UserTasksTable.updatedAt)],
-  })
-  const formattedTasks = tasks.map(parseTask);
-  return formattedTasks;
+  const tasks = await taskRepository.findTasksByUserId(sessionUser.id);
+  return tasks;
 }
 
 export async function getTasksCount(userId: string): Promise<number> {
-  const numOfTasks = await db
-    .select({
-      value: count(UserTasksTable.id),
-    })
-    .from(UserTasksTable)
-    .where(eq(UserTasksTable.userId, userId))
-  if (!numOfTasks || numOfTasks.length === 0) {
-    return 0;
-  }
-  return numOfTasks[0].value;
+  return await taskRepository.getTasksCountByUserId(userId);
 }
 
 // create a new task for the user in the database
@@ -205,15 +174,13 @@ export async function createTask(data: FormValues) {
       nextExecutedAt,
       userId: user.id,
     }
-    const result = await db.insert(UserTasksTable).values(newTask).returning({
-      id: UserTasksTable.id,
-    })
-    if (!result || result.length === 0) {
+    const result = await taskRepository.createTask(newTask);
+    if (!result || !result.id) {
       log.error("Error creating task in DB after schedule creation", { taskName: newTask.scheduleName });
       // Directly throw the error message you want on the toast
       throw new Error("Failed to save task details. Please try again later or contact support.");
     }
-    const returnedTaskId = result[0].id;
+    const returnedTaskId = result.id;
     // create a schedule for the task
     const commandInput = generateCreateScheduleCommand(data, user, returnedTaskId, scheduleName);
 
@@ -226,7 +193,7 @@ export async function createTask(data: FormValues) {
         errorDetails: response // Include the full response for more context if needed
       });
       // delete the task from the database
-      await db.delete(UserTasksTable).where(eq(UserTasksTable.id, returnedTaskId));
+      await taskRepository.deleteTask(returnedTaskId, user.id);
       // Directly throw the error message you want on the toast
       throw new Error("Failed to set up the task schedule. Please try again later or contact support.");
     }
@@ -286,13 +253,11 @@ export async function updateTask(data: FormValues, taskId: string) {
     }
     // update the task in the database
     const nextExecutedAt = deriveNextExecutionDatetime(data);
-    await db.update(UserTasksTable)
-      .set({
-        updatedAt: new Date(),
-        formValues: data,
-        nextExecutedAt,
-      })
-      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, user.id as string)))
+    await taskRepository.updateTask(taskId, user.id, {
+      updatedAt: new Date(),
+      formValues: data,
+      nextExecutedAt,
+    });
     
     log.debug("Updated task successfully in DB", { taskId });
     revalidatePath(`/tasks/${taskId}`);
@@ -332,16 +297,13 @@ export async function deleteTask(taskId: string) {
       throw new Error("Task not found. It might have been already deleted.");
     }
 
-    const deletedTaskFromDB = await db.delete(UserTasksTable)
-      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, sessionUser.id)))
-      .returning();
+    const deletedTask = await taskRepository.deleteTask(taskId, sessionUser.id);
 
-    if (!deletedTaskFromDB || deletedTaskFromDB.length === 0) {
+    if (!deletedTask) {
       log.error("Error deleting task from DB for deleteTask", { taskId });
       throw new Error("Failed to delete task details from the database. Please try again.");
     }
 
-    const deletedTask = deletedTaskFromDB[0] as Task;
     const scheduleName = deletedTask.scheduleName;
 
     // delete the schedule for the task
@@ -356,7 +318,7 @@ export async function deleteTask(taskId: string) {
       });
       // Attempt to restore the task in the database since schedule deletion failed
       try {
-        await db.insert(UserTasksTable).values(deletedTask);
+        await taskRepository.restoreTask(deletedTask);
         log.info("Restored task in DB after failed schedule deletion", { taskId, scheduleName });
       } catch (restoreError: any) {
         log.error("Failed to restore task in DB after schedule deletion error", {
@@ -423,11 +385,9 @@ export async function pauseTask(taskId: string): Promise<void> {
       throw new Error("Failed to pause the task. Please try again later or contact support.");
     }
     // update the task in the database
-    await db.update(UserTasksTable)
-      .set({
-        status: TaskStatus.PAUSED,
-      })
-      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, sessionUser.id)))
+    await taskRepository.updateTask(taskId, sessionUser.id, {
+      status: TaskStatus.PAUSED,
+    });
     
     log.debug("Paused task successfully in DB", { taskId });
     revalidatePath(`/tasks/${taskId}`);
@@ -481,11 +441,9 @@ export async function resumeTask(taskId: string): Promise<void> {
       throw new Error("Failed to resume the task. Please try again later or contact support.");
     }
     // update the task in the database
-    await db.update(UserTasksTable)
-      .set({
-        status: TaskStatus.ACTIVE,
-      })
-      .where(and(eq(UserTasksTable.id, taskId), eq(UserTasksTable.userId, sessionUser.id)))
+    await taskRepository.updateTask(taskId, sessionUser.id, {
+      status: TaskStatus.ACTIVE,
+    });
     
     log.debug("Resumed task successfully in DB", { taskId });
     revalidatePath(`/tasks/${taskId}`);
@@ -517,12 +475,7 @@ export async function getTotalEmailsDeleted(): Promise<number> {
   if (!sessionUser) {
     return 0;
   }
-  const totalEmailsDeleted = await db.select({
-    value: sum(UserTasksTable.emailsDeleted),
-  })
-  .from(UserTasksTable)
-  .where(eq(UserTasksTable.userId, sessionUser.id))
-  return  Number(totalEmailsDeleted[0]?.value ?? 0);
+  return await taskRepository.getTotalEmailsDeletedByUserId(sessionUser.id);
 }
 
 export async function getNextScheduledTask(): Promise<NextScheduledTask | null> {
@@ -530,15 +483,7 @@ export async function getNextScheduledTask(): Promise<NextScheduledTask | null> 
   if (!sessionUser) {
     return null;
   }
-  const task = await db.query.UserTasksTable.findFirst({
-    where: and(eq(UserTasksTable.userId, sessionUser.id), eq(UserTasksTable.status, TaskStatus.ACTIVE)),
-    orderBy: [asc(UserTasksTable.nextExecutedAt)],
-    columns: {
-      id: true,
-      formValues: true,
-      nextExecutedAt: true,
-    }
-  })
+  const task = await taskRepository.getNextScheduledTaskByUserId(sessionUser.id);
   if (!task) {
     return null;
   }
@@ -550,18 +495,9 @@ export async function getTaskCountsStats(): Promise<TaskCountsStats | null> {
   if (!sessionUser) {
     return null;
   }
-  const returnedTaskCountsStats = await db.select({
-    successCounts: sum(UserTasksTable.successCounts),
-    errorCounts: sum(UserTasksTable.errorCounts),
-  })
-  .from(UserTasksTable)
-  .where(eq(UserTasksTable.userId, sessionUser.id))
-  if (!returnedTaskCountsStats || returnedTaskCountsStats.length === 0) {
+  const taskCountsStats = await taskRepository.getTaskCountsStatsByUserId(sessionUser.id);
+  if (!taskCountsStats) {
     return null;
-  }
-  const taskCountsStats: TaskCountsStats = {
-    successCounts: Number(returnedTaskCountsStats[0]?.successCounts ?? 0),
-    errorCounts: Number(returnedTaskCountsStats[0]?.errorCounts ?? 0),
   }
   return taskCountsStats;
 }
@@ -581,15 +517,7 @@ export async function getActiveTasksCount(): Promise<number> {
   if (!sessionUser) {
     return 0;
   }
-  const tasksCount = await db.select({
-    value: count(),
-  })
-  .from(UserTasksTable)
-  .where(and(eq(UserTasksTable.userId, sessionUser.id), eq(UserTasksTable.status, TaskStatus.ACTIVE)));
-  if (!tasksCount || tasksCount.length === 0) {
-    return 0;
-  }
-  return tasksCount[0].value;
+  return await taskRepository.getActiveTasksCountByUserId(sessionUser.id);
 }
 
 export async function generateScheduleByPrompt(userDateTimePrompt: UserDateTimePromptType, prompt: AIPromptType): Promise<FormValues | string>{
@@ -602,51 +530,24 @@ export async function generateScheduleByPrompt(userDateTimePrompt: UserDateTimeP
 }
 
 export async function getMembershipTierByPriceId(priceId: string): Promise<MembershipTier | null> {
-  const membershipTier = await db.query.MembershipTiersTable.findFirst({
-    where: eq(MembershipTiersTable.priceId, priceId),
-  })
-  if (!membershipTier) {
-    return null;
-  }
-  return membershipTier as MembershipTier;
+  return await membershipRepository.findMembershipTierByPriceId(priceId);
 }
 
 export async function getSubscriptionById(subscriptionId: string): Promise<Subscription | null> {
-  const subscription = await db.query.SubscriptionsTable.findFirst({
-    where: eq(SubscriptionsTable.subscriptionId, subscriptionId),
-  })
-  if (!subscription) {
-    return null;
-  }
-  return subscription as Subscription;
+  return await subscriptionRepository.findSubscriptionById(subscriptionId);
 }
 
 export async function createSubscription(subscription: NewSubscription): Promise<Subscription | null> {
-  const result = await db.insert(SubscriptionsTable).values(subscription).returning();
-  if (!result || result.length === 0) {
-    return null;
-  }
-  return result[0] as Subscription;
+  return await subscriptionRepository.createSubscription(subscription);
 }
 
 export async function updateSubscription(subscriptionId: string, subscription: UpdatedSubscription): Promise<Subscription | null> {
-  const result = await db.update(SubscriptionsTable)
-    .set(subscription)
-    .where(eq(SubscriptionsTable.subscriptionId, subscriptionId))
-    .returning();
-  if (!result || result.length === 0) {
-    return null;
-  }
-  return result[0] as Subscription;
+  return await subscriptionRepository.updateSubscription(subscriptionId, subscription);
 }
 
 export async function deleteSubscription(subscriptionId: string): Promise<boolean> {
-  const result = await db.delete(SubscriptionsTable)
-    .where(eq(SubscriptionsTable.subscriptionId, subscriptionId))
-    .returning({
-      id: SubscriptionsTable.id,
-    });
-  if (!result || result.length === 0) {
+  const deletedSubscription = await subscriptionRepository.deleteSubscription(subscriptionId)
+  if (!deletedSubscription) {
     return false;
   }
   return true;
