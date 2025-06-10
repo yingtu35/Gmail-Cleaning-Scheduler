@@ -17,6 +17,12 @@ const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2025-05-28.basil',
 });
 
+function parseStringArray(value: string | string[] | undefined): string[] {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  return value.split(',');
+}
+
 // 2. Fetch all active Prices in Stripe (you can filter by product or metadata if needed)
 async function fetchActivePrices() {
   const prices: Stripe.Price[] = [];
@@ -80,6 +86,7 @@ async function syncMembershipTiers() {
     const maxTotalJobs = metadata["max_total_jobs"];
     const maxEmailsPerExec = metadata["max_emails_per_exec"];
     const maxWindowInMinutes = metadata["max_window_in_minutes"];
+    const allowedScheduleFrequencies = parseStringArray(metadata["allowed_schedule_frequencies"]);
 
     if (!maxActiveJobs || !maxTotalJobs || !maxEmailsPerExec || !maxWindowInMinutes) {
       console.error(`Price ${price.id} has missing metadata`);
@@ -105,6 +112,7 @@ async function syncMembershipTiers() {
       maxTotalJobs: maxTotalJobsInt,
       maxEmailsPerExec: maxEmailsPerExecInt,
       maxWindowInMinutes: maxWindowInMinutesInt,
+      allowedScheduleFrequencies: allowedScheduleFrequencies,
     }
 
     await db
@@ -113,13 +121,7 @@ async function syncMembershipTiers() {
       .onConflictDoUpdate({
         target: MembershipTiersTable.priceId,
         set: {
-          name: newTier.name,
-          priceCents: newTier.priceCents,
-          billingInterval: newTier.billingInterval,
-          maxActiveJobs: newTier.maxActiveJobs,
-          maxTotalJobs: newTier.maxTotalJobs,
-          maxEmailsPerExec: newTier.maxEmailsPerExec,
-          maxWindowInMinutes: newTier.maxWindowInMinutes,
+          ...newTier,
           updatedAt: new Date(),
         },
       });
