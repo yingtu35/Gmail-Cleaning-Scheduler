@@ -84,8 +84,23 @@ export async function createTask(data: FormValues) {
           requestId: response.$metadata.requestId,
           errorDetails: response
         });
-        await taskRepository.deleteTask(returnedTaskId, user.id);
-        throw new Error("Failed to set up the task schedule. Please try again later or contact support.");
+        let deleteSuccessful = false;
+        try {
+          await taskRepository.deleteTask(returnedTaskId, user.id);
+          deleteSuccessful = true;
+        } catch (deleteError: any) {
+          log.error("Failed to delete task in DB after schedule creation error", {
+            taskId: returnedTaskId,
+            scheduleName,
+            deleteErrorMessage: deleteError.message,
+            deleteErrorStack: deleteError.stack,
+          });
+        }
+        if (deleteSuccessful) {
+          throw new Error("Failed to set up the task schedule. Please try again later or contact support.");
+        } else {
+          throw new Error("Critical error: The task was not set up properly. Please contact support immediately.");
+        }
       }
       revalidatePath("/");
       return returnedTaskId;
@@ -199,18 +214,25 @@ export async function deleteTask(taskId: string) {
           scheduleName,
           taskId,
         });
-        try {
-          await taskRepository.restoreTask(deletedTask);
-          log.info("Restored task in DB after failed schedule deletion", { taskId, scheduleName });
-        } catch (restoreError: any) {
-          log.error("Failed to restore task in DB after schedule deletion error", {
-            taskId,
-            scheduleName,
-            restoreErrorMessage: restoreError.message,
-            restoreErrorStack: restoreError.stack,
-          });
-        }
-        throw new Error("Failed to delete the task schedule. The task may still exist. Please try again later or contact support.");
+        let restoreSuccessful = false;  
+        try {  
+          await taskRepository.restoreTask(deletedTask);  
+          log.info("Restored task in DB after failed schedule deletion", { taskId, scheduleName });  
+          restoreSuccessful = true;  
+        } catch (restoreError: any) {  
+          log.error("Failed to restore task in DB after schedule deletion error", {  
+            taskId,  
+            scheduleName,  
+            restoreErrorMessage: restoreError.message,  
+            restoreErrorStack: restoreError.stack,  
+          });  
+        }  
+
+        if (restoreSuccessful) {  
+          throw new Error("Failed to delete the task schedule. The task has been restored in the database, but the schedule may still exist. Please try again later or contact support.");  
+        } else {  
+          throw new Error("Critical error: Failed to delete the task schedule AND failed to restore the task in the database. The task data may be lost. Please contact support immediately.");  
+        }      
       }
   
       log.debug("Deleted task successfully", { taskId, scheduleName });
