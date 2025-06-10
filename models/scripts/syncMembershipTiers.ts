@@ -20,7 +20,7 @@ const stripe = new Stripe(stripeSecretKey, {
 function parseStringArray(value: string | string[] | undefined): string[] {
   if (!value) return [];
   if (Array.isArray(value)) return value;
-  return value.split(',');
+  return value.split(',').map(item => item.trim()).filter(item => item !== '');
 }
 
 // 2. Fetch all active Prices in Stripe (you can filter by product or metadata if needed)
