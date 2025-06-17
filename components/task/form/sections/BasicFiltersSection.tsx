@@ -142,7 +142,7 @@ export function BasicFiltersSection({ control, watch, errors }: BasicFiltersSect
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="size" />
+                        <SelectValue placeholder="Select comparison" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>

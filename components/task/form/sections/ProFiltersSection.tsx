@@ -248,7 +248,7 @@ export function ProFiltersSection({ control, watch, errors }: ProFiltersSectionP
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="size" />
+                        <SelectValue placeholder="Select comparison" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -340,7 +340,7 @@ export function ProFiltersSection({ control, watch, errors }: ProFiltersSectionP
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="size" />
+                        <SelectValue placeholder="Select comparison" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
