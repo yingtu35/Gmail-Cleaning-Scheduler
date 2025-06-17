@@ -136,7 +136,7 @@ const FormControlGroup = ({
   )
 }
 
-  interface EditFormProps {
+interface EditFormProps {
   task: FormValues;
   taskId: string;
   session: Session;

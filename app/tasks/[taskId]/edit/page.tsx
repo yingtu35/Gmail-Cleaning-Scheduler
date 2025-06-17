@@ -1,3 +1,5 @@
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { FormValues, Task as TaskType } from "@/types/task";
 import { getTaskById } from "@/actions/task";
 import EditForm from "@/components/task/form/edit-form";
@@ -16,13 +18,21 @@ export default async function Page({
     taskId: string;
   }
 }) {
+  const session = await auth();
   const task: TaskType | null = await getTaskById(params.taskId);
   // const task: TaskType | null = await getMockTask();
+  if (!session) {
+    redirect("/login");
+  }
   if (!task) {
     return <div>Task not found</div>
   }
   const formValues: FormValues = task.formValues
   return (
-    <EditForm task={formValues} taskId={params.taskId} />
+    <EditForm 
+      task={formValues} 
+      taskId={params.taskId} 
+      session={session}
+    />
   )
 }
