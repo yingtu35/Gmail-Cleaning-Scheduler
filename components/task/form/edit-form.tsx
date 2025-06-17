@@ -154,7 +154,7 @@ const EditForm = ({ task, taskId, session }: EditFormProps) => {
   const { handleSubmit, control, watch, formState: { errors }, trigger } = form;
 
   const stepDefinitions = [
-      { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Step 1: Schedule Details" control={control} watch={watch} session={session} /> },
+      { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Step 1: Schedule Details" control={control} watch={watch} /> },
       { label: 'Task', element: <TaskForm key="Task" title="Step 2: Task Details" control={control} watch={watch} errors={errors} session={session} /> },
       { label: 'Review', element: <ReviewForm key="Review" watch={watch} /> },
     ];

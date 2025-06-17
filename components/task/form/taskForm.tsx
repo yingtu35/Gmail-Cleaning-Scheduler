@@ -5,6 +5,8 @@ import { type Session } from "next-auth";
 import Link from "next/link";
 
  import { FormValues } from "@/types/task";
+ import { SubscriptionStatus } from "@/types/subscription";
+ import { MembershipTierName } from "@/types/membershipTier";
  import { Button } from "@/components/ui/button";
 
  import { FormWrapper } from "./wrapper/formWrapper"
@@ -25,11 +27,10 @@ export function TaskForm({
   errors,
   session,
 }: TaskFormProps) {
-  const { user } = session;
-  const { subscriptionDetails } = user;
+  const { user: { subscriptionDetails } } = session;
   const tierDetails = subscriptionDetails?.tierDetails;
-  const isPro = tierDetails?.name === "pro";
-  const isSubscriptionActive = subscriptionDetails?.status === "active";
+  const isPro = tierDetails?.name === MembershipTierName.PRO;
+  const isSubscriptionActive = subscriptionDetails?.status === SubscriptionStatus.ACTIVE;
 
   const shouldShowProFilters = isPro && isSubscriptionActive;
   return (
