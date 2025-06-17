@@ -1,4 +1,5 @@
 import { SubscriptionsTable } from '@/models/schema';
+import { TierDetails } from './membershipTier';
 
 export type Subscription = typeof SubscriptionsTable.$inferSelect;
 
@@ -10,4 +11,12 @@ export enum SubscriptionStatus {
   PAST_DUE = 'past_due',
   UNPAID = 'unpaid',
   CANCELED = 'canceled',
+}
+
+export type SubscriptionDetails = Pick<Subscription, 
+  'status'   |
+  'cancelAt' |
+  'canceledAt'
+> & {
+  tierDetails: TierDetails;
 }
