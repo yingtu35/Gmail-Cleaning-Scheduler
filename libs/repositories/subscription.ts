@@ -41,4 +41,4 @@ export async function deleteSubscription(subscriptionId: string): Promise<Subscr
       .where(eq(SubscriptionsTable.subscriptionId, subscriptionId))
       .returning();
     return result[0] ?? null;
-} 
+}

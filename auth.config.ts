@@ -12,6 +12,8 @@ import { getSubscriptionDetails } from "./actions/subscription";
 const SIGN_IN_PATH = "/";
 const publicPaths = [SIGN_IN_PATH];
 
+const REVALIDATE_INTERVAL = 5 * 60 * 1000; // 5 minutes in ms
+
 export const autoConfig = {
   providers: [
     // Set scope to repo to access user's private repositories
@@ -32,29 +34,43 @@ export const autoConfig = {
   },
   callbacks: {
     async jwt({ token, user, account }) {
-      // Initial sign-in
-      if (account && user) {
-        // log.debug("JWT callback: Initial sign-in", { userEmail: user.email });
+      // Initial sign-in: Set user-specific token properties
+      if (account && user && user.email) {
         token.accessToken = account.access_token;
-        token.expiresAt = account.expires_at; // This is usually a timestamp in seconds
+        token.expiresAt = account.expires_at;
         token.email = user.email;
         token.name = user.name;
         token.image = user.image;
 
-        if (user.email) {
-          const userIdRecord = await getUserInfoByEmail(user.email);
-          if (userIdRecord && userIdRecord.id) {
-            token.userId = userIdRecord.id;
-            log.debug("JWT callback: userId added to token during initial sign-in", { userId: userIdRecord.id });
-            token.subscriptionDetails = await getSubscriptionDetails(token.userId);
-            log.debug("JWT callback: subscription details added to token during initial sign-in", { subscriptionDetails: token.subscriptionDetails });
-          } else {
-            log.error("JWT callback: Could not find user ID for email during initial sign-in", { email: user.email });
-            return { ...token, error: "UserIDMissingError" }; 
-          }
+        const userInfo = await getUserInfoByEmail(user.email);
+        if (userInfo?.id) {
+          token.userId = userInfo.id;
+        } else {
+          log.error("JWT callback: Could not find user ID for email during initial sign-in", { email: user.email });
+          return { ...token, error: "UserIDMissingError" }; 
         }
-        return token;
+        // Fetch subscription details and set timestamp on initial sign-in
+        token.subscriptionDetails = await getSubscriptionDetails(token.userId);
+        token.subscriptionCheckedAt = Date.now();
       }
+
+      // On every JWT evaluation, check if the subscription needs to be updated based on time interval.
+      const now = Date.now();
+      const shouldRefetch =
+        !token.subscriptionDetails ||
+        !token.subscriptionCheckedAt ||
+        now - (token.subscriptionCheckedAt as number) > REVALIDATE_INTERVAL;
+
+      if (shouldRefetch && token.userId) {
+        try {
+          token.subscriptionDetails = await getSubscriptionDetails(token.userId as string);
+          token.subscriptionCheckedAt = now;
+        } catch (error) {
+          log.error("JWT callback: Failed to refresh subscription details", { userId: token.userId, error });
+          token.subscriptionDetails = null;
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
@@ -72,8 +88,9 @@ export const autoConfig = {
       }
       if (token.subscriptionDetails) {
         session.user.subscriptionDetails = token.subscriptionDetails;
+      } else {
+        session.user.subscriptionDetails = null;
       }
-      log.debug("Session callback: updated session subscription details", { subscriptionDetails: session.user.subscriptionDetails });
       return session;
     },
     /* Use the signIn() callback to control if a user is allowed to sign in. */

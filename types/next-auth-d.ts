@@ -23,6 +23,7 @@ declare module "next-auth/jwt" {
     accessToken?: string;
     expiresAt?: number;
     subscriptionDetails?: SubscriptionDetails | null;
+    subscriptionCheckedAt?: number;
     // We don't store refreshToken in JWT for security, but if you had other custom fields:
     // customField?: string;
   }
