@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { type Session } from 'next-auth';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/utils/cn';
@@ -34,7 +35,6 @@ import { ScheduleForm } from './scheduleForm';
 import { TaskForm } from './taskForm';
 import { ReviewForm } from './reviewForm';
 import useMultiStepForm from './hooks/useMultiStepForm';
-
 interface FormControlGroupProps {
   isFirstStep: boolean;
   isLastStep: boolean;
@@ -136,11 +136,13 @@ const FormControlGroup = ({
 interface CreateFormProps {
   formValues: FormValues;
   resetTemplate: () => void;
+  session: Session;
 }
 
 const CreateForm = ({
   formValues,
-  resetTemplate
+  resetTemplate,
+  session,
 }: CreateFormProps) => {
   const router = useRouter();
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
@@ -154,8 +156,8 @@ const CreateForm = ({
   
   // define steps with labels and components
   const stepDefinitions = [
-    { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Step 1: Schedule Details" control={control} watch={watch} /> },
-    { label: 'Task', element: <TaskForm key="Task" title="Step 2: Task Details" control={control} watch={watch} errors={errors} /> },
+    { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Step 1: Schedule Details" control={control} watch={watch} session={session} /> },
+    { label: 'Task', element: <TaskForm key="Task" title="Step 2: Task Details" control={control} watch={watch} errors={errors} session={session} /> },
     { label: 'Review', element: <ReviewForm key="Review" watch={watch} /> },
   ];
   const stepConfigs: StepConfig[] = stepDefinitions.map(d => ({ label: d.label }));

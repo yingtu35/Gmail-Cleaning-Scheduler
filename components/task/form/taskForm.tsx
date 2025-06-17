@@ -1,61 +1,21 @@
 'use client'
 
 import { Control, UseFormWatch, FieldErrors, FieldError } from "react-hook-form";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { type Session } from "next-auth";
+import Link from "next/link";
 
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { MultiSelect } from "@/components/ui/multi-select";
-import { InputTags } from "@/components/ui/input-tags";
-import { 
-  EMAIL_IS_OPTIONS,
-  HAS_OPTIONS,
-  CATEGORY_OPTIONS,
-  EMAIL_IN_OPTIONS,
- } from "@/components/task/form/constants/formValues";
- import {
-  SIZE_COMPARISON_ENUM,
-  SIZE_UNIT_ENUM,
-  AGE_COMPARISON_ENUM,
-  AGE_UNIT_ENUM,
-  TIME_COMPARISON_ENUM,
- } from "@/validations/form";
  import { FormValues } from "@/types/task";
- import { cn } from "@/utils/cn";
+ import { Button } from "@/components/ui/button";
 
- import { SectionWrapper } from "./wrapper/sectionWrapper";
  import { FormWrapper } from "./wrapper/formWrapper"
 import { BasicFiltersSection } from "./sections/BasicFiltersSection";
 import { ProFiltersSection } from "./sections/ProFiltersSection";
-
 interface TaskFormProps {
   title: string;
   control: Control<FormValues>;
   watch: UseFormWatch<FormValues>;
   errors: FieldErrors<FormValues> & { _taskConditions?: FieldError };
+  session: Session;
 }
 
 export function TaskForm({
@@ -63,7 +23,15 @@ export function TaskForm({
   control,
   watch,
   errors,
+  session,
 }: TaskFormProps) {
+  const { user } = session;
+  const { subscriptionDetails } = user;
+  const tierDetails = subscriptionDetails?.tierDetails;
+  const isPro = tierDetails?.name === "pro";
+  const isSubscriptionActive = subscriptionDetails?.status === "active";
+
+  const shouldShowProFilters = isPro && isSubscriptionActive;
   return (
     <FormWrapper title={title}>
       {errors._taskConditions && (
@@ -72,7 +40,25 @@ export function TaskForm({
         </div>
       )}
       <BasicFiltersSection control={control} watch={watch} errors={errors} />
-      <ProFiltersSection control={control} watch={watch} errors={errors} />
+      <div className="relative">
+        <div className={
+          shouldShowProFilters
+            ? ''
+            : 'blur-sm pointer-events-none select-none'
+        }>
+          <ProFiltersSection control={control} watch={watch} errors={errors} />
+        </div>
+        {!shouldShowProFilters && (
+          <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10 rounded">
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-gray-500 font-semibold">Upgrade to Pro to unlock more filters</span>
+              <Link href="/pricing">
+                <Button>Upgrade</Button>
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
     </FormWrapper>
   );
 }

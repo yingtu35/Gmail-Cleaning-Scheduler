@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { type Session } from 'next-auth';
 
 import { cn } from '@/utils/cn';
 import {
@@ -135,7 +136,13 @@ const FormControlGroup = ({
   )
 }
 
-const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
+  interface EditFormProps {
+  task: FormValues;
+  taskId: string;
+  session: Session;
+}
+
+const EditForm = ({ task, taskId, session }: EditFormProps) => {
   const router = useRouter();
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   
@@ -147,8 +154,8 @@ const EditForm = ({ task, taskId }: { task: FormValues, taskId: string }) => {
   const { handleSubmit, control, watch, formState: { errors }, trigger } = form;
 
   const stepDefinitions = [
-      { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Step 1: Schedule Details" control={control} watch={watch} /> },
-      { label: 'Task', element: <TaskForm key="Task" title="Step 2: Task Details" control={control} watch={watch} errors={errors} /> },
+      { label: 'Schedule', element: <ScheduleForm key="Schedule" title="Step 1: Schedule Details" control={control} watch={watch} session={session} /> },
+      { label: 'Task', element: <TaskForm key="Task" title="Step 2: Task Details" control={control} watch={watch} errors={errors} session={session} /> },
       { label: 'Review', element: <ReviewForm key="Review" watch={watch} /> },
     ];
 
