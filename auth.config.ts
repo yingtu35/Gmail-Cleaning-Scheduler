@@ -42,16 +42,21 @@ export const autoConfig = {
         token.name = user.name;
         token.image = user.image;
 
-        const userInfo = await getUserInfoByEmail(user.email);
-        if (userInfo?.id) {
-          token.userId = userInfo.id;
-        } else {
-          log.error("JWT callback: Could not find user ID for email during initial sign-in", { email: user.email });
-          return { ...token, error: "UserIDMissingError" }; 
+        try {
+          const userInfo = await getUserInfoByEmail(user.email);
+          if (userInfo?.id) {
+            token.userId = userInfo.id;
+          } else {
+            log.error("JWT callback: Could not find user ID for email during initial sign-in", { email: user.email });
+            return { ...token, error: "UserIDMissingError" }; 
+          }
+          // Fetch subscription details and set timestamp on initial sign-in
+          token.subscriptionDetails = await getSubscriptionDetails(token.userId);
+          token.subscriptionCheckedAt = Date.now();
+        } catch (error) {
+          log.error("JWT callback: Failed to fetch initial subscription details", { userId: token.userId, error });
+          token.subscriptionDetails = null;
         }
-        // Fetch subscription details and set timestamp on initial sign-in
-        token.subscriptionDetails = await getSubscriptionDetails(token.userId);
-        token.subscriptionCheckedAt = Date.now();
       }
 
       // On every JWT evaluation, check if the subscription needs to be updated based on time interval.
