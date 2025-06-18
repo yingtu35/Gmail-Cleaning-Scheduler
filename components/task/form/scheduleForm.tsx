@@ -36,7 +36,6 @@ import { FormValues } from "@/types/task";
 import { SectionWrapper } from "./wrapper/sectionWrapper";
 import { FormWrapper } from "./wrapper/formWrapper"
 
-
 interface ScheduleFormProps {
   title: string;
   control: Control<FormValues>;

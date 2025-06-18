@@ -240,7 +240,7 @@ export const formValuesSchema = z.object({
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["_taskConditions"], // Use a virtual path for the error
-      message: "At least one filter condition (e.g., From, To, Size, etc.) must be enabled",
+      message: "At least one filter condition (e.g., From, Title, etc.) must be enabled",
     });
   }
 });
