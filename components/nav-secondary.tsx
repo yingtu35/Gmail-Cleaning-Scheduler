@@ -32,17 +32,16 @@ export const NavSecondary = ({
     isBasicOnly?: boolean
   }[]
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) => {
-  const { subscriptionDetails } = user || {};
-  const { tierDetails } = subscriptionDetails || {};
-  const isBasicTier = tierDetails?.name === MembershipTierName.BASIC;
+  const tierDetails = user?.subscriptionDetails?.tierDetails;  
+  const isBasicTier = !tierDetails || tierDetails?.name === MembershipTierName.BASIC;
+
+  const filteredItems = items.filter((item) => !item.isBasicOnly || isBasicTier);
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          {items.map((item) => {
-            if (item.isBasicOnly && !isBasicTier) return null;
-            return (
-              <SidebarMenuItem key={item.title}>
+          {filteredItems.map((item) => (
+            <SidebarMenuItem key={item.title}>
                 <Link href={item.href} target={item.target || '_self'} rel={item.rel || undefined}>
                   <SidebarMenuButton className={cn('py-4', item.rightIcon && 'justify-between')}>
                     <div className="flex items-center gap-2">
@@ -53,8 +52,7 @@ export const NavSecondary = ({
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
-            );
-          })}
+          ))}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
