@@ -1,7 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ExternalLink } from 'lucide-react';
+import { User } from 'next-auth';
+import { ExternalLink, CreditCard } from 'lucide-react';
 
 import logo from '@/public/logo.svg';
 import {
@@ -22,7 +23,7 @@ import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from '@/components/nav-secondary';
 import { NavUser } from '@/components/nav-user';
 
-import { User } from 'next-auth';
+import { SubscriptionDetails } from '@/types/subscription';
 
 const navItems = [
   { title: 'Home',
@@ -36,6 +37,11 @@ const navItems = [
 ];
 
 const navSecondary = [
+  { title: 'Upgrade to Pro', 
+    href: '/pricing',
+    icon: CreditCard,
+    isBasicOnly: true,
+  },
   { title: 'Settings', 
     href: '/',
     icon: SettingsIcon, 
@@ -61,6 +67,7 @@ export async function AppSidebar({
 }: {
   user: ({
     id?: string;
+    subscriptionDetails?: SubscriptionDetails | null;
 } & User) | null,
   className?: string,
 }) {
@@ -82,7 +89,7 @@ export async function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navItems} />
-        <NavSecondary items={navSecondary} className="mt-auto" />
+        <NavSecondary user={user} items={navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />
